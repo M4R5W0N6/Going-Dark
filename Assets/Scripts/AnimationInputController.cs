@@ -51,6 +51,11 @@ public class AnimationInputController : PlayerInputListener
         animationController.SetFloat("VerAimAngle", currentLook.y);
     }
 
+    private float CalculateYaw()
+    {
+        return Vector3.Angle(PlayerData.LocalPlayer.Direction, PlayerData.LocalPlayer.Rotation);
+    }
+
     protected override void OnMove(InputAction.CallbackContext context)
     {
         if (context.performed)

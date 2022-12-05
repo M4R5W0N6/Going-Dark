@@ -4,7 +4,8 @@ using UnityEngine;
 
 public static class CustomUtilities
 {
-    public static readonly float DefaultDistance = 100f;
+    public static readonly float DefaultScalarDistance = 100f;
+    public static readonly float DefaultRaycastThreshold = 0.1f;
 
     public static Vector3 GetScreenPosition(Vector3 worldspace)
     {

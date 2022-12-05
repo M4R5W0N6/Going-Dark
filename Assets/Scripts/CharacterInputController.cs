@@ -42,20 +42,22 @@ public class CharacterInputController : PlayerInputListener
         currentPitch += currentLook.y * pitchSpeed;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
         origin.localRotation = Quaternion.Euler(currentPitch, Mathf.Lerp(currentLook.x * turnSpeed, 0f, Time.fixedDeltaTime* lerpSpeed), 0f);
-        target.position = origin.forward * CustomUtilities.DefaultDistance;
+        target.position = origin.forward * CustomUtilities.DefaultScalarDistance;
 
-        // raycast
+        // setup raycast
         int layerMask = 1 << LayerMask.NameToLayer("Player");
         layerMask = ~layerMask;
 
         Vector3 forward = Vector3.Normalize(target.position - Camera.main.transform.position);
 
+        // check if camera has line of sight to reticle
         RaycastHit screenHit;
         if (!Physics.Raycast(Camera.main.transform.position, forward, out screenHit, Mathf.Infinity, layerMask))
         {
-            screenHit.point = Camera.main.transform.position + forward * CustomUtilities.DefaultDistance;
+            screenHit.point = Camera.main.transform.position + forward * CustomUtilities.DefaultScalarDistance;
         }
 
+        // check if origin has line of sight
         forward = Vector3.Normalize(screenHit.point - origin.position);
 
         RaycastHit muzzleHit;
@@ -66,12 +68,13 @@ public class CharacterInputController : PlayerInputListener
 
         hitTarget.position = muzzleHit.point;
 
+
         // set player data
         PlayerData.LocalPlayer.Position = transform.position;
         PlayerData.LocalPlayer.Rotation = new Vector3(currentPitch, transform.rotation.y, 0f); // lean roll?
-        PlayerData.LocalPlayer.Direction = forward;
+        PlayerData.LocalPlayer.Direction = transform.TransformDirection(forward);
         PlayerData.LocalPlayer.OriginPosition = origin.position;
-        PlayerData.LocalPlayer.IsOnTarget = Vector3.Distance(screenHit.point, muzzleHit.point) < 10f;
+        PlayerData.LocalPlayer.IsOnTarget = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4)
         PlayerData.LocalPlayer.TargetPosition = screenHit.point;
         PlayerData.LocalPlayer.RaycastPosition = muzzleHit.point;
     }

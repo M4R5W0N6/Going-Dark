@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2161.04, g: 2265.7598, b: 3289.629, a: 1}
+  m_IndirectSpecularColor: {r: 2160.247, g: 2264.334, b: 3287.8672, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -745,7 +745,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1709946009}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &193025630
 CapsuleCollider:
@@ -861,7 +861,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 229008443}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -886,7 +886,7 @@ MonoBehaviour:
         weight: 0
     m_Offset: {x: 10.5, y: 3.5, z: -5.25}
     m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MaxLimit: 125
     m_AimAxis: 2
     m_UpAxis: 4
     m_WorldUpType: 0
@@ -897,6 +897,54 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!1 &229008442
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 229008443}
+  - component: {fileID: 229008444}
+  m_Layer: 6
+  m_Name: LookAtTarget (Raycast) (IK)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &229008443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229008442}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: 250}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1709946009}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &229008444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229008442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f192acff27711f4bbdcc6b02dda0fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  origin: {fileID: 19726826}
+  target: {fileID: 309488152}
+  lerpSpeed: 10
+  radius: 97.5
 --- !u!4 &261442878 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3874562540096589828, guid: f6f6c0f2680a556449b9fc72636def5e, type: 3}
@@ -2004,7 +2052,7 @@ Transform:
   - {fileID: 2042598095}
   - {fileID: 1126174652}
   m_Father: {fileID: 1709946009}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &688950804
 MonoBehaviour:
@@ -2226,7 +2274,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 229008443}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -2251,7 +2299,7 @@ MonoBehaviour:
         weight: 0
     m_Offset: {x: 0, y: 60, z: 0}
     m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MaxLimit: 100
     m_AimAxis: 4
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -3075,12 +3123,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: f6f6c0f2680a556449b9fc72636def5e, type: 3}
       propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'hand_r'\n\tTransform 'head'\n\tTransform
-        'lowerarm_r'\n\tTransform 'spine_02'\n\tTransform 'spine_01'\n\tTransform
-        'upperarm_l'\n\tTransform 'lowerarm_l'\n\tTransform 'neck_01'\n\tTransform
-        'hand_l'\n\tTransform 'hand_r'\n\tand more ..."
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: f6f6c0f2680a556449b9fc72636def5e, type: 3}
       propertyPath: m_ApplyRootMotion
@@ -3207,7 +3250,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 229008443}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -3232,7 +3275,7 @@ MonoBehaviour:
         weight: 0
     m_Offset: {x: -75, y: -5, z: 15}
     m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MaxLimit: 165
     m_AimAxis: 2
     m_UpAxis: 4
     m_WorldUpType: 0
