@@ -1,5 +1,44 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!206 &-9055128634811847651
+BlendTree:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: StrafeRt45
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400008, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400008, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0.5
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400008, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  m_BlendParameter: WeaponNumber
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 1
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!1101 &-9015946454226446175
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -229,6 +268,45 @@ AnimatorStateTransition:
   m_InterruptionSource: 1
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!206 &-5981533436637886035
+BlendTree:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RunRt45
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400004, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400004, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0.5
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400004, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  m_BlendParameter: WeaponNumber
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 1
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!206 &-5682205786929392979
 BlendTree:
   m_ObjectHideFlags: 1
@@ -516,6 +594,45 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!206 &-3524814884238948629
+BlendTree:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RunLt135
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400006, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400006, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0.5
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400006, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  m_BlendParameter: WeaponNumber
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 1
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!1101 &-3373458050916375457
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1021,7 +1138,7 @@ AnimatorController:
     m_Behaviours: []
     m_BlendingMode: 1
     m_SyncedLayerIndex: -1
-    m_DefaultWeight: 1
+    m_DefaultWeight: 0
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
@@ -2724,7 +2841,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20618101}
-    m_Threshold: 0.14285715
+    m_Threshold: 0.1168254
     m_Position: {x: 0, y: -0.2}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -2732,7 +2849,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20638487}
-    m_Threshold: 0.21428573
+    m_Threshold: 0.16222224
     m_Position: {x: -0.2, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -2740,7 +2857,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20641467}
-    m_Threshold: 0.2857143
+    m_Threshold: 0.20761904
     m_Position: {x: 0.2, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -2748,7 +2865,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20646044}
-    m_Threshold: 0.35714287
+    m_Threshold: 0.25301588
     m_Position: {x: -0.15, y: 0.15}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -2756,7 +2873,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20629488}
-    m_Threshold: 0.42857143
+    m_Threshold: 0.2984127
     m_Position: {x: 0.15, y: -0.15}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -2764,56 +2881,88 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20679094}
-    m_Threshold: 0.5
-    m_Position: {x: 0, y: 0.9}
+    m_Threshold: 0.34380952
+    m_Position: {x: 0, y: 0.45}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20639593}
-    m_Threshold: 0.57142854
-    m_Position: {x: 0, y: -0.9}
+    m_Threshold: 0.38920635
+    m_Position: {x: 0, y: -0.45}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20627002}
-    m_Threshold: 0.6428572
-    m_Position: {x: -0.9, y: 0}
+    m_Threshold: 0.43460318
+    m_Position: {x: -0.45, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20632617}
-    m_Threshold: 0.71428573
-    m_Position: {x: 0.9, y: 0}
+    m_Threshold: 0.48000002
+    m_Position: {x: 0.45, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20605855}
-    m_Threshold: 0.7857143
-    m_Position: {x: -0.7, y: 0.7}
+    m_Threshold: 0.5253968
+    m_Position: {x: -0.35, y: 0.35}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 20629601}
-    m_Threshold: 0.85714287
-    m_Position: {x: 0.7, y: -0.7}
+    m_Threshold: 0.5707937
+    m_Position: {x: 0.35, y: -0.35}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: 
     m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 3391282738744850776}
+    m_Threshold: 0.6161905
+    m_Position: {x: -0.15, y: -0.15}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: -9055128634811847651}
+    m_Threshold: 0.6615873
+    m_Position: {x: 0.15, y: 0.15}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: -3524814884238948629}
+    m_Threshold: 0.70698416
+    m_Position: {x: -0.39, y: -0.35}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: -5981533436637886035}
+    m_Threshold: 0.75238097
+    m_Position: {x: 0.35, y: 0.35}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
   m_BlendParameter: Horizontal
   m_BlendParameterY: Vertical
   m_MinThreshold: 0.071428575
-  m_MaxThreshold: 0.85714287
+  m_MaxThreshold: 0.75238097
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 3
@@ -5051,9 +5200,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.093626395
+  m_TransitionDuration: 0.09362639
   m_TransitionOffset: 0
-  m_ExitTime: 0.9063736
+  m_ExitTime: 0.7698612
   m_HasExitTime: 1
   m_HasFixedDuration: 0
   m_InterruptionSource: 0
@@ -5385,7 +5534,10 @@ AnimatorStateTransition:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_Conditions: []
+  m_Conditions:
+  - m_ConditionMode: 3
+    m_ConditionEvent: InputMagnitude
+    m_EventTreshold: 0.1
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 110245038}
   m_Solo: 0
@@ -7822,6 +7974,45 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!206 &3391282738744850776
+BlendTree:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: StrafeLt135
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400002, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400002, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 0.5
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400002, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+    m_Threshold: 1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: InputAngle
+    m_Mirror: 0
+  m_BlendParameter: WeaponNumber
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 1
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!206 &3561921145847614147
 BlendTree:
   m_ObjectHideFlags: 1

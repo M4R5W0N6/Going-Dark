@@ -1,8 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
+using RootMotion.FinalIK;
 
 [RequireComponent(typeof(Animator))]
 public class AnimationInputController : PlayerInputListener
@@ -11,19 +11,23 @@ public class AnimationInputController : PlayerInputListener
     private Vector2 currentMove, currentMoveGoal;
     private Vector2 currentLook, currentLookGoal;
 
-    private Rig aimingRig;
-    private float rigBlendGoal;
+    //private Rig aimingRig;
+    //private float rigBlendGoal;
+
+    private FullBodyBipedIK fullBodyIK;
 
     [SerializeField]
     private float   lerpSpeed = 2.5f, 
                     walkSpeed = 0.2f,
                     sprintSpeed = 1f;
 
+    private float blendGoal, blendValue;
+
     private void Awake()
     {
         TryGetComponent(out animationController);
-
-        aimingRig = GetComponentInChildren<Rig>();
+        TryGetComponent(out fullBodyIK);
+        //aimingRig = GetComponentInChildren<Rig>();
     }
 
     protected override void Update()
@@ -33,8 +37,19 @@ public class AnimationInputController : PlayerInputListener
         currentMove = Vector2.Lerp(currentMove, currentMoveGoal * (isSprinting ? sprintSpeed : walkSpeed), Time.deltaTime * lerpSpeed);
         currentLook = Vector2.Lerp(currentLook, currentLookGoal, Time.deltaTime * lerpSpeed);
 
-        rigBlendGoal = animationController.GetBool("IsReload") ? 0f : 1f;
-        aimingRig.weight = Mathf.Lerp(aimingRig.weight, rigBlendGoal, Time.deltaTime * lerpSpeed);
+        //rigBlendGoal = animationController.GetBool("IsReload") ? 0f : 1f;
+
+        blendGoal = animationController.GetBool("IsReload") ? 0f : 1f;
+        blendValue = Mathf.Lerp(blendValue, blendGoal, Time.deltaTime * lerpSpeed);
+
+        fullBodyIK.solver.bodyEffector.positionWeight = blendValue * 0.01f;
+        fullBodyIK.solver.leftHandEffector.positionWeight = blendValue;
+        fullBodyIK.solver.leftHandEffector.rotationWeight = blendValue;
+        fullBodyIK.solver.leftArmChain.pull = blendValue;
+        fullBodyIK.solver.leftArmChain.bendConstraint.weight = blendValue;
+        fullBodyIK.solver.leftArmMapping.weight = blendValue;
+
+        //aimingRig.weight = Mathf.Lerp(aimingRig.weight, rigBlendGoal, Time.deltaTime * lerpSpeed);
     }
 
     private void FixedUpdate()

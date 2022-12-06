@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
 public class CharacterInputController : PlayerInputListener
 {
-    private Vector3 currentMove, currentMoveGoal;
-    private Vector2 currentLook, currentLookGoal;
-    private float currentPitch = 0f;
+    [SerializeField]
+    private Transform origin, target, hitTarget;
 
     [SerializeField]
     private float   lerpSpeed = 10f, 
@@ -17,10 +17,16 @@ public class CharacterInputController : PlayerInputListener
     [SerializeField]
     private float pitchMin = -30f, pitchMax = 30f;
 
+    private Vector3 currentMove, currentMoveGoal;
+    private Vector2 currentLook, currentLookGoal;
+    private float currentPitch;
 
-    [SerializeField]
-    private Transform origin, target, hitTarget;
+    private Rigidbody rigidbody;
 
+    private void Awake()
+    {
+        TryGetComponent(out rigidbody);
+    }
 
     protected override void Update()
     {
@@ -33,8 +39,11 @@ public class CharacterInputController : PlayerInputListener
     private void FixedUpdate()
     {
         // move (xz) self
-        transform.Translate(currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f), Space.Self);
-        
+        Vector3 move = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
+        move = Camera.main.transform.TransformDirection(move);
+        rigidbody.AddForce(move);
+        //transform.Translate(currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f), Space.Self);
+
         // turn (yaw) self
         transform.Rotate(Vector3.up, currentLook.x * turnSpeed, Space.Self);
 
