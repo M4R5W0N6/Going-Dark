@@ -3,22 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Services.Core;
 
 public class GameSettings : MonoBehaviour
 {
-    private async void Awake()
-    {
-        try
-        {
-            await UnityServices.InitializeAsync();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-    }
-
     private void OnApplicationFocus(bool focus)
     {
         Cursor.lockState = CursorLockMode.Confined;
