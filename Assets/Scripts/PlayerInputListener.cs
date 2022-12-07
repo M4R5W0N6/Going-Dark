@@ -5,8 +5,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputListener : MonoBehaviour
 {
-    protected bool isSprinting;
-
     private PlayerInput playerInput;
     public PlayerInput PlayerInput {
 
@@ -95,17 +93,7 @@ public class PlayerInputListener : MonoBehaviour
     protected virtual void OnReload(InputAction.CallbackContext context) { }
     protected virtual void OnAim(InputAction.CallbackContext context) { }
     protected virtual void OnLean(InputAction.CallbackContext context) { }
-    protected virtual void OnSprint(InputAction.CallbackContext context) 
-    { 
-        if (context.performed)
-        {
-            isSprinting = true;
-        }
-        else if (context.canceled)
-        {
-            isSprinting = false;
-        }
-    }
+    protected virtual void OnSprint(InputAction.CallbackContext context) { }
     protected virtual void OnEscape(InputAction.CallbackContext context) { }
 
 }

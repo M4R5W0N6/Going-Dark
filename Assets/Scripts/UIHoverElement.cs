@@ -39,22 +39,33 @@ public class UIHoverElement : MonoBehaviour
             case TrackedObjectType.NONE:
                 break;
             case TrackedObjectType.PLAYER_ORIGIN:
-                trackedPosition = PlayerData.LocalPlayer.OriginPosition;
+                if (PlayerData.LocalPlayer)
+                    trackedPosition = PlayerData.LocalPlayer.OriginPosition.Value;
                 break;
             case TrackedObjectType.PLAYER_TARGET:
-                isActive = PlayerData.LocalPlayer.IsOnTarget;
-                trackedPosition = PlayerData.LocalPlayer.TargetPosition;
+                if (PlayerData.LocalPlayer)
+                {
+                    isActive = PlayerData.LocalPlayer.IsOnTarget.Value;
+                    trackedPosition = PlayerData.LocalPlayer.TargetPosition.Value;
+                }
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
-                isActive = !PlayerData.LocalPlayer.IsOnTarget;
-                trackedPosition = PlayerData.LocalPlayer.RaycastPosition;
+                if (PlayerData.LocalPlayer)
+                {
+                    isActive = !PlayerData.LocalPlayer.IsOnTarget.Value;
+                    trackedPosition = PlayerData.LocalPlayer.RaycastPosition.Value;
+                }
                 break;
             default:
                 break;
         }
-        trackedPosition = CustomUtilities.GetScreenPosition(trackedPosition);
 
-        transform.position = Vector3.Lerp(transform.position, trackedPosition, Time.fixedDeltaTime * moveSpeed);
+        if (isActive)
+        {
+            trackedPosition = CustomUtilities.GetScreenPosition(trackedPosition);
+
+            transform.position = Vector3.Lerp(transform.position, trackedPosition, Time.fixedDeltaTime * moveSpeed);
+        }
 
         imageComponent.color = Color.Lerp(imageComponent.color, isActive ? activeColor : inactiveColor, Time.fixedDeltaTime * colorSpeed);
     }

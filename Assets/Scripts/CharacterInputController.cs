@@ -1,12 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(NetworkObject))]
 public class CharacterInputController : PlayerInputListener
 {
-    [SerializeField]
-    private Transform origin, target, hitTarget;
-
     [SerializeField]
     private float   lerpSpeed = 10f, 
                     moveSpeed = 0.025f, 
@@ -16,48 +14,63 @@ public class CharacterInputController : PlayerInputListener
 
     [SerializeField]
     private float pitchMin = -30f, pitchMax = 30f;
+    [SerializeField]
+    private Transform pitchOrigin;
 
-    private Vector3 currentMove, currentMoveGoal;
+    private Vector2 currentMove, currentMoveGoal;
     private Vector2 currentLook, currentLookGoal;
     private float currentPitch;
 
+    private bool isSprinting;
+
     private Rigidbody rigidbody;
+    private NetworkObject networkObject;
+    private PlayerData playerData;
 
     private void Awake()
     {
         TryGetComponent(out rigidbody);
+        TryGetComponent(out networkObject);
+        TryGetComponent(out playerData);
+    }
+
+    private void Start()
+    {
+        NetworkEventManager.PlayerSpawnServerRpc(playerData.OwnerClientId);
     }
 
     protected override void Update()
     {
         base.Update();
 
-        currentMove = Vector3.Lerp(currentMove, currentMoveGoal, Time.deltaTime * lerpSpeed);
+        if (!PlayerData.LocalPlayer)
+            return;
+
+        currentMove = Vector2.Lerp(currentMove, currentMoveGoal, Time.deltaTime * lerpSpeed);
         currentLook = Vector2.Lerp(currentLook, currentLookGoal, Time.deltaTime * lerpSpeed);
     }
 
     private void FixedUpdate()
     {
-        // move (xz) self
-        Vector3 move = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
-        move = Camera.main.transform.TransformDirection(move);
-        rigidbody.AddForce(move);
-        //transform.Translate(currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f), Space.Self);
+        if (!PlayerData.LocalPlayer)
+            return;
 
-        // turn (yaw) self
-        transform.Rotate(Vector3.up, currentLook.x * turnSpeed, Space.Self);
+        if (!networkObject.IsLocalPlayer)
+            return;
 
-        // turn (pitch) origin
+        playerData.Move.Value = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
+        //playerData.Move.Value = Camera.main.transform.TransformDirection(playerData.Move.Value);
+
         currentPitch += currentLook.y * pitchSpeed;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
-        origin.localRotation = Quaternion.Euler(currentPitch, Mathf.Lerp(currentLook.x * turnSpeed, 0f, Time.fixedDeltaTime* lerpSpeed), 0f);
-        target.position = origin.forward * CustomUtilities.DefaultScalarDistance;
+
+        playerData.Turn.Value = new Vector2(currentPitch, currentLook.x);
 
         // setup raycast
         int layerMask = 1 << LayerMask.NameToLayer("Player");
         layerMask = ~layerMask;
 
-        Vector3 forward = Vector3.Normalize(target.position - Camera.main.transform.position);
+        Vector3 forward = Vector3.Normalize(pitchOrigin.forward * CustomUtilities.DefaultScalarDistance - Camera.main.transform.position);
 
         // check if camera has line of sight to reticle
         RaycastHit screenHit;
@@ -67,32 +80,34 @@ public class CharacterInputController : PlayerInputListener
         }
 
         // check if origin has line of sight
-        forward = Vector3.Normalize(screenHit.point - origin.position);
+        forward = Vector3.Normalize(screenHit.point - pitchOrigin.position);
 
         RaycastHit muzzleHit;
-        if (!Physics.Raycast(origin.position, forward, out muzzleHit, Mathf.Infinity, layerMask))
+        if (!Physics.Raycast(pitchOrigin.position, forward, out muzzleHit, Mathf.Infinity, layerMask))
         {
             muzzleHit.point = screenHit.point;
         }
 
-        hitTarget.position = muzzleHit.point;
+        playerData.OriginPosition.Value = pitchOrigin.position;
+        playerData.TargetPosition.Value = screenHit.point;
+        playerData.RaycastPosition.Value = muzzleHit.point;
+        playerData.IsOnTarget.Value = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
 
+        rigidbody.AddRelativeForce(playerData.Move.Value.x, 0f, playerData.Move.Value.y);
 
-        // set player data
-        PlayerData.LocalPlayer.Position = transform.position;
-        PlayerData.LocalPlayer.Rotation = new Vector3(currentPitch, transform.rotation.y, 0f); // lean roll?
-        PlayerData.LocalPlayer.Direction = transform.TransformDirection(forward);
-        PlayerData.LocalPlayer.OriginPosition = origin.position;
-        PlayerData.LocalPlayer.IsOnTarget = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4)
-        PlayerData.LocalPlayer.TargetPosition = screenHit.point;
-        PlayerData.LocalPlayer.RaycastPosition = muzzleHit.point;
+        transform.Rotate(Vector3.up, playerData.Turn.Value.y * turnSpeed, Space.Self);
+
+        pitchOrigin.localRotation = Quaternion.Euler(playerData.Turn.Value.x, 0f, 0f);
     }
 
     protected override void OnMove(InputAction.CallbackContext context)
     {
+        if (!playerData.IsLocalPlayer)
+            return;
+
         if (context.performed)
         {
-            currentMoveGoal = new Vector3(context.ReadValue<Vector2>().x, 0f, context.ReadValue<Vector2>().y);
+            currentMoveGoal = context.ReadValue<Vector2>();
         }
         else if (context.canceled)
         {
@@ -101,6 +116,9 @@ public class CharacterInputController : PlayerInputListener
     }
     protected override void OnLook(InputAction.CallbackContext context)
     {
+        if (!playerData.IsLocalPlayer)
+            return;
+
         if (context.performed)
         {
             currentLookGoal = context.ReadValue<Vector2>();
@@ -110,9 +128,26 @@ public class CharacterInputController : PlayerInputListener
             currentLookGoal = Vector2.zero;
         }
     }
+    protected override void OnSprint(InputAction.CallbackContext context)
+    {
+        if (!playerData.IsLocalPlayer)
+            return;
+
+        if (context.performed)
+        {
+            isSprinting = true;
+        }
+        else if (context.canceled)
+        {
+            isSprinting = false;
+        }
+    }
 
     protected override void OnLean(InputAction.CallbackContext context)
     {
+        if (!playerData.IsLocalPlayer)
+            return;
+
         if (context.performed)
         {
             //transform.localScale = new Vector3(Mathf.Sign(context.ReadValue<float>()) * 1f, 1f, 1f);

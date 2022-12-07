@@ -19,4 +19,12 @@ public static class CustomUtilities
 
         return RectTransformUtility.WorldToScreenPoint(Camera.main, worldspace);
     }
+
+    public static Vector3 GetFlattenedWorldPosition(Vector3 worldspace)
+    {
+        Vector3 screenPos = GetScreenPosition(worldspace);
+        screenPos.z = DefaultScalarDistance;
+        
+        return Camera.main.ScreenToWorldPoint(screenPos);
+    }
 }
