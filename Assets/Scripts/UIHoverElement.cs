@@ -40,20 +40,20 @@ public class UIHoverElement : MonoBehaviour
                 break;
             case TrackedObjectType.PLAYER_ORIGIN:
                 if (PlayerData.LocalPlayer)
-                    trackedPosition = PlayerData.LocalPlayer.OriginPosition.Value;
+                    trackedPosition = PlayerData.LocalPlayer.OriginPosition;
                 break;
             case TrackedObjectType.PLAYER_TARGET:
                 if (PlayerData.LocalPlayer)
                 {
-                    isActive = PlayerData.LocalPlayer.IsOnTarget.Value;
-                    trackedPosition = PlayerData.LocalPlayer.TargetPosition.Value;
+                    isActive = PlayerData.LocalPlayer.IsOnTarget;
+                    trackedPosition = PlayerData.LocalPlayer.TargetPosition;
                 }
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
                 if (PlayerData.LocalPlayer)
                 {
-                    isActive = !PlayerData.LocalPlayer.IsOnTarget.Value;
-                    trackedPosition = PlayerData.LocalPlayer.RaycastPosition.Value;
+                    isActive = !PlayerData.LocalPlayer.IsOnTarget;
+                    trackedPosition = PlayerData.LocalPlayer.RaycastPosition;
                 }
                 break;
             default:

@@ -44,19 +44,19 @@ public class TrackedObjectFollower : MonoBehaviour
             case TrackedObjectType.PLAYER_ORIGIN:
                 if (!currentPlayer) return;
 
-                trackedPosition = currentPlayer.OriginPosition.Value;
+                trackedPosition = currentPlayer.OriginPosition;
 
                 break;
             case TrackedObjectType.PLAYER_TARGET:
                 if (!currentPlayer) return;
 
-                trackedPosition = CustomUtilities.GetFlattenedWorldPosition(currentPlayer.TargetPosition.Value);
+                trackedPosition = CustomUtilities.GetFlattenedWorldPosition(currentPlayer.TargetPosition);
 
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
                 if (!currentPlayer) return;
 
-                trackedPosition = CustomUtilities.GetFlattenedWorldPosition(currentPlayer.RaycastPosition.Value);
+                trackedPosition = CustomUtilities.GetFlattenedWorldPosition(currentPlayer.RaycastPosition);
 
                 break;
             default:

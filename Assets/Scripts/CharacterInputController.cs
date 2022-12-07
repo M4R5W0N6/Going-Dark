@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody), typeof(NetworkObject))]
-public class CharacterInputController : PlayerInputListener
+public class CharacterInputController : NetworkBehaviour
 {
     [SerializeField]
     private float   lerpSpeed = 10f, 
@@ -39,10 +39,8 @@ public class CharacterInputController : PlayerInputListener
         NetworkEventManager.PlayerSpawnServerRpc(playerData.OwnerClientId);
     }
 
-    protected override void Update()
+    private void Update()
     {
-        base.Update();
-
         if (!PlayerData.LocalPlayer)
             return;
 
@@ -56,15 +54,25 @@ public class CharacterInputController : PlayerInputListener
             return;
 
         if (!networkObject.IsLocalPlayer)
-            return;
+        {
+            if (LayerMask.LayerToName(gameObject.layer) == "Player")
+                CustomUtilities.SetLayerRecursively(gameObject, "Default");
 
-        playerData.Move.Value = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
+            return;
+        }
+        else
+        {
+            if (LayerMask.LayerToName(gameObject.layer) != "Player")
+                CustomUtilities.SetLayerRecursively(gameObject, "Player");
+        }
+
+        playerData.Move = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
         //playerData.Move.Value = Camera.main.transform.TransformDirection(playerData.Move.Value);
 
         currentPitch += currentLook.y * pitchSpeed;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
 
-        playerData.Turn.Value = new Vector2(currentPitch, currentLook.x);
+        playerData.Turn = new Vector2(currentPitch, currentLook.x);
 
         // setup raycast
         int layerMask = 1 << LayerMask.NameToLayer("Player");
@@ -88,19 +96,19 @@ public class CharacterInputController : PlayerInputListener
             muzzleHit.point = screenHit.point;
         }
 
-        playerData.OriginPosition.Value = pitchOrigin.position;
-        playerData.TargetPosition.Value = screenHit.point;
-        playerData.RaycastPosition.Value = muzzleHit.point;
-        playerData.IsOnTarget.Value = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
+        playerData.OriginPosition = pitchOrigin.position;
+        playerData.TargetPosition = screenHit.point;
+        playerData.RaycastPosition = muzzleHit.point;
+        playerData.IsOnTarget = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
 
-        rigidbody.AddRelativeForce(playerData.Move.Value.x, 0f, playerData.Move.Value.y);
+        rigidbody.AddRelativeForce(playerData.Move.x, 0f, playerData.Move.y);
 
-        transform.Rotate(Vector3.up, playerData.Turn.Value.y * turnSpeed, Space.Self);
+        transform.Rotate(Vector3.up, playerData.Turn.y * turnSpeed, Space.Self);
 
-        pitchOrigin.localRotation = Quaternion.Euler(playerData.Turn.Value.x, 0f, 0f);
+        pitchOrigin.localRotation = Quaternion.Euler(playerData.Turn.x, 0f, 0f);
     }
 
-    protected override void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext context)
     {
         if (!playerData.IsLocalPlayer)
             return;
@@ -114,7 +122,7 @@ public class CharacterInputController : PlayerInputListener
             currentMoveGoal = Vector2.zero;
         }
     }
-    protected override void OnLook(InputAction.CallbackContext context)
+    public void OnLook(InputAction.CallbackContext context)
     {
         if (!playerData.IsLocalPlayer)
             return;
@@ -128,7 +136,7 @@ public class CharacterInputController : PlayerInputListener
             currentLookGoal = Vector2.zero;
         }
     }
-    protected override void OnSprint(InputAction.CallbackContext context)
+    public void OnSprint(InputAction.CallbackContext context)
     {
         if (!playerData.IsLocalPlayer)
             return;
@@ -140,17 +148,6 @@ public class CharacterInputController : PlayerInputListener
         else if (context.canceled)
         {
             isSprinting = false;
-        }
-    }
-
-    protected override void OnLean(InputAction.CallbackContext context)
-    {
-        if (!playerData.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            //transform.localScale = new Vector3(Mathf.Sign(context.ReadValue<float>()) * 1f, 1f, 1f);
         }
     }
 }

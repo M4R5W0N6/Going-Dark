@@ -27,4 +27,23 @@ public static class CustomUtilities
         
         return Camera.main.ScreenToWorldPoint(screenPos);
     }
+
+    public static void SetLayerRecursively(GameObject obj, string layerName)
+    {
+        if (null == obj)
+        {
+            return;
+        }
+
+        obj.layer = LayerMask.NameToLayer(layerName);
+
+        foreach (Transform child in obj.transform)
+        {
+            if (null == child)
+            {
+                continue;
+            }
+            SetLayerRecursively(child.gameObject, layerName);
+        }
+    }
 }

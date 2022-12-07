@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using UnityEngine.Events;
+
 public class PlayerInputListener : MonoBehaviour
 {
     private PlayerInput playerInput;
@@ -19,7 +21,7 @@ public class PlayerInputListener : MonoBehaviour
             InitPlayerInput();
         }
     }
-    protected virtual void Update()
+    private void Update()
     {
         if (!PlayerInput)
             PlayerInput = FindObjectOfType<PlayerInput>();
@@ -27,73 +29,75 @@ public class PlayerInputListener : MonoBehaviour
 
     private void InitPlayerInput()
     {
-        PlayerInput.actions["Move"].started += OnMove;
-        PlayerInput.actions["Look"].started += OnLook;
-        PlayerInput.actions["Fire"].started += OnFire;
-        PlayerInput.actions["Reload"].started += OnReload;
-        PlayerInput.actions["Aim"].started += OnAim;
-        PlayerInput.actions["Lean"].started += OnLean;
-        PlayerInput.actions["Sprint"].started += OnSprint;
-        PlayerInput.actions["Escape"].started += OnEscape;
+        PlayerInput.actions["Move"].started += OnMove.Invoke;
+        PlayerInput.actions["Look"].started += OnLook.Invoke;
+        PlayerInput.actions["Fire"].started += OnFire.Invoke;
+        PlayerInput.actions["Reload"].started += OnReload.Invoke;
+        PlayerInput.actions["Aim"].started += OnAim.Invoke;
+        PlayerInput.actions["Lean"].started += OnLean.Invoke;
+        PlayerInput.actions["Sprint"].started += OnSprint.Invoke;
+        PlayerInput.actions["Escape"].started += OnEscape.Invoke;
 
-        PlayerInput.actions["Move"].performed += OnMove;
-        PlayerInput.actions["Look"].performed += OnLook;
-        PlayerInput.actions["Fire"].performed += OnFire;
-        PlayerInput.actions["Reload"].performed += OnReload;
-        PlayerInput.actions["Aim"].performed += OnAim;
-        PlayerInput.actions["Lean"].performed += OnLean;
-        PlayerInput.actions["Sprint"].performed += OnSprint;
-        PlayerInput.actions["Escape"].performed += OnEscape;
+        PlayerInput.actions["Move"].performed += OnMove.Invoke;
+        PlayerInput.actions["Look"].performed += OnLook.Invoke;
+        PlayerInput.actions["Fire"].performed += OnFire.Invoke;
+        PlayerInput.actions["Reload"].performed += OnReload.Invoke;
+        PlayerInput.actions["Aim"].performed += OnAim.Invoke;
+        PlayerInput.actions["Lean"].performed += OnLean.Invoke;
+        PlayerInput.actions["Sprint"].performed += OnSprint.Invoke;
+        PlayerInput.actions["Escape"].performed += OnEscape.Invoke;
 
-        PlayerInput.actions["Move"].canceled += OnMove;
-        PlayerInput.actions["Look"].canceled += OnLook;
-        PlayerInput.actions["Fire"].canceled += OnFire;
-        PlayerInput.actions["Reload"].canceled += OnReload;
-        PlayerInput.actions["Aim"].canceled += OnAim;
-        PlayerInput.actions["Lean"].canceled += OnLean; 
-        PlayerInput.actions["Sprint"].canceled += OnSprint;
-        PlayerInput.actions["Escape"].canceled += OnEscape;
+        PlayerInput.actions["Move"].canceled += OnMove.Invoke;
+        PlayerInput.actions["Look"].canceled += OnLook.Invoke;
+        PlayerInput.actions["Fire"].canceled += OnFire.Invoke;
+        PlayerInput.actions["Reload"].canceled += OnReload.Invoke;
+        PlayerInput.actions["Aim"].canceled += OnAim.Invoke;
+        PlayerInput.actions["Lean"].canceled += OnLean.Invoke; 
+        PlayerInput.actions["Sprint"].canceled += OnSprint.Invoke;
+        PlayerInput.actions["Escape"].canceled += OnEscape.Invoke;
     }
     private void OnDisable()
     {
         if (!PlayerInput)
             return;
 
-        PlayerInput.actions["Move"].started -= OnMove;
-        PlayerInput.actions["Look"].started -= OnLook;
-        PlayerInput.actions["Fire"].started -= OnFire;
-        PlayerInput.actions["Reload"].started -= OnReload;
-        PlayerInput.actions["Aim"].started -= OnAim;
-        PlayerInput.actions["Lean"].started -= OnLean;
-        PlayerInput.actions["Sprint"].started -= OnSprint;
-        PlayerInput.actions["Escape"].started -= OnEscape;
+        PlayerInput.actions["Move"].started -= OnMove.Invoke;
+        PlayerInput.actions["Look"].started -= OnLook.Invoke;
+        PlayerInput.actions["Fire"].started -= OnFire.Invoke;
+        PlayerInput.actions["Reload"].started -= OnReload.Invoke;
+        PlayerInput.actions["Aim"].started -= OnAim.Invoke;
+        PlayerInput.actions["Lean"].started -= OnLean.Invoke;
+        PlayerInput.actions["Sprint"].started -= OnSprint.Invoke;
+        PlayerInput.actions["Escape"].started -= OnEscape.Invoke;
 
-        PlayerInput.actions["Move"].performed -= OnMove;
-        PlayerInput.actions["Look"].performed -= OnLook;
-        PlayerInput.actions["Fire"].performed -= OnFire;
-        PlayerInput.actions["Reload"].performed -= OnReload;
-        PlayerInput.actions["Aim"].performed -= OnAim;
-        PlayerInput.actions["Lean"].performed -= OnLean;
-        PlayerInput.actions["Sprint"].performed -= OnSprint;
-        PlayerInput.actions["Escape"].performed -= OnEscape;
+        PlayerInput.actions["Move"].performed -= OnMove.Invoke;
+        PlayerInput.actions["Look"].performed -= OnLook.Invoke;
+        PlayerInput.actions["Fire"].performed -= OnFire.Invoke;
+        PlayerInput.actions["Reload"].performed -= OnReload.Invoke;
+        PlayerInput.actions["Aim"].performed -= OnAim.Invoke;
+        PlayerInput.actions["Lean"].performed -= OnLean.Invoke;
+        PlayerInput.actions["Sprint"].performed -= OnSprint.Invoke;
+        PlayerInput.actions["Escape"].performed -= OnEscape.Invoke;
 
-        PlayerInput.actions["Move"].canceled -= OnMove;
-        PlayerInput.actions["Look"].canceled -= OnLook;
-        PlayerInput.actions["Fire"].canceled -= OnFire;
-        PlayerInput.actions["Reload"].canceled -= OnReload;
-        PlayerInput.actions["Aim"].canceled -= OnAim;
-        PlayerInput.actions["Lean"].canceled -= OnLean;
-        PlayerInput.actions["Sprint"].canceled -= OnSprint;
-        PlayerInput.actions["Escape"].canceled -= OnEscape;
+        PlayerInput.actions["Move"].canceled -= OnMove.Invoke;
+        PlayerInput.actions["Look"].canceled -= OnLook.Invoke;
+        PlayerInput.actions["Fire"].canceled -= OnFire.Invoke;
+        PlayerInput.actions["Reload"].canceled -= OnReload.Invoke;
+        PlayerInput.actions["Aim"].canceled -= OnAim.Invoke;
+        PlayerInput.actions["Lean"].canceled -= OnLean.Invoke;
+        PlayerInput.actions["Sprint"].canceled -= OnSprint.Invoke;
+        PlayerInput.actions["Escape"].canceled -= OnEscape.Invoke;
     }
 
-    protected virtual void OnMove(InputAction.CallbackContext context) { }
-    protected virtual void OnLook(InputAction.CallbackContext context) { }
-    protected virtual void OnFire(InputAction.CallbackContext context) { }
-    protected virtual void OnReload(InputAction.CallbackContext context) { }
-    protected virtual void OnAim(InputAction.CallbackContext context) { }
-    protected virtual void OnLean(InputAction.CallbackContext context) { }
-    protected virtual void OnSprint(InputAction.CallbackContext context) { }
-    protected virtual void OnEscape(InputAction.CallbackContext context) { }
-
+    public InputEvent OnMove;
+    public InputEvent OnLook;
+    public InputEvent OnFire;
+    public InputEvent OnReload;
+    public InputEvent OnAim;
+    public InputEvent OnLean;
+    public InputEvent OnSprint;
+    public InputEvent OnEscape;
 }
+
+[System.Serializable]
+public class InputEvent : UnityEvent<InputAction.CallbackContext> { }

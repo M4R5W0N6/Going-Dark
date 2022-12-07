@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using Unity.Netcode;
 
-public class CameraInputController : PlayerInputListener
+public class CameraInputController : MonoBehaviour
 {
     [SerializeField]
     private CinemachineVirtualCamera defaultCamera, aimingCamera;
@@ -19,7 +20,7 @@ public class CameraInputController : PlayerInputListener
         aimingFollow = aimingCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
     }
 
-    protected override void OnAim(InputAction.CallbackContext context)
+    public void OnAim(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -32,7 +33,7 @@ public class CameraInputController : PlayerInputListener
             aimingCamera.gameObject.SetActive(false);
         }
     }
-    protected override void OnLean(InputAction.CallbackContext context)
+    public void OnLean(InputAction.CallbackContext context)
     {
         if (context.performed)
         {

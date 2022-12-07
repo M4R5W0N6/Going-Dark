@@ -6,7 +6,7 @@ using RootMotion.FinalIK;
 using Unity.Netcode;
 
 [RequireComponent(typeof(Animator))]
-public class AnimationInputController : PlayerInputListener
+public class AnimationInputController : NetworkBehaviour
 {
     private NetworkObject networkObject;
     private PlayerData playerData;
@@ -44,10 +44,8 @@ public class AnimationInputController : PlayerInputListener
         //aimingRig = GetComponentInChildren<Rig>();
     }
 
-    protected override void Update()
+    private void Update()
     {
-        base.Update();
-
         //if (!PlayerData.LocalPlayer)
         //    return;
 
@@ -74,8 +72,8 @@ public class AnimationInputController : PlayerInputListener
 
     private void FixedUpdate()
     {
-        Vector3 posIK = Vector3.Lerp(playerData.TargetPosition.Value, playerData.RaycastPosition.Value,
-            CustomUtilities.DefaultScalarDistance / Vector3.Distance(playerData.TargetPosition.Value, playerData.RaycastPosition.Value));
+        Vector3 posIK = Vector3.Lerp(playerData.TargetPosition, playerData.RaycastPosition,
+            CustomUtilities.DefaultScalarDistance / Vector3.Distance(playerData.TargetPosition, playerData.RaycastPosition));
         targetIK.position = Vector3.Lerp(targetIK.position, posIK, Time.fixedDeltaTime * lerpSpeed);
 
 
@@ -100,7 +98,7 @@ public class AnimationInputController : PlayerInputListener
     //    return Vector3.Angle(PlayerData.LocalPlayer.Direction.Value, PlayerData.LocalPlayer.Turn.Value);
     //}
 
-    protected override void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext context)
     {
         if (!networkObject.IsLocalPlayer)
             return;
@@ -120,7 +118,7 @@ public class AnimationInputController : PlayerInputListener
             currentMoveGoal = Vector2.zero;
         }
     }
-    protected override void OnLook(InputAction.CallbackContext context)
+    public void OnLook(InputAction.CallbackContext context)
     {
         if (!networkObject.IsLocalPlayer)
             return;
@@ -135,7 +133,7 @@ public class AnimationInputController : PlayerInputListener
             currentLookGoal.x = 0f;
         }
     }
-    protected override void OnFire(InputAction.CallbackContext context)
+    public void OnFire(InputAction.CallbackContext context)
     {
         if (!networkObject.IsLocalPlayer)
             return;
@@ -149,7 +147,7 @@ public class AnimationInputController : PlayerInputListener
             animationController.SetBool("IsShoot", false);
         }
     }
-    protected override void OnSprint(InputAction.CallbackContext context)
+    public void OnSprint(InputAction.CallbackContext context)
     {
         if (!playerData.IsLocalPlayer)
             return;
@@ -163,7 +161,7 @@ public class AnimationInputController : PlayerInputListener
             isSprinting = false;
         }
     }
-    protected override void OnReload(InputAction.CallbackContext context)
+    public void OnReload(InputAction.CallbackContext context)
     {
         if (!networkObject.IsLocalPlayer)
             return;
@@ -175,16 +173,6 @@ public class AnimationInputController : PlayerInputListener
         else if (context.canceled)
         {
             //animationController.SetBool("IsReload", false);
-        }
-    }
-    protected override void OnLean(InputAction.CallbackContext context)
-    {
-        if (!networkObject.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            // set bool to transition to mirrored animation states ?
         }
     }
 
