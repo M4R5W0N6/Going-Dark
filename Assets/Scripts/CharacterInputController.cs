@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 
-[RequireComponent(typeof(Rigidbody), typeof(NetworkObject))]
+[RequireComponent(typeof(Rigidbody), typeof(PlayerData))]
 public class CharacterInputController : NetworkBehaviour
 {
     [SerializeField]
@@ -17,43 +17,36 @@ public class CharacterInputController : NetworkBehaviour
     [SerializeField]
     private Transform pitchOrigin;
 
-    private Vector2 currentMove, currentMoveGoal;
-    private Vector2 currentLook, currentLookGoal;
+    private Vector2 currentMove;
+    private Vector2 currentLook;
     private float currentPitch;
 
-    private bool isSprinting;
-
     private Rigidbody rigidbody;
-    private NetworkObject networkObject;
     private PlayerData playerData;
 
     private void Awake()
     {
         TryGetComponent(out rigidbody);
-        TryGetComponent(out networkObject);
         TryGetComponent(out playerData);
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        NetworkEventManager.PlayerSpawnServerRpc(playerData.OwnerClientId);
+        NetworkEventManager.PlayerSpawnServerRpc(OwnerClientId);
     }
 
     private void Update()
     {
-        if (!PlayerData.LocalPlayer)
+        if (!IsLocalPlayer)
             return;
 
-        currentMove = Vector2.Lerp(currentMove, currentMoveGoal, Time.deltaTime * lerpSpeed);
-        currentLook = Vector2.Lerp(currentLook, currentLookGoal, Time.deltaTime * lerpSpeed);
+        currentMove = Vector2.Lerp(currentMove, playerData.InputMove.Value, Time.deltaTime * lerpSpeed);
+        currentLook = Vector2.Lerp(currentLook, playerData.InputLook.Value, Time.deltaTime * lerpSpeed);
     }
 
     private void FixedUpdate()
     {
-        if (!PlayerData.LocalPlayer)
-            return;
-
-        if (!networkObject.IsLocalPlayer)
+        if (!IsLocalPlayer)
         {
             if (LayerMask.LayerToName(gameObject.layer) == "Player")
                 CustomUtilities.SetLayerRecursively(gameObject, "Default");
@@ -66,25 +59,31 @@ public class CharacterInputController : NetworkBehaviour
                 CustomUtilities.SetLayerRecursively(gameObject, "Player");
         }
 
-        playerData.Move = currentMove * moveSpeed * (isSprinting ? sprintSpeed : 1f);
-        //playerData.Move.Value = Camera.main.transform.TransformDirection(playerData.Move.Value);
+        rigidbody.AddRelativeForce(playerData.CharacterMove.Value.x, 0f, playerData.CharacterMove.Value.y);
+
+        transform.Rotate(Vector3.up, playerData.CharacterTurn.Value.y * turnSpeed, Space.Self);
+
+        pitchOrigin.localRotation = Quaternion.Euler(playerData.CharacterTurn.Value.x, 0f, 0f);
+
+        playerData.CharacterMove.Value = currentMove * moveSpeed * (playerData.InputSprint.Value ? sprintSpeed : 1f);
 
         currentPitch += currentLook.y * pitchSpeed;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
 
-        playerData.Turn = new Vector2(currentPitch, currentLook.x);
+        playerData.CharacterTurn.Value = new Vector2(currentPitch, currentLook.x);
 
         // setup raycast
         int layerMask = 1 << LayerMask.NameToLayer("Player");
         layerMask = ~layerMask;
 
-        Vector3 forward = Vector3.Normalize(pitchOrigin.forward * CustomUtilities.DefaultScalarDistance - Camera.main.transform.position);
+        playerData.CharacterTargetPosition.Value = (pitchOrigin.forward * CustomUtilities.DefaultScalarDistance) + transform.position;
+        Vector3 forward = Vector3.Normalize(playerData.CharacterTargetPosition.Value - playerData.CameraPosition.Value);
 
         // check if camera has line of sight to reticle
         RaycastHit screenHit;
-        if (!Physics.Raycast(Camera.main.transform.position, forward, out screenHit, Mathf.Infinity, layerMask))
+        if (!Physics.Raycast(playerData.CameraPosition.Value, forward, out screenHit, Mathf.Infinity, layerMask))
         {
-            screenHit.point = Camera.main.transform.position + forward * CustomUtilities.DefaultScalarDistance;
+            screenHit.point = playerData.CameraPosition.Value + forward * CustomUtilities.DefaultScalarDistance;
         }
 
         // check if origin has line of sight
@@ -96,58 +95,8 @@ public class CharacterInputController : NetworkBehaviour
             muzzleHit.point = screenHit.point;
         }
 
-        playerData.OriginPosition = pitchOrigin.position;
-        playerData.TargetPosition = screenHit.point;
-        playerData.RaycastPosition = muzzleHit.point;
-        playerData.IsOnTarget = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
-
-        rigidbody.AddRelativeForce(playerData.Move.x, 0f, playerData.Move.y);
-
-        transform.Rotate(Vector3.up, playerData.Turn.y * turnSpeed, Space.Self);
-
-        pitchOrigin.localRotation = Quaternion.Euler(playerData.Turn.x, 0f, 0f);
-    }
-
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (!playerData.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            currentMoveGoal = context.ReadValue<Vector2>();
-        }
-        else if (context.canceled)
-        {
-            currentMoveGoal = Vector2.zero;
-        }
-    }
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        if (!playerData.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            currentLookGoal = context.ReadValue<Vector2>();
-        }
-        else if (context.canceled)
-        {
-            currentLookGoal = Vector2.zero;
-        }
-    }
-    public void OnSprint(InputAction.CallbackContext context)
-    {
-        if (!playerData.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            isSprinting = true;
-        }
-        else if (context.canceled)
-        {
-            isSprinting = false;
-        }
+        playerData.CharacterOriginPosition.Value = pitchOrigin.position;
+        playerData.CharacterRaycastPosition.Value = muzzleHit.point;
+        playerData.CharacterIsOnTarget.Value = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
     }
 }

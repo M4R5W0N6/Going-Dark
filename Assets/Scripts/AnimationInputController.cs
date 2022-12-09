@@ -4,26 +4,23 @@ using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
 using RootMotion.FinalIK;
 using Unity.Netcode;
+using System.Collections;
 
 [RequireComponent(typeof(Animator))]
 public class AnimationInputController : NetworkBehaviour
 {
-    private NetworkObject networkObject;
     private PlayerData playerData;
     private Animator animationController;
-    private Vector2 currentMove, currentMoveGoal;
-    private Vector2 currentLook, currentLookGoal;
-    private bool isSprinting;
-
-    //private Rig aimingRig;
-    //private float rigBlendGoal;
+    private Vector2 currentMove;
+    private Vector2 currentLook;
 
     private FullBodyBipedIK fullBodyIK;
 
     [SerializeField]
     private float   lerpSpeed = 2.5f, 
                     walkSpeed = 0.2f,
-                    sprintSpeed = 1f;
+                    sprintSpeed = 1f,
+                    ikSpeed = 25f;
 
     [SerializeField]
     private Transform targetIK;
@@ -35,30 +32,18 @@ public class AnimationInputController : NetworkBehaviour
         TryGetComponent(out animationController);
         TryGetComponent(out fullBodyIK);
 
-        networkObject = GetComponentInParent<NetworkObject>();
         playerData = GetComponentInParent<PlayerData>();
 
-        if (!networkObject || !playerData)
+        if (!playerData)
             enabled = false;
-
-        //aimingRig = GetComponentInChildren<Rig>();
     }
 
     private void Update()
     {
-        //if (!PlayerData.LocalPlayer)
-        //    return;
+        // Do IK locally
+        blendGoal = playerData.CharacterIsReloading.Value ? 0f : 1f;
+        blendValue = Mathf.Lerp(blendValue, blendGoal, Time.deltaTime * ikSpeed);
 
-        //if (!networkObject.IsLocalPlayer)
-        //    return;
-
-        currentMove = Vector2.Lerp(currentMove, currentMoveGoal * (isSprinting ? sprintSpeed : walkSpeed), Time.deltaTime * lerpSpeed);
-        currentLook = Vector2.Lerp(currentLook, currentLookGoal, Time.deltaTime * lerpSpeed);
-
-        //rigBlendGoal = animationController.GetBool("IsReload") ? 0f : 1f;
-
-        blendGoal = animationController.GetBool("IsReload") ? 0f : 1f;
-        blendValue = Mathf.Lerp(blendValue, blendGoal, Time.deltaTime * lerpSpeed);
 
         fullBodyIK.solver.bodyEffector.positionWeight = blendValue * 0.01f;
         fullBodyIK.solver.leftHandEffector.positionWeight = blendValue;
@@ -67,117 +52,65 @@ public class AnimationInputController : NetworkBehaviour
         fullBodyIK.solver.leftArmChain.bendConstraint.weight = blendValue;
         fullBodyIK.solver.leftArmMapping.weight = blendValue;
 
-        //aimingRig.weight = Mathf.Lerp(aimingRig.weight, rigBlendGoal, Time.deltaTime * lerpSpeed);
+        if (!IsLocalPlayer)
+            return;
+
+        Vector2 inputLook = playerData.InputLook.Value;
+        inputLook.x *= 55f;
+        inputLook.y *= -25f;
+
+        currentMove = Vector2.Lerp(currentMove, playerData.InputMove.Value * (playerData.InputSprint.Value ? sprintSpeed : walkSpeed), Time.deltaTime * lerpSpeed);
+        currentLook = Vector2.Lerp(currentLook, inputLook, Time.deltaTime * lerpSpeed);
     }
 
     private void FixedUpdate()
     {
-        Vector3 posIK = Vector3.Lerp(playerData.TargetPosition, playerData.RaycastPosition,
-            CustomUtilities.DefaultScalarDistance / Vector3.Distance(playerData.TargetPosition, playerData.RaycastPosition));
-        targetIK.position = Vector3.Lerp(targetIK.position, posIK, Time.fixedDeltaTime * lerpSpeed);
+        // Do IK locally
+        Vector3 posIK = Vector3.Lerp(playerData.CharacterTargetPosition.Value, playerData.CharacterRaycastPosition.Value,
+            CustomUtilities.DefaultScalarDistance / Vector3.Distance(playerData.CharacterTargetPosition.Value, playerData.CharacterRaycastPosition.Value));
+        targetIK.position = Vector3.Lerp(targetIK.position, posIK, Time.fixedDeltaTime * ikSpeed);
 
 
-        if (!networkObject.IsLocalPlayer)
+        if (!IsLocalPlayer)
             return;
-
 
         animationController.SetFloat("Horizontal", currentMove.x);
         animationController.SetFloat("Vertical", currentMove.y);
 
-        animationController.SetFloat("InputMagnitude", currentMoveGoal.magnitude);
+        animationController.SetFloat("InputMagnitude", playerData.InputMove.Value.magnitude);
 
-        animationController.SetFloat("WalkStartAngle", GetAngleFromVector(currentMoveGoal));
-        animationController.SetFloat("WalkStopAngle", GetAngleFromVector(currentMove));
+        animationController.SetFloat("WalkStartAngle", CustomUtilities.GetAngleFromVector(playerData.InputMove.Value));
+        animationController.SetFloat("WalkStopAngle", CustomUtilities.GetAngleFromVector(currentMove));
 
         animationController.SetFloat("HorAimAngle", currentLook.x);
         animationController.SetFloat("VerAimAngle", currentLook.y);
-    }
 
-    //private float CalculateYaw()
-    //{
-    //    return Vector3.Angle(PlayerData.LocalPlayer.Direction.Value, PlayerData.LocalPlayer.Turn.Value);
-    //}
-
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (!networkObject.IsLocalPlayer)
-            return;
-
-        if (context.performed)
+        if (playerData.InputMove.Value.magnitude > 0f)
         {
             animationController.SetBool("IsStopRU", false);
             animationController.SetBool("IsStopLU", false);
-
-            currentMoveGoal = context.ReadValue<Vector2>();
         }
-        else if(context.canceled)
+        else
         {
             animationController.SetBool("IsStopRU", animationController.GetFloat("IsRU") > 0f);
             animationController.SetBool("IsStopLU", animationController.GetFloat("IsRU") <= 0f);
-
-            currentMoveGoal = Vector2.zero;
         }
+
+        animationController.SetBool("IsShoot", playerData.InputFire.Value);
+        animationController.SetBool("IsReload", playerData.CharacterIsReloading.Value);
     }
-    public void OnLook(InputAction.CallbackContext context)
+    public void OnReload()
     {
-        if (!networkObject.IsLocalPlayer)
-            return;
+        playerData.CharacterIsReloading.Value = true;
 
-        if (context.performed)
-        {
-            currentLookGoal.x = context.ReadValue<Vector2>().x * 55f;
-            currentLookGoal.y = context.ReadValue<Vector2>().y * -25f;
-        }
-        else if (context.canceled)
-        {
-            currentLookGoal.x = 0f;
-        }
+        animationController.SetBool("IsReload", playerData.CharacterIsReloading.Value);
+
+        StartCoroutine(WaitForReloadFinish());
     }
-    public void OnFire(InputAction.CallbackContext context)
+    private IEnumerator WaitForReloadFinish()
     {
-        if (!networkObject.IsLocalPlayer)
-            return;
+        yield return new WaitUntil(() => animationController.GetBool("IsReload") == false);
 
-        if (context.performed)
-        {
-            animationController.SetBool("IsShoot", true);
-        }
-        else if (context.canceled)
-        {
-            animationController.SetBool("IsShoot", false);
-        }
-    }
-    public void OnSprint(InputAction.CallbackContext context)
-    {
-        if (!playerData.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            isSprinting = true;
-        }
-        else if (context.canceled)
-        {
-            isSprinting = false;
-        }
-    }
-    public void OnReload(InputAction.CallbackContext context)
-    {
-        if (!networkObject.IsLocalPlayer)
-            return;
-
-        if (context.performed)
-        {
-            animationController.SetBool("IsReload", true);
-        }
-        else if (context.canceled)
-        {
-            //animationController.SetBool("IsReload", false);
-        }
-    }
-
-    public static float GetAngleFromVector(Vector2 vector)
-    {
-        return Mathf.Abs(Mathf.Atan2(vector.x, vector.y) * Mathf.Rad2Deg) * Mathf.Sign(vector.x);
+        playerData.CharacterIsReloading.Value = false;
     }
 }

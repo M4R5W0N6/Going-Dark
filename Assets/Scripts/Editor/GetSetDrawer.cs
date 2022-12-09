@@ -32,6 +32,8 @@ sealed class GetSetDrawer : PropertyDrawer
 
             attribute.dirty = false;
         }
+
+        GUI.enabled = true;
     }
 
     public static object GetParentObject(string path, object obj)

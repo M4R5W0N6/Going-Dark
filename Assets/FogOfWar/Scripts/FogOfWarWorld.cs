@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine.Profiling;
 #endif
 
@@ -45,6 +46,9 @@ namespace FOW
 
         public Texture2D fogTexture;
         public Vector2 fogTextureTiling = Vector2.one;
+
+        public bool useWorldBounds;
+        public Bounds worldBounds = new Bounds(Vector3.zero, Vector3.one);
 
         [Range(0.001f, 1f)]
         public float SightExtraAmount = .01f;
@@ -536,6 +540,28 @@ namespace FOW
         {
             "XZ", "XY", "ZY"
         };
+        private BoxBoundsHandle m_BoundsHandle = new BoxBoundsHandle();
+        void OnSceneGUI()
+        {
+            FogOfWarWorld fow = (FogOfWarWorld)target;
+            if (fow.useWorldBounds)
+            {
+                m_BoundsHandle.center = fow.worldBounds.center;
+                m_BoundsHandle.size = fow.worldBounds.size;
+
+                EditorGUI.BeginChangeCheck();
+                m_BoundsHandle.DrawHandle();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(fow, "Change Bounds");
+
+                    Bounds newBounds = new Bounds();
+                    newBounds.center = m_BoundsHandle.center;
+                    newBounds.size = m_BoundsHandle.size;
+                    fow.worldBounds = newBounds;
+                }
+            }
+        }
         public override void OnInspectorGUI()
         {
             //DrawDefaultInspector();
@@ -741,7 +767,7 @@ namespace FOW
                     fow.updateFogConfiguration();
                 }
             }
-
+            
             float oldExtraSightAmount = fow.SightExtraAmount;
             float newExtraSightAmount = EditorGUILayout.Slider("Extra Sight Distance: ", oldExtraSightAmount, 0, 1);
             if (oldExtraSightAmount != newExtraSightAmount)
@@ -750,6 +776,18 @@ namespace FOW
                 Undo.RegisterCompleteObjectUndo(fow, "Change FOW parameters");
                 fow.updateFogConfiguration();
             }
+
+            //sneak peak for a future update ;)
+            bool useWorldBounds = fow.useWorldBounds;
+            //bool newUseBounds = EditorGUILayout.Toggle("Use World Bounds?", useWorldBounds);
+            bool newUseBounds = false;
+            if (useWorldBounds != newUseBounds)
+            {
+                fow.useWorldBounds = newUseBounds;
+                Undo.RegisterCompleteObjectUndo(fow, "Change FOW parameters");
+                fow.updateFogConfiguration();
+            }
+            
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.Space();

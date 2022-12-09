@@ -20,25 +20,19 @@ public class CameraInputController : MonoBehaviour
         aimingFollow = aimingCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
     }
 
-    public void OnAim(InputAction.CallbackContext context)
+    public void OnAim()
     {
-        if (context.performed)
-        {
-            defaultCamera.gameObject.SetActive(false);
-            aimingCamera.gameObject.SetActive(true);
-        }
-        else if (context.canceled)
-        {
-            defaultCamera.gameObject.SetActive(true);
-            aimingCamera.gameObject.SetActive(false);
-        }
+        defaultCamera.gameObject.SetActive(false);
+        aimingCamera.gameObject.SetActive(true);
     }
-    public void OnLean(InputAction.CallbackContext context)
+    public void OnAimEnd()
     {
-        if (context.performed)
-        {
-            leanAmount = context.ReadValue<float>() * 0.5f + 0.5f;
-        }
+        defaultCamera.gameObject.SetActive(true);
+        aimingCamera.gameObject.SetActive(false);
+    }
+    public void OnLean(float value)
+    {
+        leanAmount = value;
     }
 
     private void FixedUpdate()

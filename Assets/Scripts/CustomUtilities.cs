@@ -46,4 +46,9 @@ public static class CustomUtilities
             SetLayerRecursively(child.gameObject, layerName);
         }
     }
+
+    public static float GetAngleFromVector(Vector2 vector)
+    {
+        return Mathf.Abs(Mathf.Atan2(vector.x, vector.y) * Mathf.Rad2Deg) * Mathf.Sign(vector.x);
+    }
 }

@@ -190,6 +190,8 @@ namespace FOW
 		{
 			FogOfWarHider hiderInQuestion;
 			float distToHider;
+			float heightDist = 0;
+			Vector3 eyePos = getEyePos();
 			float sightDist = viewRadius;
 			if (revealHidersInFadeOutZone && FogOfWarWorld.instance.usingBlur)
 				sightDist += FogOfWarWorld.instance.softenDistance;
@@ -198,20 +200,27 @@ namespace FOW
 				hiderInQuestion = FogOfWarWorld.hiders[i];
 				bool seen = false;
 				Transform samplePoint;
-				float minDistToHider = distBetweenVectors(hiderInQuestion.transform.position, getEyePos()) - hiderInQuestion.maxDistBetweenPoints;
+				float minDistToHider = distBetweenVectors(hiderInQuestion.transform.position, eyePos) - hiderInQuestion.maxDistBetweenPoints;
 				if (minDistToHider < unobscuredRadius || (minDistToHider < sightDist))
 				{
 					for (int j = 0; j < hiderInQuestion.samplePoints.Length; j++)
 					{
 						samplePoint = hiderInQuestion.samplePoints[j];
-						distToHider = distBetweenVectors(samplePoint.position, getEyePos());
-                        if (distToHider < unobscuredRadius || (distToHider < sightDist && Mathf.Abs(AngleBetweenVector2(samplePoint.position - getEyePos(), getForward())) < viewAngle / 2))
+
+						distToHider = distBetweenVectors(samplePoint.position, eyePos);
+						switch(FogOfWarWorld.instance.gamePlane)
+                        {
+							case FogOfWarWorld.GamePlane.XZ: heightDist = Mathf.Abs(eyePos.y - samplePoint.position.y); break;
+							case FogOfWarWorld.GamePlane.XY: heightDist = Mathf.Abs(eyePos.z - samplePoint.position.z); break;
+							case FogOfWarWorld.GamePlane.ZY: heightDist = Mathf.Abs(eyePos.x - samplePoint.position.x); break;
+                        }
+                        if ((distToHider < unobscuredRadius || (distToHider < sightDist && Mathf.Abs(AngleBetweenVector2(samplePoint.position - eyePos, getForward())) < viewAngle / 2)) && heightDist < visionHeight)
 						{
 							//hiderPosition.x = samplePoint.position.x;
 							//hiderPosition.y = getEyePos().y;
 							//hiderPosition.z = samplePoint.position.z;
 							setHiderPosition(samplePoint.position);
-							if (!Physics.Raycast(getEyePos(), hiderPosition - getEyePos(), distToHider, obstacleMask))
+							if (!Physics.Raycast(eyePos, hiderPosition - eyePos, distToHider, obstacleMask))
 							{
 								seen = true;
 								break;

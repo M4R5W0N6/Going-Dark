@@ -2644,6 +2644,10 @@ MonoBehaviour:
   blurSamples: 6
   fogTexture: {fileID: 2800000, guid: e47f79b3449108f4fbb12890e55f5d70, type: 3}
   fogTextureTiling: {x: 0.1, y: 0.1}
+  useWorldBounds: 1
+  worldBounds:
+    m_Center: {x: 0.99283123, y: 0, z: 0.61159897}
+    m_Extent: {x: 14.2050085, y: 0.5, z: 17.05222}
   SightExtraAmount: 0.01
   revealerMode: 0
   numRevealersPerFrame: 3

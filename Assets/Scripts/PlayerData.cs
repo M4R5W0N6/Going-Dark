@@ -28,33 +28,63 @@ public class PlayerData : NetworkBehaviour
         }
     }
 
-    [SerializeField, GetSet("Move")]
-    private Vector2 move;
-    public Vector2 Move { get { return NetworkMove.Value; } set { move = value; if (NetworkObject.IsLocalPlayer) NetworkMove.Value = value; } }
-    private NetworkVariable<Vector2> NetworkMove = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // force to apply to player character
+    private void Update()
+    {
+        if (IsOwner)
+        {
+            CameraPosition.Value = Camera.main.transform.position;
+        }
+    }
 
-    [SerializeField, GetSet("Turn")]
-    private Vector2 turn;
-    public Vector2 Turn { get { return NetworkTurn.Value; } set { turn = value; if (NetworkObject.IsLocalPlayer) NetworkTurn.Value = value; } }
-    private NetworkVariable<Vector2> NetworkTurn = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // how much the player is rotated (origin.pitch, character.yaw)
+    /// Misc Data (from owning client)
+    #region MiscData
+    [Header("Misc Data")]
+    public NetworkVariable<Vector3> CameraPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // where the player's local camera instance is (in worldspace)
+    #endregion
 
-    [SerializeField, GetSet("Origin Position")]
-    private Vector3 originPosition;
-    public Vector3 OriginPosition { get { return NetworkOriginPosition.Value; } set { originPosition = value; if (NetworkObject.IsLocalPlayer) NetworkOriginPosition.Value = value; } }
-    private NetworkVariable<Vector3> NetworkOriginPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);  // where the player's raycast is determined from
+    /// Input Data (from owning client)
+    #region InputData
+    [Header("Input Data")]
+    public NetworkVariable<Vector2> InputMove = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInputMove(Vector2 value) { InputMove.Value = value; }
 
-    [SerializeField, GetSet("Is On Target")]
-    private bool isOnTarget;
-    public bool IsOnTarget { get { return NetworkIsOnTarget.Value; } set { isOnTarget = value; if (NetworkObject.IsLocalPlayer) NetworkIsOnTarget.Value = value; } }
-    private NetworkVariable<bool> NetworkIsOnTarget = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // whether the player is going to shoot where they're aiming
+    public NetworkVariable<Vector2> InputLook = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInputLook(Vector2 value) { InputLook.Value = value; }
 
-    [SerializeField, GetSet("Target Position")]
-    private Vector3 targetPosition;
-    public Vector3 TargetPosition { get { return NetworkTargetPosition.Value; } set { targetPosition = value; if (NetworkObject.IsLocalPlayer) NetworkTargetPosition.Value = value; } }
-    private NetworkVariable<Vector3> NetworkTargetPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // where the player is aiming (in worldspace)
+    public NetworkVariable<bool> InputFire = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInput_IsFiring() { InputFire.Value = true; }
+    public void SetInput_IsNotFiring() { InputFire.Value = false; }
 
-    [SerializeField, GetSet("Raycast Position")]
-    private Vector3 raycastPosition;
-    public Vector3 RaycastPosition { get { return NetworkRaycastPosition.Value; } set { raycastPosition = value; if (NetworkObject.IsLocalPlayer) NetworkRaycastPosition.Value = value; } }
-    private NetworkVariable<Vector3> NetworkRaycastPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // where the player is going to shoot (in worldspace)
+    public NetworkVariable<bool> InputReload = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInput_IsReloading() { InputReload.Value = true; }
+    public void SetInput_IsNotReloading() { InputReload.Value = false; }
+
+    public NetworkVariable<bool> InputAim = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInput_IsAiming() { InputAim.Value = true; }
+    public void SetInput_IsNotAiming() { InputAim.Value = false; }
+
+    public NetworkVariable<float> InputLean = new NetworkVariable<float>(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInput_Lean(float value) { InputLean.Value = value; }
+
+    public NetworkVariable<bool> InputSprint = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public void SetInput_IsSprinting() { InputSprint.Value = true; }
+    public void SetInput_IsNotSprinting() { InputSprint.Value = false; }
+
+    //[SerializeField, GetSet("Escape")]
+    //private bool inputEscape;
+    //public bool InputEscape { get { return NetworkInputEscape.Value; } set { inputEscape = value; if (NetworkObject.IsLocalPlayer) NetworkInputEscape.Value = value; } }
+    //private NetworkVariable<bool> NetworkInputEscape = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    #endregion
+
+    /// Character Data (from owning client -- should be server for authoritative schema)
+    #region CharacterData
+    [Header("Character Data")]
+    public NetworkVariable<Vector2> CharacterMove = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // force to apply to player character
+    public NetworkVariable<Vector2> CharacterTurn = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // how much the player is rotated (origin.pitch, character.yaw)
+    public NetworkVariable<Vector3> CharacterOriginPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);  // where the player's raycast is determined from
+    public NetworkVariable<Vector3> CharacterTargetPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // where the player is aiming (in worldspace)
+    public NetworkVariable<Vector3> CharacterRaycastPosition = new NetworkVariable<Vector3>(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // where the player is going to shoot (in worldspace)
+    public NetworkVariable<bool> CharacterIsOnTarget = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // whether the player is going to shoot where they're aiming
+    public NetworkVariable<bool> CharacterIsReloading = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // if the player is done reloading (in worldspace)
+    #endregion
 }
