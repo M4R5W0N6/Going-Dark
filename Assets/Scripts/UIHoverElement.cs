@@ -39,21 +39,21 @@ public class UIHoverElement : MonoBehaviour
             case TrackedObjectType.NONE:
                 break;
             case TrackedObjectType.PLAYER_ORIGIN:
-                if (PlayerData.LocalPlayer)
-                    trackedPosition = PlayerData.LocalPlayer.CharacterOriginPosition.Value;
+                if (PlayerData.OwnerPlayer)
+                    trackedPosition = PlayerData.OwnerPlayer.CharacterOriginPosition.Value;
                 break;
             case TrackedObjectType.PLAYER_TARGET:
-                if (PlayerData.LocalPlayer)
+                if (PlayerData.OwnerPlayer)
                 {
-                    isActive = PlayerData.LocalPlayer.CharacterIsOnTarget.Value;
-                    trackedPosition = PlayerData.LocalPlayer.CharacterTargetPosition.Value;
+                    isActive = GameManager.IsInRound && PlayerData.OwnerPlayer.CharacterIsOnTarget.Value;
+                    trackedPosition = PlayerData.OwnerPlayer.CharacterTargetPosition.Value;
                 }
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
-                if (PlayerData.LocalPlayer)
+                if (PlayerData.OwnerPlayer)
                 {
-                    isActive = !PlayerData.LocalPlayer.CharacterIsOnTarget.Value;
-                    trackedPosition = PlayerData.LocalPlayer.CharacterRaycastPosition.Value;
+                    isActive = GameManager.IsInRound && !PlayerData.OwnerPlayer.CharacterIsOnTarget.Value;
+                    trackedPosition = PlayerData.OwnerPlayer.CharacterRaycastPosition.Value;
                 }
                 break;
             default:

@@ -5,10 +5,10 @@ using UnityEngine.InputSystem;
 using Cinemachine;
 using Unity.Netcode;
 
-public class CameraInputController : MonoBehaviour
+public class CameraInputController : NetworkEventListener_MonoBehaviour
 {
     [SerializeField]
-    private CinemachineVirtualCamera defaultCamera, aimingCamera;
+    private CinemachineVirtualCamera menuCamera, defaultCamera, aimingCamera;
     private Cinemachine3rdPersonFollow defaultFollow, aimingFollow;
     private float leanAmount = 1f;
     [SerializeField]
@@ -18,26 +18,56 @@ public class CameraInputController : MonoBehaviour
     {
         defaultFollow = defaultCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
         aimingFollow = aimingCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-    }
 
-    public void OnAim()
-    {
-        defaultCamera.gameObject.SetActive(false);
-        aimingCamera.gameObject.SetActive(true);
-    }
-    public void OnAimEnd()
-    {
-        defaultCamera.gameObject.SetActive(true);
-        aimingCamera.gameObject.SetActive(false);
-    }
-    public void OnLean(float value)
-    {
-        leanAmount = value;
+        SwitchToCamera(menuCamera);
     }
 
     private void FixedUpdate()
     {
         defaultFollow.CameraSide = Mathf.Lerp(defaultFollow.CameraSide, leanAmount, Time.fixedDeltaTime * leanSpeed);
         aimingFollow.CameraSide = Mathf.Lerp(aimingFollow.CameraSide, leanAmount, Time.fixedDeltaTime * leanSpeed);
+    }
+
+    #region EventCallbacks
+    protected override void InputAimCallback(bool previousValue, bool currentValue)
+    {
+        if (currentValue)
+        {
+            if (GameManager.IsInRound)
+            {
+                SwitchToCamera(aimingCamera);
+            }
+        }
+        else
+        {
+            if (GameManager.IsInRound)
+            {
+                SwitchToCamera(defaultCamera);
+            }
+        }
+    }
+    protected override void InputLeanCallback(float previousValue, float currentValue)
+    {
+        if (GameManager.IsInRound)
+        {
+            leanAmount = currentValue;
+        }
+    }
+
+    protected override void RoundStartCallback()
+    {
+        SwitchToCamera(defaultCamera);
+    }
+    protected override void RoundEndCallback()
+    {
+        SwitchToCamera(menuCamera);
+    }
+    #endregion
+
+    private void SwitchToCamera(CinemachineVirtualCamera camera)
+    {
+        menuCamera.gameObject.SetActive(menuCamera == camera);
+        defaultCamera.gameObject.SetActive(defaultCamera == camera);
+        aimingCamera.gameObject.SetActive(aimingCamera == camera);
     }
 }

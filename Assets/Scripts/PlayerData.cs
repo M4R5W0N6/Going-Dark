@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -5,26 +6,63 @@ using UnityEngine;
 
 public class PlayerData : NetworkBehaviour
 {
-    // add find by id function?
-
-    public static PlayerData GetPlayer(ulong id)
+    private static List<PlayerData> players;
+    public static List<PlayerData> Players
     {
-        List<PlayerData> players = new List<PlayerData>(FindObjectsOfType<PlayerData>());
+        get
+        {
+            players = new List<PlayerData>(FindObjectsOfType<PlayerData>());
 
-        players = players.Where(x => x.GetComponent<NetworkBehaviour>().OwnerClientId == id).ToList();
+            return players;
+        }
+    }
+
+    public static PlayerData GetPlayer(ulong ownerId)
+    {
+        List<PlayerData> players = Players;
+
+        players = players.Where(x => x.GetComponent<NetworkBehaviour>().OwnerClientId == ownerId).ToList();
 
         return players.Count > 0 ? players[0] : null;
     }
 
+    private static PlayerData ownerPlayer;
+    public static PlayerData OwnerPlayer
+    {
+        get
+        {
+            if (ownerPlayer)
+                if (ownerPlayer.IsOwner)
+                    return ownerPlayer;
+
+
+            List<PlayerData> players = Players;
+
+            players = players.Where(x => x.IsOwner).ToList();
+
+            ownerPlayer = players.Count > 0 ? players[0] : null;
+
+            return ownerPlayer;
+        }
+    }
+
+    private static PlayerData localPlayer;
     public static PlayerData LocalPlayer
     {
         get
         {
+            if (localPlayer)
+                if (localPlayer.IsLocalPlayer)
+                    return localPlayer;
+
+
             List<PlayerData> players = new List<PlayerData>(FindObjectsOfType<PlayerData>());
 
             players = players.Where(x => x.IsLocalPlayer).ToList();
 
-            return players.Count > 0 ? players[0] : null;
+            localPlayer = players.Count > 0 ? players[0] : null;
+
+            return localPlayer;
         }
     }
 

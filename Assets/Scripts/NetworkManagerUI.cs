@@ -22,8 +22,8 @@ public class NetworkManagerUI : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.MatchFound += MatchFound;
-        GameManager.Instance.UpdateState += UpdateState;
+        LobbyRelayManager.Instance.MatchFound += MatchFound;
+        LobbyRelayManager.Instance.UpdateState += UpdateState;
     }
 
     private void UpdateState(string newState)

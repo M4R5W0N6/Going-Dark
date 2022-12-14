@@ -18,22 +18,6 @@ public class TrackedObjectFollower : MonoBehaviour
     [SerializeField]
     private Vector3 offset;
 
-    private PlayerData currentPlayer;
-
-
-    private void Awake()
-    {
-        NetworkEventManager.EventPlayerSpawn += OnPlayerSpawn;
-    }
-
-    private void OnPlayerSpawn(ulong id)
-    {
-        PlayerData newPlayer = PlayerData.GetPlayer(id);
-
-        if (newPlayer.IsLocalPlayer)
-            currentPlayer = newPlayer;
-    }
-
     private void FixedUpdate()
     {
         Vector3 trackedPosition = transform.position;
@@ -42,28 +26,31 @@ public class TrackedObjectFollower : MonoBehaviour
             case TrackedObjectType.NONE:
                 break;
             case TrackedObjectType.PLAYER_ORIGIN:
-                if (!currentPlayer) return;
+                if (!PlayerData.OwnerPlayer) return;
 
-                trackedPosition = currentPlayer.CharacterOriginPosition.Value;
+                trackedPosition = PlayerData.OwnerPlayer.CharacterOriginPosition.Value;
 
                 break;
             case TrackedObjectType.PLAYER_TARGET:
-                if (!currentPlayer) return;
+                if (!PlayerData.OwnerPlayer) return;
 
-                trackedPosition = currentPlayer.CharacterTargetPosition.Value;
+                trackedPosition = PlayerData.OwnerPlayer.CharacterTargetPosition.Value;
 
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
-                if (!currentPlayer) return;
+                if (!PlayerData.OwnerPlayer) return;
 
-                trackedPosition = currentPlayer.CharacterRaycastPosition.Value;
+                trackedPosition = PlayerData.OwnerPlayer.CharacterRaycastPosition.Value;
 
                 break;
             default:
                 break;
         }
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, currentPlayer.transform.rotation, Time.fixedDeltaTime * moveSpeed);
-        transform.position = Vector3.Lerp(transform.position, trackedPosition + currentPlayer.transform.TransformVector(offset), Time.fixedDeltaTime * moveSpeed);
+        if (!CharacterInputController.OwnerCharacter)
+            return;
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, CharacterInputController.OwnerCharacter.transform.rotation, Time.fixedDeltaTime * moveSpeed);
+        transform.position = Vector3.Lerp(transform.position, trackedPosition + CharacterInputController.OwnerCharacter.transform.TransformVector(offset), Time.fixedDeltaTime * moveSpeed);
     }
 }
