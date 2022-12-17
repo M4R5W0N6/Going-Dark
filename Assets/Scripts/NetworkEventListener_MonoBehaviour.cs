@@ -10,8 +10,7 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
     {
         get
         {
-            if (localPlayer == null)
-                localPlayer = PlayerData.LocalPlayer;
+            localPlayer = PlayerData.LocalPlayer;
 
             return localPlayer;
         }
@@ -30,12 +29,10 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
     {
         RoundManager.EventRoundStart += RoundStartCallback;
         RoundManager.EventRoundEnd += RoundEndCallback;
-
         RoundManager.EventPlayerSpawn += PlayerSpawnCallback;
-        RoundManager.EventPlayerSpawn += SubscribeToPlayerVariables;
-
         RoundManager.EventPlayerDespawn += PlayerDespawnCallback;
-        RoundManager.EventPlayerDespawn += UnsubscribeToPlayerVariables;
+        RoundManager.EventCharacterSpawn += CharacterSpawnCallback;
+        RoundManager.EventCharacterDespawn += CharacterDespawnCallback;
 
         yield return new WaitUntil(() => LobbyRelayManager.Instance);
 
@@ -54,12 +51,10 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
     {
         RoundManager.EventRoundStart -= RoundStartCallback;
         RoundManager.EventRoundEnd -= RoundEndCallback;
-
         RoundManager.EventPlayerSpawn -= PlayerSpawnCallback;
-        RoundManager.EventPlayerSpawn -= SubscribeToPlayerVariables;
-
         RoundManager.EventPlayerDespawn -= PlayerDespawnCallback;
-        RoundManager.EventPlayerDespawn -= UnsubscribeToPlayerVariables;
+        RoundManager.EventCharacterSpawn -= CharacterSpawnCallback;
+        RoundManager.EventCharacterDespawn -= CharacterDespawnCallback;
 
         if (LobbyRelayManager.Instance)
         {
@@ -76,11 +71,8 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
         }
     }
 
-    private void SubscribeToPlayerVariables(ulong playerID)
+    private void SubscribeToPlayerVariables()
     {
-        if (LocalPlayer != PlayerData.GetPlayer(playerID))
-            return;
-
         LocalPlayer.InputMove.OnValueChanged += InputMoveCallback;
         LocalPlayer.InputLook.OnValueChanged += InputLookCallback;
         LocalPlayer.InputFire.OnValueChanged += InputFireCallback;
@@ -90,11 +82,8 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
         LocalPlayer.InputSprint.OnValueChanged += InputSprintCallback;
         LocalPlayer.CharacterIsReloading.OnValueChanged += CharacterIsReloadingCallback;
     }
-    private void UnsubscribeToPlayerVariables(ulong playerID, ulong enemyID)
+    private void UnsubscribeToPlayerVariables()
     {
-        if (LocalPlayer != PlayerData.GetPlayer(playerID))
-            return;
-
         LocalPlayer.InputMove.OnValueChanged -= InputMoveCallback;
         LocalPlayer.InputLook.OnValueChanged -= InputLookCallback;
         LocalPlayer.InputFire.OnValueChanged -= InputFireCallback;
@@ -114,8 +103,18 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
     protected virtual void InputSprintCallback(bool previousValue, bool currentValue) { }
     protected virtual void CharacterIsReloadingCallback(bool previousValue, bool currentValue) { }
 
-    protected virtual void PlayerDespawnCallback(ulong playerID, ulong enemyID) { }
-    protected virtual void PlayerSpawnCallback(ulong playerID) { }
+    protected virtual void CharacterDespawnCallback(ulong playerID, ulong enemyID) { }
+    protected virtual void CharacterSpawnCallback(ulong playerID) { }
+    protected virtual void PlayerDespawnCallback(ulong playerID)
+    {
+        if (PlayerData.GetPlayer(playerID) == LocalPlayer)
+            UnsubscribeToPlayerVariables();
+    }
+    protected virtual void PlayerSpawnCallback(ulong playerID)
+    {
+        if (PlayerData.GetPlayer(playerID) == LocalPlayer)
+            SubscribeToPlayerVariables();
+    }
     protected virtual void RoundEndCallback() { }
     protected virtual void RoundStartCallback() { }
     protected virtual void ClientConnectedCallback(ulong obj) { }

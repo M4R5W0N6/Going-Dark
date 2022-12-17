@@ -10,8 +10,7 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
     {
         get
         {
-            if (ownerPlayer == null)
-                ownerPlayer = PlayerData.GetPlayer(NetworkObject.OwnerClientId);
+            ownerPlayer = PlayerData.GetPlayer(NetworkObject.OwnerClientId);
 
             return ownerPlayer;
         }
@@ -30,12 +29,10 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
     {
         RoundManager.EventRoundStart += RoundStartCallback;
         RoundManager.EventRoundEnd += RoundEndCallback;
-
         RoundManager.EventPlayerSpawn += PlayerSpawnCallback;
-        RoundManager.EventPlayerSpawn += SubscribeToPlayerVariables;
-
         RoundManager.EventPlayerDespawn += PlayerDespawnCallback;
-        RoundManager.EventPlayerDespawn += UnsubscribeToPlayerVariables;
+        RoundManager.EventCharacterSpawn += CharacterSpawnCallback;
+        RoundManager.EventCharacterDespawn += CharacterDespawnCallback;
 
         yield return new WaitUntil(() => LobbyRelayManager.Instance);
 
@@ -54,12 +51,10 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
     {
         RoundManager.EventRoundStart -= RoundStartCallback;
         RoundManager.EventRoundEnd -= RoundEndCallback;
-
         RoundManager.EventPlayerSpawn -= PlayerSpawnCallback;
-        RoundManager.EventPlayerSpawn -= SubscribeToPlayerVariables;
-
         RoundManager.EventPlayerDespawn -= PlayerDespawnCallback;
-        RoundManager.EventPlayerDespawn -= UnsubscribeToPlayerVariables;
+        RoundManager.EventCharacterSpawn -= CharacterSpawnCallback;
+        RoundManager.EventCharacterDespawn -= CharacterDespawnCallback;
 
         if (LobbyRelayManager.Instance)
         {
@@ -76,11 +71,8 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
         }
     }
 
-    private void SubscribeToPlayerVariables(ulong playerID)
+    private void SubscribeToPlayerVariables()
     {
-        if (OwnerPlayer != PlayerData.GetPlayer(playerID))
-            return;
-
         OwnerPlayer.InputMove.OnValueChanged += InputMoveCallback;
         OwnerPlayer.InputLook.OnValueChanged += InputLookCallback;
         OwnerPlayer.InputFire.OnValueChanged += InputFireCallback;
@@ -90,11 +82,8 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
         OwnerPlayer.InputSprint.OnValueChanged += InputSprintCallback;
         OwnerPlayer.CharacterIsReloading.OnValueChanged += CharacterIsReloadingCallback;
     }
-    private void UnsubscribeToPlayerVariables(ulong playerID, ulong enemyID)
+    private void UnsubscribeToPlayerVariables()
     {
-        if (OwnerPlayer != PlayerData.GetPlayer(playerID))
-            return;
-
         OwnerPlayer.InputMove.OnValueChanged -= InputMoveCallback;
         OwnerPlayer.InputLook.OnValueChanged -= InputLookCallback;
         OwnerPlayer.InputFire.OnValueChanged -= InputFireCallback;
@@ -114,8 +103,18 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
     protected virtual void InputSprintCallback(bool previousValue, bool currentValue) { }
     protected virtual void CharacterIsReloadingCallback(bool previousValue, bool currentValue) { }
 
-    protected virtual void PlayerDespawnCallback(ulong playerID, ulong enemyID) { }
-    protected virtual void PlayerSpawnCallback(ulong playerID) { }
+    protected virtual void CharacterDespawnCallback(ulong playerID, ulong enemyID) { }
+    protected virtual void CharacterSpawnCallback(ulong playerID) { }
+    protected virtual void PlayerDespawnCallback(ulong playerID) 
+    {
+        if (PlayerData.GetPlayer(playerID) == OwnerPlayer)
+            UnsubscribeToPlayerVariables();
+    }
+    protected virtual void PlayerSpawnCallback(ulong playerID) 
+    {
+        if (PlayerData.GetPlayer(playerID) == OwnerPlayer)
+            SubscribeToPlayerVariables();
+    }
     protected virtual void RoundEndCallback() { }
     protected virtual void RoundStartCallback() { }
     protected virtual void ClientConnectedCallback(ulong obj) { }

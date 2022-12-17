@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 22553.996, g: 17306.023, b: 16627.422, a: 1}
+  m_IndirectSpecularColor: {r: 22536.574, g: 17303.523, b: 16656.156, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1172,7 +1172,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b85aa8ac6caa2f4eb3d85930783ca0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPlayer: {fileID: 0}
   roundManagerPrefab: {fileID: 2915045897462864308, guid: c8102435b81634c468adf5ab74e9cfab, type: 3}
 --- !u!114 &222741047
 MonoBehaviour:
@@ -3620,7 +3619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377d353d5032f7045ac2d9d31e0fc093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPlayer: {fileID: 0}
 --- !u!1 &694919669
 GameObject:
   m_ObjectHideFlags: 0
@@ -4645,6 +4643,7 @@ GameObject:
   - component: {fileID: 938072085}
   - component: {fileID: 938072084}
   - component: {fileID: 938072086}
+  - component: {fileID: 938072087}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -4712,6 +4711,18 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!114 &938072087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 938072082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f27b55523684b4b44956fb26223dc34d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &939075985
 GameObject:
   m_ObjectHideFlags: 0
@@ -7706,7 +7717,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1543422471}
-    PlayerPrefab: {fileID: 7800419068353216193, guid: 4330cbdd13a0e4945a93a30a6daf5450, type: 3}
+    PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
       Prefab: {fileID: 7800419068353216193, guid: 4330cbdd13a0e4945a93a30a6daf5450, type: 3}
@@ -8695,7 +8706,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7071cf64352290e42980bafcf064699a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPlayer: {fileID: 0}
   menuCamera: {fileID: 793865355}
   defaultCamera: {fileID: 978393449}
   aimingCamera: {fileID: 1176009887}

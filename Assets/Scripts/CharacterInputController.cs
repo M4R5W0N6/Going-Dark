@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CharacterInputController : NetworkBehaviour
+public class CharacterInputController : NetworkBehaviour, IEventListener
 {
     private static List<CharacterInputController> characters;
     public static List<CharacterInputController> Characters
@@ -70,13 +70,11 @@ public class CharacterInputController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        RoundManager.Instance.PlayerSpawnServerRpc(OwnerClientId);
-
-        PlayerData.OwnerPlayer.CharacterIsReloading.Value = false;
+        RoundManager.Instance.OnCharacterSpawnServerRpc(OwnerClientId);
     }
     public override void OnNetworkDespawn()
     {
-        RoundManager.Instance.PlayerDespawnServerRpc(OwnerClientId, OwnerClientId);
+        RoundManager.Instance.OnCharacterDespawnServerRpc(OwnerClientId, OwnerClientId);
     }
 
     private void Update()

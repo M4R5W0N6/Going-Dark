@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerData : NetworkBehaviour
+public class PlayerData : NetworkBehaviour, IEventListener
 {
     private static List<PlayerData> players;
     public static List<PlayerData> Players
@@ -66,12 +66,28 @@ public class PlayerData : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkSpawn()
+    {
+        RoundManager.Instance.OnPlayerSpawnServerRpc(OwnerClientId);
+    }
+    public override void OnNetworkDespawn()
+    {
+        RoundManager.Instance.OnPlayerDespawnServerRpc(OwnerClientId);
+    }
+
     private void Update()
     {
         if (IsOwner)
         {
             CameraPosition.Value = Camera.main.transform.position;
         }
+    }
+
+    public void CharacterSpawnCallback(ulong playerID)
+    {
+        CharacterIsReloading.Value = false;
+
+        InputLean.OnValueChanged?.Invoke(InputLean.Value, InputLean.Value);
     }
 
     /// Misc Data (from owning client)

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using Cinemachine;
 using Unity.Netcode;
 
-public class CameraInputController : NetworkEventListener_MonoBehaviour
+public class CameraInputController : MonoBehaviour, IEventListener
 {
     [SerializeField]
     private CinemachineVirtualCamera menuCamera, defaultCamera, aimingCamera;
@@ -29,7 +29,7 @@ public class CameraInputController : NetworkEventListener_MonoBehaviour
     }
 
     #region EventCallbacks
-    protected override void InputAimCallback(bool previousValue, bool currentValue)
+    public void InputAimCallback(bool previousValue, bool currentValue)
     {
         if (currentValue)
         {
@@ -46,7 +46,7 @@ public class CameraInputController : NetworkEventListener_MonoBehaviour
             }
         }
     }
-    protected override void InputLeanCallback(float previousValue, float currentValue)
+    public void InputLeanCallback(float previousValue, float currentValue)
     {
         if (GameManager.IsInRound)
         {
@@ -54,11 +54,11 @@ public class CameraInputController : NetworkEventListener_MonoBehaviour
         }
     }
 
-    protected override void RoundStartCallback()
+    public void RoundStartCallback()
     {
         SwitchToCamera(defaultCamera);
     }
-    protected override void RoundEndCallback()
+    public void RoundEndCallback()
     {
         SwitchToCamera(menuCamera);
     }

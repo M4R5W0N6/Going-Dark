@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class GameManager : NetworkEventListener_MonoBehaviour
+public class GameManager : MonoBehaviour, IEventListener
 {
     public static bool IsInRound;
 
     [SerializeField]
     private GameObject roundManagerPrefab;
 
-    protected override void ServerStartedCallback()
+    public void ServerStartedCallback()
     {
         if (!NetworkManager.Singleton.IsHost)
             return;
@@ -19,11 +19,11 @@ public class GameManager : NetworkEventListener_MonoBehaviour
         roundManager.Spawn(false);
     }
 
-    protected override void RoundStartCallback()
+    public void RoundStartCallback()
     {
         IsInRound = true;
     }
-    protected override void RoundEndCallback()
+    public void RoundEndCallback()
     {
         IsInRound = false;
     }

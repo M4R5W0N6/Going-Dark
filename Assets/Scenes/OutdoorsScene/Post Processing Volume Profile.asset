@@ -166,7 +166,7 @@ MonoBehaviour:
   active: 1
   quality:
     m_OverrideState: 1
-    m_Value: 3
+    m_Value: 2
   rayTracing:
     m_OverrideState: 0
     m_Value: 0
@@ -175,10 +175,10 @@ MonoBehaviour:
     m_Value: 2
   directLightingStrength:
     m_OverrideState: 1
-    m_Value: 0.045
+    m_Value: 0.1
   radius:
     m_OverrideState: 1
-    m_Value: 0.25
+    m_Value: 1
   spatialBilateralAggressiveness:
     m_OverrideState: 1
     m_Value: 0.15
@@ -210,7 +210,7 @@ MonoBehaviour:
     m_Value: 1
   m_MaximumRadiusInPixels:
     m_OverrideState: 1
-    m_Value: 72
+    m_Value: 80
   m_BilateralUpsample:
     m_OverrideState: 1
     m_Value: 1

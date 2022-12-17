@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 using FOW;
 
 [RequireComponent(typeof(Volume))]
-public class FogOfWarVolume : NetworkEventListener_MonoBehaviour
+public class FogOfWarVolume : MonoBehaviour, IEventListener
 {
     private Volume volume;
 
@@ -16,12 +16,12 @@ public class FogOfWarVolume : NetworkEventListener_MonoBehaviour
         volume.weight = 0f;
     }
 
-    protected override void RoundStartCallback()
+    public void RoundStartCallback()
     {
         volume.weight = 1f;
     }
 
-    protected override void RoundEndCallback()
+    public void RoundEndCallback()
     {
         volume.weight = 0f;
     }
