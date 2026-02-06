@@ -3,11 +3,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
 using RootMotion.FinalIK;
-using Unity.Netcode;
 using System.Collections;
 
 [RequireComponent(typeof(Animator))]
-public class AnimationInputController : NetworkBehaviour, IEventListener
+public class AnimationInputController : MonoBehaviour, IEventListener
 {
     private Animator animationController;
     private Vector2 currentMove;
@@ -26,6 +25,8 @@ public class AnimationInputController : NetworkBehaviour, IEventListener
     private Transform targetIKAim, targetIKLean;
     private Vector3 leanGoal;
     private float blendGoal, blendValue;
+    private bool reloadPressedLastFrame;
+    private Coroutine reloadCoroutine;
 
     private void Awake()
     {
@@ -35,8 +36,13 @@ public class AnimationInputController : NetworkBehaviour, IEventListener
 
     private void Update()
     {
-        // Do IK locally
-        blendGoal = PlayerData.OwnerPlayer.CharacterIsReloading.Value ? 0f : 1f;
+        var player = PlayerData.OwnerPlayer;
+        if (player == null || animationController == null || fullBodyIK == null)
+        {
+            reloadPressedLastFrame = false;
+            return;
+        }
+        blendGoal = player.CharacterIsReloading.Value ? 0f : 1f;
         blendValue = Mathf.Lerp(blendValue, blendGoal, Time.deltaTime * aimIKSpeed);
 
         fullBodyIK.solver.bodyEffector.positionWeight = blendValue * 0.01f;
@@ -46,40 +52,49 @@ public class AnimationInputController : NetworkBehaviour, IEventListener
         fullBodyIK.solver.leftArmChain.bendConstraint.weight = blendValue;
         fullBodyIK.solver.leftArmMapping.weight = blendValue;
 
-        if (!PlayerData.OwnerPlayer.IsOwner)
-            return;
+        // Local-only mode; always run for the local player
 
-        Vector2 inputLook = PlayerData.OwnerPlayer.InputLook.Value;
+        Vector2 inputLook = player.InputLook.Value;
         inputLook.x *= 55f;
         inputLook.y *= -25f;
 
-        currentMove = Vector2.Lerp(currentMove, PlayerData.OwnerPlayer.InputMove.Value * (PlayerData.OwnerPlayer.InputSprint.Value ? sprintSpeed : walkSpeed), Time.deltaTime * lerpSpeed);
+        currentMove = Vector2.Lerp(currentMove, player.InputMove.Value * (player.InputSprint.Value ? sprintSpeed : walkSpeed), Time.deltaTime * lerpSpeed);
         currentLook = Vector2.Lerp(currentLook, inputLook, Time.deltaTime * lerpSpeed);
+
+        leanGoal = new Vector3(player.InputLean.Value - 0.5f, 0.5f, 0.5f);
+
+        bool isReloadPressed = player.InputReload.Value;
+        if (isReloadPressed && !reloadPressedLastFrame)
+            TryStartReload(player);
+        reloadPressedLastFrame = isReloadPressed;
     }
 
     private void FixedUpdate()
     {
-        // Do IK locally
-        Vector3 posIK = Vector3.Lerp(PlayerData.OwnerPlayer.CharacterTargetPosition.Value, PlayerData.OwnerPlayer.CharacterRaycastPosition.Value,
-            CustomUtilities.DefaultScalarDistance / Vector3.Distance(PlayerData.OwnerPlayer.CharacterTargetPosition.Value, PlayerData.OwnerPlayer.CharacterRaycastPosition.Value));
-        targetIKAim.position = Vector3.Lerp(targetIKAim.position, posIK, Time.fixedDeltaTime * aimIKSpeed);
-        targetIKLean.localPosition = Vector3.Lerp(targetIKLean.localPosition, leanGoal, Time.fixedDeltaTime * leanIKSpeed);
-
-        if (!PlayerData.OwnerPlayer.IsOwner)
+        var player = PlayerData.OwnerPlayer;
+        if (player == null || animationController == null || fullBodyIK == null || targetIKAim == null || targetIKLean == null)
             return;
+        Vector3 posIK = Vector3.Lerp(player.CharacterTargetPosition.Value, player.CharacterRaycastPosition.Value,
+            CustomUtilities.DefaultScalarDistance / Vector3.Distance(player.CharacterTargetPosition.Value, player.CharacterRaycastPosition.Value));
+        if (targetIKAim)
+            targetIKAim.position = Vector3.Lerp(targetIKAim.position, posIK, Time.fixedDeltaTime * aimIKSpeed);
+        if (targetIKLean)
+            targetIKLean.localPosition = Vector3.Lerp(targetIKLean.localPosition, leanGoal, Time.fixedDeltaTime * leanIKSpeed);
+
+        // Local-only mode; always run for the local player
 
         animationController.SetFloat("Horizontal", currentMove.x);
         animationController.SetFloat("Vertical", currentMove.y);
 
-        animationController.SetFloat("InputMagnitude", PlayerData.OwnerPlayer.InputMove.Value.magnitude);
+        animationController.SetFloat("InputMagnitude", player.InputMove.Value.magnitude);
 
-        animationController.SetFloat("WalkStartAngle", CustomUtilities.GetAngleFromVector(PlayerData.OwnerPlayer.InputMove.Value));
+        animationController.SetFloat("WalkStartAngle", CustomUtilities.GetAngleFromVector(player.InputMove.Value));
         animationController.SetFloat("WalkStopAngle", CustomUtilities.GetAngleFromVector(currentMove));
 
         animationController.SetFloat("HorAimAngle", currentLook.x);
         animationController.SetFloat("VerAimAngle", currentLook.y);
 
-        if (PlayerData.OwnerPlayer.InputMove.Value.magnitude > 0f)
+        if (player.InputMove.Value.magnitude > 0f)
         {
             animationController.SetBool("IsStopRU", false);
             animationController.SetBool("IsStopLU", false);
@@ -90,8 +105,8 @@ public class AnimationInputController : NetworkBehaviour, IEventListener
             animationController.SetBool("IsStopLU", animationController.GetFloat("IsRU") <= 0f);
         }
 
-        animationController.SetBool("IsShoot", PlayerData.OwnerPlayer.InputFire.Value);
-        animationController.SetBool("IsReload", PlayerData.OwnerPlayer.CharacterIsReloading.Value);
+        animationController.SetBool("IsShoot", player.InputFire.Value);
+        animationController.SetBool("IsReload", player.CharacterIsReloading.Value);
     }
 
     public void InputLeanCallback(float previousValue, float currentValue)
@@ -101,22 +116,35 @@ public class AnimationInputController : NetworkBehaviour, IEventListener
 
     public void InputReloadCallback(bool previousValue, bool currentValue)
     {
-        if (!PlayerData.OwnerPlayer.IsOwner)
+        if (!currentValue)
             return;
 
-        if (PlayerData.OwnerPlayer.CharacterIsReloading.Value == true)
+        TryStartReload(PlayerData.OwnerPlayer);
+    }
+
+    private void TryStartReload(PlayerData player)
+    {
+        if (player == null || animationController == null)
+            return;
+        if (player.CharacterIsReloading.Value)
             return;
 
-        PlayerData.OwnerPlayer.CharacterIsReloading.Value = true;
+        player.CharacterIsReloading.Value = true;
 
         animationController.SetBool("IsReload", true);
 
-        StartCoroutine(WaitForReloadFinish());
+        if (reloadCoroutine != null)
+            StopCoroutine(reloadCoroutine);
+        reloadCoroutine = StartCoroutine(WaitForReloadFinish(player));
     }
-    private IEnumerator WaitForReloadFinish()
-    {
-        yield return new WaitUntil(() => animationController.GetBool("IsReload") == false);
 
-        PlayerData.OwnerPlayer.CharacterIsReloading.Value = false;
+    private IEnumerator WaitForReloadFinish(PlayerData player)
+    {
+        yield return new WaitUntil(() => animationController == null || animationController.GetBool("IsReload") == false);
+
+        if (player != null)
+            player.CharacterIsReloading.Value = false;
+
+        reloadCoroutine = null;
     }
 }

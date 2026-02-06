@@ -4,13 +4,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
-using Unity.Netcode;
 using MyBox;
 
-public class NetworkInputEventBroadcaster : NetworkBehaviour
+public class NetworkInputEventBroadcaster : MonoBehaviour
 {
     [SerializeField]
     private bool AnyClientInput;
+    [SerializeField]
+    private bool allowSinglePlayerFallback = true;
+
+    private static int activeBroadcasterCount;
+    private bool CanProcessInput => AnyClientInput || (allowSinglePlayerFallback && activeBroadcasterCount <= 1);
+
+    private void OnEnable()
+    {
+        activeBroadcasterCount++;
+    }
 
     private PlayerInput playerInput;
     public PlayerInput PlayerInput
@@ -64,6 +73,8 @@ public class NetworkInputEventBroadcaster : NetworkBehaviour
     }
     private void OnDisable()
     {
+        activeBroadcasterCount = Mathf.Max(0, activeBroadcasterCount - 1);
+
         if (!PlayerInput)
             return;
 
@@ -100,7 +111,7 @@ public class NetworkInputEventBroadcaster : NetworkBehaviour
     #region OnMove
     private void OnLocalPlayerMove(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         Vector2 value = Vector2.zero;
@@ -111,36 +122,21 @@ public class NetworkInputEventBroadcaster : NetworkBehaviour
 
             Local_MoveEvent?.Invoke(value);
 
-            OnMoveServerRpc(value, NetworkManager.LocalClientId);
+            Server_MoveEvent?.Invoke(value);
         }
         else if (context.canceled)
         {
             Local_MoveEvent?.Invoke(value);
 
-            OnMoveServerRpc(value, NetworkManager.LocalClientId);
+            Server_MoveEvent?.Invoke(value);
         }
     }
-    [ServerRpc]
-    private void OnMoveServerRpc(Vector2 value, ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_MoveEvent?.Invoke(value);
-
-        OnMoveClientRpc(value, clientID);
-    }
-    [ClientRpc]
-    private void OnMoveClientRpc(Vector2 value, ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_MoveEvent?.Invoke(value);
-    }
+    
     #endregion
     #region OnLook
     private void OnLocalPlayerLook(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         Vector2 value = Vector2.zero;
@@ -151,192 +147,84 @@ public class NetworkInputEventBroadcaster : NetworkBehaviour
 
             Local_LookEvent?.Invoke(value);
 
-            OnLookServerRpc(value, NetworkManager.LocalClientId);
+            Server_LookEvent?.Invoke(value);
         }
         else if (context.canceled)
         {
             Local_LookEvent?.Invoke(value);
 
-            OnLookServerRpc(value, NetworkManager.LocalClientId);
+            Server_LookEvent?.Invoke(value);
         }
     }
-    [ServerRpc]
-    private void OnLookServerRpc(Vector2 value, ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_LookEvent?.Invoke(value);
-
-        OnLookClientRpc(value, clientID);
-    }
-    [ClientRpc]
-    private void OnLookClientRpc(Vector2 value, ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_LookEvent?.Invoke(value);
-    }
+    
     #endregion
     #region OnFire
     private void OnLocalPlayerFire(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
         {
             Local_FireEvent?.Invoke();
 
-            OnFireServerRpc(NetworkManager.LocalClientId);
+            Server_FireEvent?.Invoke();
         }
         else if (context.canceled)
         {
             Local_FireEndEvent?.Invoke();
 
-            OnFireEndServerRpc(NetworkManager.LocalClientId);
+            Server_FireEndEvent?.Invoke();
         }
     }
-    [ServerRpc]
-    private void OnFireServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_FireEvent?.Invoke();
-
-        OnFireClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnFireClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_FireEvent?.Invoke();
-    }
-    [ServerRpc]
-    private void OnFireEndServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_FireEndEvent?.Invoke();
-
-        OnFireEndClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnFireEndClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_FireEndEvent?.Invoke();
-    }
+    
     #endregion
     #region OnReload
     private void OnLocalPlayerReload(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
         {
             Local_ReloadEvent?.Invoke();
 
-            OnReloadServerRpc(NetworkManager.LocalClientId);
+            Server_ReloadEvent?.Invoke();
         }
         else if (context.canceled)
         {
             Local_ReloadEndEvent?.Invoke();
 
-            OnReloadEndServerRpc(NetworkManager.LocalClientId);
+            Server_ReloadEndEvent?.Invoke();
         }
     }
-    [ServerRpc]
-    private void OnReloadServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_ReloadEvent?.Invoke();
-
-        OnReloadClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnReloadClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_ReloadEvent?.Invoke();
-    }
-    [ServerRpc]
-    private void OnReloadEndServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_ReloadEndEvent?.Invoke();
-
-        OnReloadEndClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnReloadEndClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_ReloadEndEvent?.Invoke();
-    }
+    
     #endregion
     #region OnAim
     private void OnLocalPlayerAim(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
         {
             Local_AimEvent?.Invoke();
 
-            OnAimServerRpc(NetworkManager.LocalClientId);
+            Server_AimEvent?.Invoke();
         }
         else if (context.canceled)
         {
             Local_AimEndEvent?.Invoke();
 
-            OnAimEndServerRpc(NetworkManager.LocalClientId);
+            Server_AimEndEvent?.Invoke();
         }
     }
-    [ServerRpc]
-    private void OnAimServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_AimEvent?.Invoke();
-
-        OnAimClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnAimClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_AimEvent?.Invoke();
-    }
-    [ServerRpc]
-    private void OnAimEndServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_AimEndEvent?.Invoke();
-
-        OnAimEndClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnAimEndClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_AimEndEvent?.Invoke();
-    }
+    
     #endregion
     #region OnLean
     private void OnLocalPlayerLean(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
@@ -345,107 +233,46 @@ public class NetworkInputEventBroadcaster : NetworkBehaviour
 
             Local_LeanEvent?.Invoke(value);
 
-            OnLeanServerRpc(value, NetworkManager.LocalClientId);
+            Server_LeanEvent?.Invoke(value);
         }
     }
-    [ServerRpc]
-    private void OnLeanServerRpc(float value, ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_LeanEvent?.Invoke(value);
-
-        OnLeanClientRpc(value, clientID);
-    }
-    [ClientRpc]
-    private void OnLeanClientRpc(float value, ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_LeanEvent?.Invoke(value);
-    }
+    
     #endregion
     #region OnSprint
     private void OnLocalPlayerSprint(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
         {
             Local_SprintEvent?.Invoke();
 
-            OnSprintServerRpc(NetworkManager.LocalClientId);
+            Server_SprintEvent?.Invoke();
         }
         else if (context.canceled)
         {
             Local_SprintEndEvent?.Invoke();
 
-            OnSprintEndServerRpc(NetworkManager.LocalClientId);
+            Server_SprintEndEvent?.Invoke();
         }
     }
-    [ServerRpc]
-    private void OnSprintServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_SprintEvent?.Invoke();
-
-        OnSprintClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnSprintClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_SprintEvent?.Invoke();
-    }
-    [ServerRpc]
-    private void OnSprintEndServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_SprintEvent?.Invoke();
-
-        OnSprintEndClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnSprintEndClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_SprintEvent?.Invoke();
-    }
+    
     #endregion
     #region OnEscape
     private void OnLocalPlayerEscape(InputAction.CallbackContext context)
     {
-        if (!(AnyClientInput || IsOwner))
+        if (!CanProcessInput)
             return;
 
         if (context.performed)
         {
             Local_EscapeEvent?.Invoke();
 
-            OnEscapeServerRpc(NetworkManager.LocalClientId);
+            Server_EscapeEvent?.Invoke();
         }
     }
-    [ServerRpc]
-    private void OnEscapeServerRpc(ulong clientID)
-    {
-        if (!IsServer)
-            return;
-
-        Server_EscapeEvent?.Invoke();
-
-        OnEscapeClientRpc(clientID);
-    }
-    [ClientRpc]
-    private void OnEscapeClientRpc(ulong clientID)
-    {
-        if (clientID == NetworkManager.LocalClientId)
-            Client_EscapeEvent?.Invoke();
-    }
+    
     #endregion
     #endregion
 

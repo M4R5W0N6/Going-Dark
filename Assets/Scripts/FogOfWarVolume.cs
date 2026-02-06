@@ -8,21 +8,38 @@ using FOW;
 public class FogOfWarVolume : MonoBehaviour, IEventListener
 {
     private Volume volume;
+    private float targetWeight;
 
     private void Awake()
     {
         TryGetComponent(out volume);
 
-        volume.weight = 0f;
+        SetFogEnabled(GameManager.IsInRound);
+    }
+
+    private void Update()
+    {
+        // Keep FoW rendering in sync even when round events are not broadcast.
+        SetFogEnabled(GameManager.IsInRound);
     }
 
     public void RoundStartCallback()
     {
-        volume.weight = 1f;
+        SetFogEnabled(true);
     }
 
     public void RoundEndCallback()
     {
-        volume.weight = 0f;
+        SetFogEnabled(false);
+    }
+
+    private void SetFogEnabled(bool enabled)
+    {
+        if (volume == null)
+            return;
+
+        targetWeight = enabled ? 1f : 0f;
+        if (!Mathf.Approximately(volume.weight, targetWeight))
+            volume.weight = targetWeight;
     }
 }

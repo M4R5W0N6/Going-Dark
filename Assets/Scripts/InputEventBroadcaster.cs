@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
-using Unity.Netcode;
 
 public class InputEventBroadcaster : MonoBehaviour
 {

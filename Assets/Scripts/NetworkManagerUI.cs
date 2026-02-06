@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Netcode;
-using System;
 using TMPro;
 
 public class NetworkManagerUI : MonoBehaviour
@@ -15,15 +11,15 @@ public class NetworkManagerUI : MonoBehaviour
 
     private void Awake()
     {
-        serverButton.onClick.AddListener(() => { NetworkManager.Singleton.StartServer(); });
-        hostButton.onClick.AddListener(() => { NetworkManager.Singleton.StartHost(); });
-        clientButton.onClick.AddListener(() => { NetworkManager.Singleton.StartClient(); });
+        // Networking disabled: hide controls
+        if (serverButton) serverButton.gameObject.SetActive(false);
+        if (hostButton) hostButton.gameObject.SetActive(false);
+        if (clientButton) clientButton.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        LobbyRelayManager.Instance.MatchFound += MatchFound;
-        LobbyRelayManager.Instance.UpdateState += UpdateState;
+        // no lobby/relay in single-player
     }
 
     private void UpdateState(string newState)
@@ -33,6 +29,6 @@ public class NetworkManagerUI : MonoBehaviour
 
     private void MatchFound()
     {
-        relayButton.gameObject.SetActive(false);
+        if (relayButton) relayButton.gameObject.SetActive(false);
     }
 }

@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CharacterInputController : NetworkBehaviour, IEventListener
+public class CharacterInputController : MonoBehaviour, IEventListener
 {
     private static List<CharacterInputController> characters;
     public static List<CharacterInputController> Characters
@@ -24,12 +23,11 @@ public class CharacterInputController : NetworkBehaviour, IEventListener
         get
         {
             if (ownerCharacter)
-                if (ownerCharacter.IsOwner)
-                    return ownerCharacter;
+                return ownerCharacter;
 
             List<CharacterInputController> characters = Characters;
 
-            characters = characters.Where(x => x.IsOwner).ToList();
+            // Single-player: first instance is the owner
 
             ownerCharacter = characters.Count > 0 ? characters[0] : null;
 
@@ -39,9 +37,6 @@ public class CharacterInputController : NetworkBehaviour, IEventListener
     public static CharacterInputController GetCharacter(ulong ownerId)
     {
         List<CharacterInputController> characters = Characters;
-
-        characters = characters.Where(x => x.GetComponent<NetworkBehaviour>().OwnerClientId == ownerId).ToList();
-
         return characters.Count > 0 ? characters[0] : null;
     }
 
@@ -66,48 +61,44 @@ public class CharacterInputController : NetworkBehaviour, IEventListener
     private void Awake()
     {
         TryGetComponent(out rigidbody);
+        // Ensure a PlayerData exists on the player
+        if (!TryGetComponent<PlayerData>(out _))
+        {
+            gameObject.AddComponent<PlayerData>();
+        }
     }
 
-    public override void OnNetworkSpawn()
-    {
-        RoundManager.Instance.OnCharacterSpawnServerRpc(OwnerClientId);
-    }
-    public override void OnNetworkDespawn()
-    {
-        RoundManager.Instance.OnCharacterDespawnServerRpc(OwnerClientId, OwnerClientId);
-    }
+    private void Start() { }
+    private void OnDestroy() { }
 
     private void Update()
     {
-        if (!IsOwner)
+        var player = PlayerData.OwnerPlayer;
+        if (player == null)
             return;
 
-        currentMove = Vector2.Lerp(currentMove, PlayerData.OwnerPlayer.InputMove.Value, Time.deltaTime * lerpSpeed);
-        currentLook = Vector2.Lerp(currentLook, PlayerData.OwnerPlayer.InputLook.Value, Time.deltaTime * lerpSpeed);
+        currentMove = Vector2.Lerp(currentMove, player.InputMove.Value, Time.deltaTime * lerpSpeed);
+        currentLook = Vector2.Lerp(currentLook, player.InputLook.Value, Time.deltaTime * lerpSpeed);
     }
 
     private void FixedUpdate()
     {
-        if (!IsOwner)
-        {
-            if (LayerMask.LayerToName(gameObject.layer) == "Player")
-                CustomUtilities.SetLayerRecursively(gameObject, "Default");
-
+        var player = PlayerData.OwnerPlayer;
+        if (player == null)
             return;
-        }
-        else
-        {
-            if (LayerMask.LayerToName(gameObject.layer) != "Player")
-                CustomUtilities.SetLayerRecursively(gameObject, "Player");
-        }
 
-        rigidbody.AddRelativeForce(PlayerData.OwnerPlayer.CharacterMove.Value.x, 0f, PlayerData.OwnerPlayer.CharacterMove.Value.y);
+        if (LayerMask.LayerToName(gameObject.layer) != "Player")
+            CustomUtilities.SetLayerRecursively(gameObject, "Player");
 
-        transform.Rotate(Vector3.up, PlayerData.OwnerPlayer.CharacterTurn.Value.y * turnSpeed, Space.Self);
+        if (rigidbody)
+            rigidbody.AddRelativeForce(player.CharacterMove.Value.x, 0f, player.CharacterMove.Value.y);
 
-        pitchOrigin.localRotation = Quaternion.Euler(PlayerData.OwnerPlayer.CharacterTurn.Value.x, 0f, 0f);
+        transform.Rotate(Vector3.up, player.CharacterTurn.Value.y * turnSpeed, Space.Self);
 
-        PlayerData.LocalPlayer.CharacterMove.Value = currentMove * moveSpeed * (PlayerData.OwnerPlayer.InputSprint.Value ? sprintSpeed : 1f);
+        if (pitchOrigin)
+            pitchOrigin.localRotation = Quaternion.Euler(player.CharacterTurn.Value.x, 0f, 0f);
+
+        PlayerData.LocalPlayer.CharacterMove.Value = currentMove * moveSpeed * (player.InputSprint.Value ? sprintSpeed : 1f);
 
         currentPitch += currentLook.y * pitchSpeed * GameSettings.Sensitivity;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
@@ -118,27 +109,36 @@ public class CharacterInputController : NetworkBehaviour, IEventListener
         int layerMask = 1 << LayerMask.NameToLayer("Player");
         layerMask = ~layerMask;
 
-        PlayerData.OwnerPlayer.CharacterTargetPosition.Value = (pitchOrigin.forward * CustomUtilities.DefaultScalarDistance) + transform.position;
-        Vector3 forward = Vector3.Normalize(PlayerData.OwnerPlayer.CharacterTargetPosition.Value - PlayerData.OwnerPlayer.CameraPosition.Value);
+        if (pitchOrigin)
+            player.CharacterTargetPosition.Value = (pitchOrigin.forward * CustomUtilities.DefaultScalarDistance) + transform.position;
+        Vector3 forward = Vector3.Normalize(player.CharacterTargetPosition.Value - player.CameraPosition.Value);
 
         // check if camera has line of sight to reticle
         RaycastHit screenHit;
-        if (!Physics.Raycast(PlayerData.OwnerPlayer.CameraPosition.Value, forward, out screenHit, Mathf.Infinity, layerMask))
+        if (!Physics.Raycast(player.CameraPosition.Value, forward, out screenHit, Mathf.Infinity, layerMask))
         {
-            screenHit.point = PlayerData.OwnerPlayer.CameraPosition.Value + forward * CustomUtilities.DefaultScalarDistance;
+            screenHit.point = player.CameraPosition.Value + forward * CustomUtilities.DefaultScalarDistance;
         }
 
         // check if origin has line of sight
-        forward = Vector3.Normalize(screenHit.point - pitchOrigin.position);
-
-        RaycastHit muzzleHit;
-        if (!Physics.Raycast(pitchOrigin.position, forward, out muzzleHit, Mathf.Infinity, layerMask))
+        Vector3 muzzlePoint = screenHit.point;
+        if (pitchOrigin)
         {
-            muzzleHit.point = screenHit.point;
+            forward = Vector3.Normalize(screenHit.point - pitchOrigin.position);
+            RaycastHit tmpHit;
+            if (Physics.Raycast(pitchOrigin.position, forward, out tmpHit, Mathf.Infinity, layerMask))
+            {
+                muzzlePoint = tmpHit.point;
+            }
+            else
+            {
+                muzzlePoint = screenHit.point;
+            }
         }
 
-        PlayerData.OwnerPlayer.CharacterOriginPosition.Value = pitchOrigin.position;
-        PlayerData.OwnerPlayer.CharacterRaycastPosition.Value = muzzleHit.point;
-        PlayerData.OwnerPlayer.CharacterIsOnTarget.Value = Vector3.Distance(screenHit.point, muzzleHit.point) < CustomUtilities.DefaultRaycastThreshold; // replace with FoW sample point (v1.4) ?
+        if (pitchOrigin)
+            player.CharacterOriginPosition.Value = pitchOrigin.position;
+        player.CharacterRaycastPosition.Value = muzzlePoint;
+        player.CharacterIsOnTarget.Value = Vector3.Distance(screenHit.point, muzzlePoint) < CustomUtilities.DefaultRaycastThreshold;
     }
 }

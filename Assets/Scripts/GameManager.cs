@@ -1,30 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 
 public class GameManager : MonoBehaviour, IEventListener
 {
-    public static bool IsInRound;
+    public static bool IsInRound = true; // kept for compatibility; default true in single-player
 
     [SerializeField]
     private GameObject roundManagerPrefab;
 
-    public void ServerStartedCallback()
-    {
-        if (!NetworkManager.Singleton.IsHost)
-            return;
+    public void ServerStartedCallback() { }
 
-        NetworkObject roundManager = Instantiate(roundManagerPrefab, Vector3.zero, Quaternion.identity).GetComponent<NetworkObject>();
-        roundManager.Spawn(false);
-    }
-
-    public void RoundStartCallback()
-    {
-        IsInRound = true;
-    }
-    public void RoundEndCallback()
-    {
-        IsInRound = false;
-    }
+    public void RoundStartCallback() { IsInRound = true; }
+    public void RoundEndCallback() { IsInRound = false; }
 }

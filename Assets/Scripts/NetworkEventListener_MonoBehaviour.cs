@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Unity.Netcode;
 
 public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
 {
@@ -27,48 +26,16 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
 
     private IEnumerator SubscribeToEvents()
     {
-        RoundManager.EventRoundStart += RoundStartCallback;
-        RoundManager.EventRoundEnd += RoundEndCallback;
-        RoundManager.EventPlayerSpawn += PlayerSpawnCallback;
-        RoundManager.EventPlayerDespawn += PlayerDespawnCallback;
-        RoundManager.EventCharacterSpawn += CharacterSpawnCallback;
-        RoundManager.EventCharacterDespawn += CharacterDespawnCallback;
+        yield break;
 
-        yield return new WaitUntil(() => LobbyRelayManager.Instance);
-
-        LobbyRelayManager.Instance.MatchFound += NetworkMatchFoundCallback;
-        LobbyRelayManager.Instance.UpdateState += NetworkUpdateCallback;
-
-        yield return new WaitUntil(() => NetworkManager.Singleton);
-
-        NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectCallback;
-        NetworkManager.Singleton.OnServerStarted += ServerStartedCallback;
-        NetworkManager.Singleton.OnTransportFailure += TransportFailureCallback;
+        yield break;
     }
 
     private void UnsubscribeToEvents()
     {
-        RoundManager.EventRoundStart -= RoundStartCallback;
-        RoundManager.EventRoundEnd -= RoundEndCallback;
-        RoundManager.EventPlayerSpawn -= PlayerSpawnCallback;
-        RoundManager.EventPlayerDespawn -= PlayerDespawnCallback;
-        RoundManager.EventCharacterSpawn -= CharacterSpawnCallback;
-        RoundManager.EventCharacterDespawn -= CharacterDespawnCallback;
+        // nothing to unsubscribe in single-player
 
-        if (LobbyRelayManager.Instance)
-        {
-            LobbyRelayManager.Instance.MatchFound -= NetworkMatchFoundCallback;
-            LobbyRelayManager.Instance.UpdateState -= NetworkUpdateCallback;
-        }
-
-        if (NetworkManager.Singleton)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedCallback;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectCallback;
-            NetworkManager.Singleton.OnServerStarted -= ServerStartedCallback;
-            NetworkManager.Singleton.OnTransportFailure -= TransportFailureCallback;
-        }
+        // No networking to unsubscribe in local mode
     }
 
     private void SubscribeToPlayerVariables()

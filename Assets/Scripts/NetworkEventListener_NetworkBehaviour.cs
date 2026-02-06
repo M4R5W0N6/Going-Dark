@@ -1,8 +1,7 @@
 using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
-public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
+public abstract class NetworkEventListener_NetworkBehaviour : MonoBehaviour
 {
     [SerializeField, GetSet("Owner")]
     private PlayerData ownerPlayer;
@@ -10,7 +9,7 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
     {
         get
         {
-            ownerPlayer = PlayerData.GetPlayer(NetworkObject.OwnerClientId);
+            ownerPlayer = PlayerData.OwnerPlayer;
 
             return ownerPlayer;
         }
@@ -25,51 +24,9 @@ public abstract class NetworkEventListener_NetworkBehaviour : NetworkBehaviour
         UnsubscribeToEvents();
     }
 
-    private IEnumerator SubscribeToEvents()
-    {
-        RoundManager.EventRoundStart += RoundStartCallback;
-        RoundManager.EventRoundEnd += RoundEndCallback;
-        RoundManager.EventPlayerSpawn += PlayerSpawnCallback;
-        RoundManager.EventPlayerDespawn += PlayerDespawnCallback;
-        RoundManager.EventCharacterSpawn += CharacterSpawnCallback;
-        RoundManager.EventCharacterDespawn += CharacterDespawnCallback;
+    private IEnumerator SubscribeToEvents() { yield break; }
 
-        yield return new WaitUntil(() => LobbyRelayManager.Instance);
-
-        LobbyRelayManager.Instance.MatchFound += NetworkMatchFoundCallback;
-        LobbyRelayManager.Instance.UpdateState += NetworkUpdateCallback;
-
-        yield return new WaitUntil(() => NetworkManager.Singleton);
-
-        NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectCallback;
-        NetworkManager.Singleton.OnServerStarted += ServerStartedCallback;
-        NetworkManager.Singleton.OnTransportFailure += TransportFailureCallback;
-    }
-
-    private void UnsubscribeToEvents()
-    {
-        RoundManager.EventRoundStart -= RoundStartCallback;
-        RoundManager.EventRoundEnd -= RoundEndCallback;
-        RoundManager.EventPlayerSpawn -= PlayerSpawnCallback;
-        RoundManager.EventPlayerDespawn -= PlayerDespawnCallback;
-        RoundManager.EventCharacterSpawn -= CharacterSpawnCallback;
-        RoundManager.EventCharacterDespawn -= CharacterDespawnCallback;
-
-        if (LobbyRelayManager.Instance)
-        {
-            LobbyRelayManager.Instance.MatchFound -= NetworkMatchFoundCallback;
-            LobbyRelayManager.Instance.UpdateState -= NetworkUpdateCallback;
-        }
-
-        if (NetworkManager.Singleton)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnectedCallback;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnectCallback;
-            NetworkManager.Singleton.OnServerStarted -= ServerStartedCallback;
-            NetworkManager.Singleton.OnTransportFailure -= TransportFailureCallback;
-        }
-    }
+    private void UnsubscribeToEvents() { }
 
     private void SubscribeToPlayerVariables()
     {
