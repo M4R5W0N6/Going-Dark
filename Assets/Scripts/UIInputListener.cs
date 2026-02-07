@@ -22,7 +22,7 @@ public class UIInputListener : MonoBehaviour
     protected virtual void Update()
     {
         if (!PlayerInput)
-            PlayerInput = FindObjectOfType<PlayerInput>();
+            PlayerInput = FindFirstObjectByType<PlayerInput>();
     }
 
     private void InitPlayerInput()

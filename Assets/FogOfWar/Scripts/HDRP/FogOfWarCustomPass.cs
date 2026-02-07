@@ -24,7 +24,7 @@ namespace FOW
             }
             else
             {
-                fow = GameObject.FindObjectOfType<FogOfWarWorld>();
+                fow = Object.FindFirstObjectByType<FogOfWarWorld>();
                 if (!fow)
                 {
                     this.enabled = false;

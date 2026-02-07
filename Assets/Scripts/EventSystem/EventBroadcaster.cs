@@ -11,7 +11,7 @@ public class EventBroadcaster : MonoBehaviour
     {
         get
         {
-            listeners = (List<IEventListener>)FindObjectsOfType<MonoBehaviour>().OfType<IEventListener>();
+            listeners = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IEventListener>().ToList();
             return listeners;
         }
     }

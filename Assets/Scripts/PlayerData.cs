@@ -10,7 +10,7 @@ public class PlayerData : MonoBehaviour, IEventListener
     {
         get
         {
-            players = new List<PlayerData>(FindObjectsOfType<PlayerData>());
+            players = new List<PlayerData>(FindObjectsByType<PlayerData>(FindObjectsSortMode.None));
 
             return players;
         }

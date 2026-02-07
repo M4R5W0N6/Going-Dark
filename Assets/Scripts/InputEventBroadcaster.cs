@@ -23,7 +23,7 @@ public class InputEventBroadcaster : MonoBehaviour
     private void Update()
     {
         if (!PlayerInput)
-            PlayerInput = FindObjectOfType<PlayerInput>();
+            PlayerInput = FindFirstObjectByType<PlayerInput>();
     }
 
     private void InitPlayerInput()

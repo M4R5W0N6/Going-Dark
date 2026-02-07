@@ -27,8 +27,6 @@ public abstract class NetworkEventListener_MonoBehaviour : MonoBehaviour
     private IEnumerator SubscribeToEvents()
     {
         yield break;
-
-        yield break;
     }
 
     private void UnsubscribeToEvents()

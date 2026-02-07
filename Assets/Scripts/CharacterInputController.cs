@@ -11,7 +11,7 @@ public class CharacterInputController : MonoBehaviour, IEventListener
     {
         get
         {
-            characters = new List<CharacterInputController>(FindObjectsOfType<CharacterInputController>());
+            characters = new List<CharacterInputController>(FindObjectsByType<CharacterInputController>(FindObjectsSortMode.None));
 
             return characters;
         }
@@ -56,11 +56,11 @@ public class CharacterInputController : MonoBehaviour, IEventListener
     private Vector2 currentLook;
     private float currentPitch;
 
-    private Rigidbody rigidbody;
+    private Rigidbody characterRigidbody;
 
     private void Awake()
     {
-        TryGetComponent(out rigidbody);
+        TryGetComponent(out characterRigidbody);
         // Ensure a PlayerData exists on the player
         if (!TryGetComponent<PlayerData>(out _))
         {
@@ -90,8 +90,8 @@ public class CharacterInputController : MonoBehaviour, IEventListener
         if (LayerMask.LayerToName(gameObject.layer) != "Player")
             CustomUtilities.SetLayerRecursively(gameObject, "Player");
 
-        if (rigidbody)
-            rigidbody.AddRelativeForce(player.CharacterMove.Value.x, 0f, player.CharacterMove.Value.y);
+        if (characterRigidbody)
+            characterRigidbody.AddRelativeForce(player.CharacterMove.Value.x, 0f, player.CharacterMove.Value.y);
 
         transform.Rotate(Vector3.up, player.CharacterTurn.Value.y * turnSpeed, Space.Self);
 

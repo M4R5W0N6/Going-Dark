@@ -22,7 +22,6 @@ namespace FOW
 
         public override void Setup()
         {
-            FogOfWarWorld fow;
             if (!Application.isPlaying)
             {
                 return;

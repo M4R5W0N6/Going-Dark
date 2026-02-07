@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
-using MyBox;
 
 public class NetworkInputEventBroadcaster : MonoBehaviour
 {
@@ -39,7 +38,7 @@ public class NetworkInputEventBroadcaster : MonoBehaviour
     private void Update()
     {
         if (!PlayerInput)
-            PlayerInput = FindObjectOfType<PlayerInput>();
+            PlayerInput = FindFirstObjectByType<PlayerInput>();
     }
 
     private void InitPlayerInput()
@@ -285,81 +284,49 @@ public class NetworkInputEventBroadcaster : MonoBehaviour
         CLIENTS
     }
 
-    [Separator("Input Events")]
+    [Header("Input Events")]
     public NetworkEventType BroadcastTarget = NetworkEventType.NONE;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
+
+    [Header("Server Events")]
     public UnityEvent_Vector2 Server_MoveEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent_Vector2 Server_LookEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_FireEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_FireEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_ReloadEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_ReloadEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_AimEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_AimEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent_Float Server_LeanEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_SprintEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_SprintEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.SERVER)]
     public UnityEvent Server_EscapeEvent;
 
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
+    [Header("Client Events")]
     public UnityEvent_Vector2 Client_MoveEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent_Vector2 Client_LookEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_FireEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_FireEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_ReloadEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_ReloadEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_AimEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_AimEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent_Float Client_LeanEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_SprintEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_SprintEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.CLIENTS)]
     public UnityEvent Client_EscapeEvent;
 
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
+    [Header("Local Events")]
     public UnityEvent_Vector2 Local_MoveEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent_Vector2 Local_LookEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_FireEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_FireEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_ReloadEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_ReloadEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_AimEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_AimEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent_Float Local_LeanEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_SprintEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_SprintEndEvent;
-    [ConditionalField(nameof(BroadcastTarget), false, NetworkEventType.LOCAL)]
     public UnityEvent Local_EscapeEvent;
     #endregion
 }
