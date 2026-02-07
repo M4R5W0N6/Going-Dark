@@ -10,14 +10,14 @@ namespace FOW
 {
     public class GenerateInvertedCollider : MonoBehaviour
     {
-        public bool includeChildren = true;
-        public bool disableOldColliders = false;
-        public LayerMask layersToFlip;
+        public bool IncludeChildren = true;
+        public bool DisableOldColliders = false;
+        public LayerMask LayersToFlip;
 #if UNITY_EDITOR
         public SingleUnityLayer FlippedColliderLayer;
 #endif
 
-        public Mesh getFlippedMesh(Mesh mesh)
+        public Mesh GetFlippedMesh(Mesh mesh)
         {
             Mesh newMesh = new Mesh();
 
@@ -27,18 +27,18 @@ namespace FOW
             newMesh.triangles = mesh.triangles.Reverse().ToArray();
 
             return newMesh;
-            GameObject flipped = new GameObject("flipped mesh");
-            flipped.AddComponent<MeshFilter>().mesh = newMesh;
+            //GameObject flipped = new GameObject("flipped mesh");
+            //flipped.AddComponent<MeshFilter>().mesh = newMesh;
         }
 
 #if UNITY_EDITOR
         public IndexedFlippedCol flippedColliders = new IndexedFlippedCol();
-        public void flipColliders()
+        public void FlipColliders()
         {
             Collider[] colliders = new Collider[1];
             if (GetComponent<Collider>() != null)
                 colliders[0] = GetComponent<Collider>();
-            if (includeChildren)
+            if (IncludeChildren)
                 colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0 || colliders[0] == null)
             {
@@ -58,7 +58,7 @@ namespace FOW
             }
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (layersToFlip == (layersToFlip | (1 << colliders[i].gameObject.layer)))
+                if (LayersToFlip == (LayersToFlip | (1 << colliders[i].gameObject.layer)))
                 {
                     if (flippedColliders.ContainsValue(colliders[i].gameObject))
                         continue;
@@ -94,12 +94,12 @@ namespace FOW
                         meshToFlip = colliders[i].GetComponent<MeshCollider>().sharedMesh;
 
                     colliderObject.layer = FlippedColliderLayer.LayerIndex;
-                    colliderObject.GetComponent<MeshCollider>().sharedMesh = getFlippedMesh(meshToFlip);
+                    colliderObject.GetComponent<MeshCollider>().sharedMesh = GetFlippedMesh(meshToFlip);
                     colliderObject.transform.localPosition = Vector3.zero;
                     colliderObject.transform.localRotation = Quaternion.identity;
                     colliderObject.transform.localScale = Vector3.one;
 
-                    if (disableOldColliders)
+                    if (DisableOldColliders)
                         colliders[i].enabled = false;
 
                     if (createdObject != null)
@@ -192,7 +192,7 @@ namespace FOW
             GenerateInvertedCollider gen = (GenerateInvertedCollider)target;
             if (GUILayout.Button("Generate Colliders"))
             {
-                gen.flipColliders();
+                gen.FlipColliders();
                 EditorUtility.SetDirty(gen);
             }
         }

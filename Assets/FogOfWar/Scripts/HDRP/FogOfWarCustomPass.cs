@@ -35,8 +35,8 @@ namespace FOW
             }
 
 
-            fowMaterial = fow.fowMat;
-            fowPass = fowMaterial.FindPass("FOW Pass");
+            fowMaterial = fow.FogOfWarMaterial;
+            fowPass = fowMaterial != null ? fowMaterial.FindPass("FOW Pass") : -1;
         }
 
         protected override void Execute(CustomPassContext ctx)

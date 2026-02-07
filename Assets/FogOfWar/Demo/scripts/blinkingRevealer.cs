@@ -2,27 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FOW
+namespace FOW.Demos
 {
-    public class blinkingRevealer : MonoBehaviour
+    public class BlinkingRevealer : MonoBehaviour
     {
-        public float blinkCycleTime = 5;
+        public float BlinkCycleTime = 5;
 
-        public bool randomOffset = true;
+        public bool RandomOffset = true;
         private void Awake()
         {
-            if (randomOffset)
-                blinkCycleTime += Random.Range(0, blinkCycleTime * .5f);
+            if (RandomOffset)
+                BlinkCycleTime += Random.Range(0, BlinkCycleTime * .5f);
         }
         private void Update()
         {
-            if (Time.time % blinkCycleTime < blinkCycleTime / 2)
+            if (Time.time % BlinkCycleTime < BlinkCycleTime / 2)
             {
-                transform.GetChild(0).gameObject.SetActive(true);
+                if (!transform.GetChild(0).gameObject.activeInHierarchy)
+                    transform.GetChild(0).gameObject.SetActive(true);
             }
             else
             {
-                transform.GetChild(0).gameObject.SetActive(false);
+                if (transform.GetChild(0).gameObject.activeInHierarchy)
+                    transform.GetChild(0).gameObject.SetActive(false);
             }
         }
     }

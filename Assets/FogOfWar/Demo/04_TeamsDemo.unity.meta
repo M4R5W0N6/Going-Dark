@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f77b57e018be1f948acef8d1ae8b1c39
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229484
+  packageName: Pixel-Perfect Fog Of War
+  packageVersion: 3.1.1
+  assetPath: Assets/FogOfWar/Demo/04_TeamsDemo.unity
+  uploadId: 854814

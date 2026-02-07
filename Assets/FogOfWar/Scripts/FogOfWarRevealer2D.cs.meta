@@ -9,3 +9,10 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229484
+  packageName: Pixel-Perfect Fog Of War
+  packageVersion: 3.1.1
+  assetPath: Assets/FogOfWar/Scripts/FogOfWarRevealer2D.cs
+  uploadId: 854814

@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: FogOfWarEffect
   m_EditorClassIdentifier: 
   active: 1
-  m_AdvancedMode: 0
   enabled:
     m_OverrideState: 1
     m_Value: 1
@@ -30,4 +29,20 @@ MonoBehaviour:
   m_Name: FowProfile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: -5354911643990669468}
+  - {fileID: 5169653665378162302}
+--- !u!114 &5169653665378162302
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57995f446426d5c408760f42cccf62da, type: 3}
+  m_Name: FogOfWarEffect
+  m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarEffect
+  active: 1
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1

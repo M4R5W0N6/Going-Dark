@@ -5,3 +5,10 @@ DefaultImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229484
+  packageName: Pixel-Perfect Fog Of War
+  packageVersion: 3.1.1
+  assetPath: Assets/FogOfWar/FOW-URP.unitypackage
+  uploadId: 854814

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FOW
+namespace FOW.Demos
 {
-    public class teamsDemo : MonoBehaviour
+    public class TeamsDemo : MonoBehaviour
     {
         public Text teamText;
 
@@ -17,7 +17,7 @@ namespace FOW
         public List<FogOfWarRevealer> team3Members = new List<FogOfWarRevealer>();
 
         int team;
-        private void Awake()
+        private void Start()
         {
             team = 2;
             changeTeams();

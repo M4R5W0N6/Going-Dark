@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 2f1cfa2a14c47e94d915a1e74f914463
+guid: 50307bbc963e4964ba84bffe2c36cb8a
 DefaultImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229484
+  packageName: Pixel-Perfect Fog Of War
+  packageVersion: 3.1.1
+  assetPath: Assets/FogOfWar/Demo/demo_zy.unity
+  uploadId: 854814

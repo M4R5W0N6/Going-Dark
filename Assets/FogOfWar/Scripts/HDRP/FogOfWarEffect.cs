@@ -10,13 +10,15 @@ namespace FOW
     {
         public BoolParameter enabled = new BoolParameter(false);
 
-        Material fowMaterial;
-        int fowPass;
+        //Material fowMaterial;
+        //int fowPass;
 
-        public bool IsActive() => fowMaterial != null && enabled.value && FogOfWarWorld.instance != null && FogOfWarWorld.instance.enabled;
+        //public bool IsActive() => fowMaterial != null && enabled.value && FogOfWarWorld.instance != null && FogOfWarWorld.instance.enabled;
+        public bool IsActive() => enabled.value && FogOfWarWorld.instance != null && FogOfWarWorld.instance.enabled;
 
         // Do not forget to add this post process in the Custom Post Process Orders list (Project Settings > HDRP Default Settings).
-        public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.BeforeTAA;
+        //public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.BeforeTAA;
+        public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.AfterOpaqueAndSky;
 
         public override void Setup()
         {
@@ -26,37 +28,50 @@ namespace FOW
                 return;
             }
 
-            if (FogOfWarWorld.instance)
-            {
-                fow = FogOfWarWorld.instance;
-            }
-            else
-            {
-                fow = GameObject.FindObjectOfType<FogOfWarWorld>();
-                if (!fow)
-                {
-                    //this.enabled = false;
-                    Debug.Log("You must have a FogOfWarWorld object in your scene to use the FogOfWar Custom Pass");
-                    return;
-                }
-                fow.Initialize();
-            }
+            //if (FogOfWarWorld.instance)
+            //{
+            //    fow = FogOfWarWorld.instance;
+            //}
+            //else
+            //{
+            //    fow = GameObject.FindObjectOfType<FogOfWarWorld>();
+            //    if (!fow)
+            //    {
+            //        //this.enabled = false;
+            //        Debug.Log("You must have a FogOfWarWorld object in your scene to use the FogOfWar Custom Pass");
+            //        return;
+            //    }
+            //    //fow.Initialize();
+            //}
 
-            fowMaterial = fow.fowMat;
-            fowPass = fowMaterial.FindPass("FOW Pass");
+            //fowMaterial = fow.FogOfWarMaterial;
+            //fowPass = fowMaterial.FindPass("FOW Pass");
         }
 
         public override void Render(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination)
         {
-            if (fowMaterial == null)
+            if (FogOfWarWorld.instance == null || !FogOfWarWorld.instance.enabled)
+            {
+                HDUtils.BlitCameraTexture(cmd, source, destination);
+                //Debug.Log("returning");
                 return;
+            }
 
-            cmd.Blit(source, destination, fowMaterial, fowPass);
+            FogOfWarWorld.OnPreRenderFog();
+
+            if (FogOfWarWorld.instance.FogOfWarMaterial == null || FogOfWarWorld.instance.GetFowAppearance() == FogOfWarWorld.FogOfWarAppearance.None)
+            {
+                HDUtils.BlitCameraTexture(cmd, source, destination);
+                return;
+            }
+
+            //cmd.Blit(source, destination, fowMaterial, fowPass);
+            cmd.Blit(source, destination, FogOfWarWorld.instance.FogOfWarMaterial);
         }
 
         public override void Cleanup()
         {
-            CoreUtils.Destroy(fowMaterial);
+            //CoreUtils.Destroy(fowMaterial);
         }
     }
 }

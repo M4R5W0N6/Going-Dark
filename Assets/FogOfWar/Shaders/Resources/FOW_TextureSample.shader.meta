@@ -1,9 +1,17 @@
 fileFormatVersion: 2
-guid: e0cec8fb629f5744ea34cdcba865fdcf
+guid: 6abef5af6a311e841aabef9c5a037a56
 ShaderImporter:
   externalObjects: {}
   defaultTextures: []
   nonModifiableTextures: []
+  preprocessorOverride: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229484
+  packageName: Pixel-Perfect Fog Of War
+  packageVersion: 3.1.1
+  assetPath: Assets/FogOfWar/Shaders/Resources/FOW_TextureSample.shader
+  uploadId: 854814
