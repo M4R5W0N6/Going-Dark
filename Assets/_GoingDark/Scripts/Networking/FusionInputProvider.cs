@@ -179,10 +179,30 @@ public class FusionInputProvider : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        // In multi-peer, only the runner owning the currently presented scene should consume local device input.
+        if (runner == null || !runner.ProvideInput || !IsPresentationRunner(runner))
+        {
+            input.Set(default(FusionNetworkInput));
+            return;
+        }
+
         if (!TryBuildInput(out FusionNetworkInput currentInput))
             currentInput = default;
 
         input.Set(currentInput);
+    }
+
+    private static bool IsPresentationRunner(NetworkRunner runner)
+    {
+        if (runner == null || !runner.IsRunning)
+            return false;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+            return runner.GetVisible();
+
+        int cameraSceneHandle = mainCamera.gameObject.scene.handle;
+        return runner.gameObject.scene.handle == cameraSceneHandle || runner.SimulationUnityScene.handle == cameraSceneHandle;
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

@@ -3416,7 +3416,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4096
     maxStep: 0.5
-    heightOffset: 0
+    heightOffset: -1.08
     footSpeed: 2.5
     footRadius: 0.15
     footCenterOffset: 0

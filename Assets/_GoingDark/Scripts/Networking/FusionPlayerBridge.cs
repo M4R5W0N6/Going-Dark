@@ -1,5 +1,6 @@
 using Fusion;
 using FOW;
+using RootMotion.FinalIK;
 using UnityEngine;
 
 [RequireComponent(typeof(NetworkObject))]
@@ -19,6 +20,8 @@ public class FusionPlayerBridge : NetworkBehaviour
     [SerializeField]
     private Rigidbody characterRigidbody;
     private FogOfWarRevealer[] fogRevealers;
+    private FogOfWarHider[] fogHiders;
+    private GrounderFBBIK grounderIK;
 
     [Networked]
     private Vector3 NetworkPosition { get; set; }
@@ -70,6 +73,7 @@ public class FusionPlayerBridge : NetworkBehaviour
 
     private bool lastHasStateAuthority;
     private bool lastHasInputAuthority;
+    private bool lastIsPresentationRunner;
 
     private void Awake()
     {
@@ -98,6 +102,9 @@ public class FusionPlayerBridge : NetworkBehaviour
             ApplyInput(in input);
         else
             ApplyInput(default);
+
+        if (characterInputController != null)
+            characterInputController.SimulateStateAuthorityStep();
 
         CaptureState();
     }
@@ -132,22 +139,33 @@ public class FusionPlayerBridge : NetworkBehaviour
 
         if (fogRevealers == null || fogRevealers.Length == 0)
             fogRevealers = GetComponentsInChildren<FogOfWarRevealer>(true);
+
+        if (fogHiders == null || fogHiders.Length == 0)
+            fogHiders = GetComponentsInChildren<FogOfWarHider>(true);
+
+        if (grounderIK == null)
+            grounderIK = GetComponentInChildren<GrounderFBBIK>(true);
     }
 
     private void ApplyAuthorityState(bool force)
     {
         bool hasStateAuthority = Object != null && Object.HasStateAuthority;
         bool hasInputAuthority = Object != null && Object.HasInputAuthority;
+        bool isPresentationRunner = IsPresentationRunner();
 
-        if (!force && lastHasStateAuthority == hasStateAuthority && lastHasInputAuthority == hasInputAuthority)
+        if (!force &&
+            lastHasStateAuthority == hasStateAuthority &&
+            lastHasInputAuthority == hasInputAuthority &&
+            lastIsPresentationRunner == isPresentationRunner)
             return;
 
         lastHasStateAuthority = hasStateAuthority;
         lastHasInputAuthority = hasInputAuthority;
+        lastIsPresentationRunner = isPresentationRunner;
 
         if (playerData != null)
         {
-            bool shouldBeLocal = hasInputAuthority;
+            bool shouldBeLocal = hasInputAuthority && isPresentationRunner;
             if (playerData.IsLocalPlayer != shouldBeLocal)
                 playerData.IsLocalPlayer = shouldBeLocal;
 
@@ -161,15 +179,46 @@ public class FusionPlayerBridge : NetworkBehaviour
         if (characterRigidbody != null)
             characterRigidbody.isKinematic = !hasStateAuthority;
 
+        if (grounderIK != null)
+        {
+            grounderIK.enabled = hasInputAuthority && isPresentationRunner;
+        }
+
         if (fogRevealers != null)
         {
             for (int i = 0; i < fogRevealers.Length; i++)
             {
                 FogOfWarRevealer revealer = fogRevealers[i];
                 if (revealer != null)
-                    revealer.enabled = hasInputAuthority;
+                    revealer.enabled = hasInputAuthority && isPresentationRunner;
             }
         }
+
+        if (fogHiders != null)
+        {
+            for (int i = 0; i < fogHiders.Length; i++)
+            {
+                FogOfWarHider hider = fogHiders[i];
+                if (hider != null)
+                    hider.enabled = !hasInputAuthority && isPresentationRunner;
+            }
+        }
+    }
+
+    private bool IsPresentationRunner()
+    {
+        if (Object == null || Object.Runner == null || !Object.Runner.IsRunning)
+            return true;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+            return Object.Runner.GetVisible();
+
+        int cameraSceneHandle = mainCamera.gameObject.scene.handle;
+        if (gameObject.scene.handle == cameraSceneHandle)
+            return true;
+
+        return Object.Runner.SimulationUnityScene.handle == cameraSceneHandle;
     }
 
     private static ulong ToOwnerId(PlayerRef playerRef)

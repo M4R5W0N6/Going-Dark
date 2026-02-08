@@ -59,23 +59,17 @@ public class LocalInputDriver : MonoBehaviour
 
     private bool CanDriveThisPlayer()
     {
-        if (player == null)
-            return false;
-
-        if (player.IsLocalPlayer)
-            return true;
-
-        return PlayerData.LocalPlayer == player;
+        return player != null && PlayerData.LocalPlayer == player;
     }
 
     private void Update()
     {
+        PlayerData owner = PlayerData.OwnerPlayer;
+        if (owner != null && player != owner)
+            player = owner;
+
         if (player == null)
-        {
-            player = PlayerData.OwnerPlayer;
-            if (player == null)
-                return;
-        }
+            return;
 
         if (moveAction == null || lookAction == null)
             ResolveInputActions();

@@ -951,7 +951,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157207112}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
   m_Name: 
@@ -3240,6 +3240,7 @@ GameObject:
   - component: {fileID: 938072084}
   - component: {fileID: 938072086}
   - component: {fileID: 938072083}
+  - component: {fileID: 938072087}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -3328,6 +3329,24 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
+--- !u!114 &938072087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 938072082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Unity::Fusion.EnableOnSingleRunner
+  PreferredRunner: 0
+  Components:
+  - {fileID: 938072084}
+  - {fileID: 938072086}
+  - {fileID: 938072083}
+  _guid: c3531f52-8cea-4d9d-
 --- !u!1 &940199501
 GameObject:
   m_ObjectHideFlags: 0
@@ -4653,13 +4672,13 @@ MonoBehaviour:
   StartMode: 0
   AutoStartAs: 2
   AutoHideGUI: 1
-  AutoClients: 1
+  AutoClients: 0
   ClientStartDelay: 0.1
   ServerPort: 0
   DefaultRoomName: 
   InitialScenePath: 
   _currentStage: 0
-  AutoConnectVirtualInstances: 1
+  AutoConnectVirtualInstances: 0
   VirtualInstanceConnectDelay: 1
 --- !u!4 &1407912749
 Transform:
@@ -4911,6 +4930,7 @@ GameObject:
   - component: {fileID: 1628683238}
   - component: {fileID: 1628683237}
   - component: {fileID: 1628683240}
+  - component: {fileID: 1628683241}
   m_Layer: 0
   m_Name: Prototype Runner
   m_TagString: Untagged
@@ -5036,6 +5056,18 @@ MonoBehaviour:
   - {fileID: 1204216574}
   - {fileID: 1068053702}
   disableOfflineSceneCharacters: 1
+--- !u!114 &1628683241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628683236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8edbe7108d8a43ab838cf8b8d9453df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.RunnerEnableVisibility
 --- !u!1 &1742416371
 GameObject:
   m_ObjectHideFlags: 0
@@ -5566,14 +5598,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1823688464}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Unity::Fusion.EnableOnSingleRunner
   PreferredRunner: 0
   Components:
+  - {fileID: 1823688466}
   - {fileID: 1823688465}
+  - {fileID: 1823688468}
+  - {fileID: 1823688469}
+  - {fileID: 1823688470}
   _guid: a8ebe109-923c-4658-
 --- !u!1 &1849610986
 GameObject:
@@ -5699,6 +5735,7 @@ GameObject:
   - component: {fileID: 1978201662}
   - component: {fileID: 1978201661}
   - component: {fileID: 1978201660}
+  - component: {fileID: 1978201664}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -5789,6 +5826,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1978201664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1978201659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Unity::Fusion.EnableOnSingleRunner
+  PreferredRunner: 0
+  Components:
+  - {fileID: 1978201662}
+  - {fileID: 1978201661}
+  - {fileID: 1978201660}
+  _guid: 3f2a5741-c5df-4878-
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1

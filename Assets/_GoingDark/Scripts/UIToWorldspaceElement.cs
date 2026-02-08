@@ -17,7 +17,11 @@ public class UIToWorldspaceElement : MonoBehaviour
         Vector3 screenPos = target.position;
         screenPos.z = CustomUtilities.DefaultScalarDistance;
 
-        trackedPosition = Camera.main.ScreenToWorldPoint(screenPos);
+        Camera camera = CustomUtilities.GetBestCamera(transform);
+        if (camera == null)
+            return;
+
+        trackedPosition = camera.ScreenToWorldPoint(screenPos);
 
         transform.position = Vector3.Lerp(transform.position, trackedPosition, Time.fixedDeltaTime * moveSpeed);
     }
