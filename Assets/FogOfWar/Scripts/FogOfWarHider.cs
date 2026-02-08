@@ -127,6 +127,14 @@ namespace FOW
 
         void CalculateSamplePointData()
         {
+            List<Transform> ValidSamplePoints = new List<Transform>();
+            for (int i = 0; i < SamplePoints.Length; i++)
+            {
+                if (SamplePoints[i] != null)
+                    ValidSamplePoints.Add(SamplePoints[i]);
+            }
+            SamplePoints = ValidSamplePoints.ToArray();
+            
             if (SamplePoints.Length == 0)
             {
                 SamplePoints = new Transform[1];

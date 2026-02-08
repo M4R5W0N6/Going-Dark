@@ -37,10 +37,20 @@ namespace FOW
 
             fowMaterial = fow.FogOfWarMaterial;
             fowPass = fowMaterial != null ? fowMaterial.FindPass("FOW Pass") : -1;
+            if (fowMaterial == null || fowPass < 0)
+            {
+                this.enabled = false;
+                Debug.LogWarning("FogOfWar Custom Pass could not resolve the FOW material pass.");
+            }
         }
 
         protected override void Execute(CustomPassContext ctx)
         {
+            if (!Application.isPlaying || fowMaterial == null || fowPass < 0)
+            {
+                return;
+            }
+
             ctx.cmd.Blit(ctx.cameraColorBuffer, ctx.cameraColorBuffer, fowMaterial, fowPass);
         }
     }

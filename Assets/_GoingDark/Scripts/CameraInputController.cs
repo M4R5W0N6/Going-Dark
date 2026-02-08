@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
 
-public class CameraInputController : MonoBehaviour, IEventListener
+public class CameraInputController : MonoBehaviour
 {
     [SerializeField]
     private CinemachineVirtualCamera menuCamera, defaultCamera, aimingCamera;

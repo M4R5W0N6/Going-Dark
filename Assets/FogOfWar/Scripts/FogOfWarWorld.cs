@@ -1917,6 +1917,8 @@ namespace FOW
             _gridRangesBuffer = new ComputeBuffer(_tableSize, sizeof(int) * 2);
             _revealerGridIdsBuffer = new ComputeBuffer(_maxGridIds, sizeof(int));
 
+            _gridRangesBuffer.SetData(_ranges);
+            
             FogOfWarWorld.instance.BindSpatialHashComputeBuffersToAllMaterials();
         }
 

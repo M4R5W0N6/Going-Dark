@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using LocalData;
 
-public class PlayerData : MonoBehaviour, IEventListener
+public class PlayerData : MonoBehaviour
 {
     private static List<PlayerData> players;
     public static List<PlayerData> Players
@@ -18,8 +17,14 @@ public class PlayerData : MonoBehaviour, IEventListener
 
     public static PlayerData GetPlayer(ulong ownerId)
     {
-        // Single-player: just return the first player
-        return Players.Count > 0 ? Players[0] : null;
+        List<PlayerData> currentPlayers = Players;
+        for (int i = 0; i < currentPlayers.Count; i++)
+        {
+            if (currentPlayers[i] != null && currentPlayers[i].NetworkOwnerId == ownerId)
+                return currentPlayers[i];
+        }
+
+        return currentPlayers.Count > 0 ? currentPlayers[0] : null;
     }
 
     private static PlayerData ownerPlayer;
@@ -27,10 +32,7 @@ public class PlayerData : MonoBehaviour, IEventListener
     {
         get
         {
-            if (ownerPlayer)
-                return ownerPlayer;
-
-            ownerPlayer = Players.Count > 0 ? Players[0] : null;
+            ownerPlayer = LocalPlayer;
             return ownerPlayer;
         }
     }
@@ -40,19 +42,81 @@ public class PlayerData : MonoBehaviour, IEventListener
     {
         get
         {
-            if (localPlayer)
+            if (IsValidCachedLocalPlayer(localPlayer))
                 return localPlayer;
 
-            localPlayer = Players.Count > 0 ? Players[0] : null;
+            localPlayer = null;
+
+            List<PlayerData> currentPlayers = Players;
+            for (int i = 0; i < currentPlayers.Count; i++)
+            {
+                if (currentPlayers[i] != null && currentPlayers[i].isLocalPlayer)
+                {
+                    localPlayer = currentPlayers[i];
+                    return localPlayer;
+                }
+            }
+
+            localPlayer = currentPlayers.Count > 0 ? currentPlayers[0] : null;
             return localPlayer;
         }
     }
 
+    [SerializeField]
+    private bool isLocalPlayer;
+    public bool IsLocalPlayer
+    {
+        get => isLocalPlayer;
+        set
+        {
+            isLocalPlayer = value;
+
+            if (value)
+                SetLocalPlayer(this);
+            else if (localPlayer == this)
+                localPlayer = null;
+        }
+    }
+
+    [SerializeField]
+    private ulong networkOwnerId;
+    public ulong NetworkOwnerId => networkOwnerId;
+
+    public static void SetLocalPlayer(PlayerData player)
+    {
+        localPlayer = player;
+        ownerPlayer = player;
+    }
+
+    public void SetNetworkOwnerId(ulong ownerId)
+    {
+        networkOwnerId = ownerId;
+    }
+
     private void Start() { }
-    private void OnDestroy() { }
+    private void OnDisable()
+    {
+        if (localPlayer == this)
+            localPlayer = null;
+
+        if (ownerPlayer == this)
+            ownerPlayer = null;
+    }
+
+    private void OnDestroy()
+    {
+        if (localPlayer == this)
+            localPlayer = null;
+
+        if (ownerPlayer == this)
+            ownerPlayer = null;
+    }
 
     private void Update()
     {
+        if (!IsLocalPlayer)
+            return;
+
         CameraPosition.Value = Camera.main ? Camera.main.transform.position : Vector3.zero;
     }
 
@@ -114,4 +178,9 @@ public class PlayerData : MonoBehaviour, IEventListener
     public ObservableVariable<bool> CharacterIsOnTarget = new ObservableVariable<bool>(false); // whether the player is going to shoot where they're aiming
     public ObservableVariable<bool> CharacterIsReloading = new ObservableVariable<bool>(false); // if the player is done reloading (in worldspace)
     #endregion
+
+    private static bool IsValidCachedLocalPlayer(PlayerData player)
+    {
+        return player != null && player.isActiveAndEnabled;
+    }
 }

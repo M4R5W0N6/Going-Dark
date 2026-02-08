@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// Simple local-only input driver that writes Input System values into PlayerData
+/// Simple local-only input driver that writes Input System values into PlayerData.
 [RequireComponent(typeof(PlayerData))]
-[RequireComponent(typeof(PlayerInput))]
 public class LocalInputDriver : MonoBehaviour
 {
-    private PlayerInput playerInput;
+    [SerializeField]
+    private PlayerInput scenePlayerInput;
+
     private PlayerData player;
 
     private InputAction moveAction;
@@ -19,35 +20,52 @@ public class LocalInputDriver : MonoBehaviour
 
     private void Awake()
     {
-        TryGetComponent(out playerInput);
         TryGetComponent(out player);
     }
 
     private void OnEnable()
     {
-        if (playerInput == null) return;
-
-        var actions = playerInput.actions;
-        moveAction = actions["Move"];lookAction = actions["Look"];fireAction = actions["Fire"];reloadAction = actions["Reload"];aimAction = actions["Aim"];leanAction = actions["Lean"];sprintAction = actions["Sprint"]; 
-
-        moveAction?.Enable();
-        lookAction?.Enable();
-        fireAction?.Enable();
-        reloadAction?.Enable();
-        aimAction?.Enable();
-        leanAction?.Enable();
-        sprintAction?.Enable();
+        ResolveInputActions();
     }
 
     private void OnDisable()
     {
-        moveAction?.Disable();
-        lookAction?.Disable();
-        fireAction?.Disable();
-        reloadAction?.Disable();
-        aimAction?.Disable();
-        leanAction?.Disable();
-        sprintAction?.Disable();
+        moveAction = null;
+        lookAction = null;
+        fireAction = null;
+        reloadAction = null;
+        aimAction = null;
+        leanAction = null;
+        sprintAction = null;
+    }
+
+    private void ResolveInputActions()
+    {
+        if (scenePlayerInput == null || !scenePlayerInput.isActiveAndEnabled)
+            scenePlayerInput = FindFirstObjectByType<PlayerInput>();
+
+        if (scenePlayerInput == null || scenePlayerInput.actions == null)
+            return;
+
+        var actions = scenePlayerInput.actions;
+        moveAction = actions.FindAction("Move", false);
+        lookAction = actions.FindAction("Look", false);
+        fireAction = actions.FindAction("Fire", false);
+        reloadAction = actions.FindAction("Reload", false);
+        aimAction = actions.FindAction("Aim", false);
+        leanAction = actions.FindAction("Lean", false);
+        sprintAction = actions.FindAction("Sprint", false);
+    }
+
+    private bool CanDriveThisPlayer()
+    {
+        if (player == null)
+            return false;
+
+        if (player.IsLocalPlayer)
+            return true;
+
+        return PlayerData.LocalPlayer == player;
     }
 
     private void Update()
@@ -55,8 +73,15 @@ public class LocalInputDriver : MonoBehaviour
         if (player == null)
         {
             player = PlayerData.OwnerPlayer;
-            if (player == null) return;
+            if (player == null)
+                return;
         }
+
+        if (moveAction == null || lookAction == null)
+            ResolveInputActions();
+
+        if (!CanDriveThisPlayer())
+            return;
 
         if (moveAction != null)
             player.SetInputMove(moveAction.ReadValue<Vector2>());
@@ -84,7 +109,7 @@ public class LocalInputDriver : MonoBehaviour
 
         if (leanAction != null)
         {
-            // Map [-1,1] → [0,1]
+            // Map [-1,1] to [0,1]
             float raw = leanAction.ReadValue<float>();
             float mapped = raw * 0.5f + 0.5f;
             player.SetInput_Lean(mapped);
@@ -97,5 +122,3 @@ public class LocalInputDriver : MonoBehaviour
         }
     }
 }
-
-
