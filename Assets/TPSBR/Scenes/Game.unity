@@ -8494,6 +8494,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gameplay
       objectReference: {fileID: 0}
+    - target: {fileID: 8830440039824677774, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: FowResX
+      value: 4096
+      objectReference: {fileID: 0}
+    - target: {fileID: 8830440039824677774, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: FowResY
+      value: 4096
+      objectReference: {fileID: 0}
+    - target: {fileID: 8830440039824677774, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: UseRegrow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8830440039824677774, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: UseWorldBounds
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9080143026142482366, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
       propertyPath: m_ForceIntoRT
       value: 0

@@ -11,7 +11,6 @@ using static FOW.FogOfWarRevealer3D;
 using Unity.Mathematics;
 using UnityEngine.Rendering;
 using Unity.Profiling;
-using UnityEditor.Experimental.GraphView;
 
 
 #if UNITY_EDITOR

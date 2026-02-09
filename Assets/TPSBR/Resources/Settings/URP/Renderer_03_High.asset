@@ -27,6 +27,7 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 9150547372020699685}
   - {fileID: 6655370625985388588}
+  - {fileID: 120001003}
   m_RendererFeatureMap: 2592ad695a46fd7e2ca06d9a52a05c5c
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
@@ -34,13 +35,13 @@ MonoBehaviour:
   m_AssetVersion: 3
   m_PrepassLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4278190079
   m_OpaqueLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4278190079
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4278190079
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
@@ -85,3 +86,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   _resources: {fileID: 11400000, guid: 231d88937a104094b8e4e0fdb8d2e77b, type: 2}
+--- !u!114 &120001003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de80c3d5a104f07ad41dd71a0c1f4aa, type: 3}
+  m_Name: FogOfWarStencilFeature
+  m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarStencilFeature
+  m_Active: 1
+  renderPassEvent: 300
+  actorLayerMask:
+    serializedVersion: 2
+    m_Bits: 16777216
+  visibilityThreshold: 0.5
+  applyInSceneView: 1

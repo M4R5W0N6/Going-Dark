@@ -582,7 +582,7 @@ GameObject:
   - component: {fileID: 5716663943389591712}
   - component: {fileID: 6805317486278066857}
   m_Layer: 0
-  m_Name: FoW (Player)
+  m_Name: FoW (Agent)
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -622,7 +622,7 @@ MonoBehaviour:
   unobscuredSoftenDistance: 0.25
   visionHeight: 10
   visionHeightSoftenDistance: 1
-  viewAngle: 125
+  viewAngle: 100
   opacity: 1
   EyeOffset: 1.65
   ShaderEyeOffset: 0
@@ -635,7 +635,7 @@ MonoBehaviour:
   addCorners: 1
   ObstacleMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   OcclusionQuality: 5
   raycastResolution: 2.5
   NumExtraIterations: 4
@@ -5076,6 +5076,7 @@ GameObject:
   - component: {fileID: 2084853432409141758}
   - component: {fileID: 3227591614157517285}
   - component: {fileID: 42101657442118405}
+  - component: {fileID: 112233445566778899}
   m_Layer: 8
   m_Name: AgentBase
   m_TagString: Untagged
@@ -5197,7 +5198,7 @@ MonoBehaviour:
     ColliderLayer: 11
     CollisionLayerMask:
       serializedVersion: 2
-      m_Bits: 2305
+      m_Bits: 16779521
     Features: -1
     InputAuthorityBehavior: 1
     StateAuthorityBehavior: 0
@@ -5551,6 +5552,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 7479170632602112611}
   _enableLogs: 1
+--- !u!114 &112233445566778899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6241de6004a49b0b875bd4516987260, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _disableOnDedicatedServer: 1
+  _disableWhenPeerNotVisible: 1
+  _revealers: []
+  _hiders: []
+  _useHiderComponents: 0
+  _usePartialHiderMaterials: 0
+  _assignVisualRenderersToFoWLayer: 1
+  _visualRendererLayerName: FoW
+  _visualsRoot: {fileID: 4348347289748489880}
+  _partialHiderOpaqueTemplate: {fileID: 2100000, guid: 74bdf2f4a40cc9240a485da3ae79912d, type: 2}
+  _partialHiderTransparentTemplate: {fileID: 2100000, guid: 764a5f43ae94c0b41b40a010eb361e85, type: 2}
+  _forceTransparentPartialShader: 1
+  _swapMaterialsAtRuntime: 1
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0

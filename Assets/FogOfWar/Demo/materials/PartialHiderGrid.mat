@@ -8,16 +8,15 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PartialHiderGrid
-  m_Shader: {fileID: -6465566751694194690, guid: db1c1192b07f6304fb423e80da8b8823,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: db1c1192b07f6304fb423e80da8b8823, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - INNER_SOFTEN
   - SOFT
   - USE_SPATIAL_HASHING
   - USE_TEXTURE_BLUR
   m_InvalidKeywords:
+  - INNER_SOFTEN
   - IS_3D
   - SAMPLE_TEXTURE
   - _SURFACE_TYPE_TRANSPARENT
@@ -147,6 +146,7 @@ Material:
     - _UVOffset: {r: 0, g: 0, b: 0, a: 0}
     - _UVScale: {r: 2, g: 2, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &580613637559718568
 MonoBehaviour:
   m_ObjectHideFlags: 11

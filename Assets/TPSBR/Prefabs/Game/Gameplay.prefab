@@ -135,7 +135,7 @@ MonoBehaviour:
   WorldBoundsInfluence: 1
   InvertFowEffect: 0
   AllowBleeding: 0
-  FOWSamplingMode: 0
+  FOWSamplingMode: 1
   HidersUseFogTexture: 1
   HiderSeenThreshold: 0.5
   AsyncReadbackFogDataToCpu: 0
@@ -154,7 +154,7 @@ MonoBehaviour:
   MaxFogRegrowAmount: 0.3
   WorldBounds:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    m_Extent: {x: 128, y: 128, z: 128}
   UpdateMethod: 1
   RevealerUpdateMode: 1
   MaxNumRevealersPerFrame: 25
@@ -614,6 +614,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1923010081, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 1857658018939495220, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
       propertyPath: _precacheObjects.Array.size
       value: 0

@@ -28,6 +28,12 @@ namespace TPSBR
 			base.OnInitialize();
 
 			_cameraCullingMask = _camera.cullingMask;
+
+			int fowLayer = LayerMask.NameToLayer("FoW");
+			if (fowLayer >= 0)
+			{
+				_cameraCullingMask |= 1 << fowLayer;
+			}
 		}
 
 		protected override void OnTick()

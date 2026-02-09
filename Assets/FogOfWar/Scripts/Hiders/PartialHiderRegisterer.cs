@@ -21,10 +21,16 @@ namespace FOW
 
         public void RegisterMaterials()
         {
+            if (MaterialsToInitialize == null || MaterialsToInitialize.Length == 0)
+                return;
+
             if (InitializedMaterials == null)
                 InitializedMaterials = new Dictionary<Material, PartialHider>();
             foreach (Material mat in MaterialsToInitialize)
             {
+                if (mat == null)
+                    continue;
+
                 if (!InitializedMaterials.ContainsKey(mat))
                     InitializedMaterials.Add(mat, new PartialHider(mat));
 
@@ -34,10 +40,16 @@ namespace FOW
 
         public void DeRegisterMaterials()
         {
+            if (MaterialsToInitialize == null || MaterialsToInitialize.Length == 0)
+                return;
+
             if (InitializedMaterials == null)
                 InitializedMaterials = new Dictionary<Material, PartialHider>();
             foreach (Material mat in MaterialsToInitialize)
             {
+                if (mat == null)
+                    continue;
+
                 if (!InitializedMaterials.ContainsKey(mat))
                     InitializedMaterials.Add(mat, new PartialHider(mat));
 

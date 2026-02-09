@@ -121,6 +121,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
+    - _DstBlendAlpha: 10
     - _FowEffectStrength: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -144,6 +145,7 @@ Material:
     - _Smoothness_Min_SmoothnessRemapMin: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
+    - _SrcBlendAlpha: 1
     - _Surface: 1
     - _UVSec: 0
     - _WorkflowMode: 1
