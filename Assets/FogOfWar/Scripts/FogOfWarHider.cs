@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
@@ -134,7 +135,7 @@ namespace FOW
                     ValidSamplePoints.Add(SamplePoints[i]);
             }
             SamplePoints = ValidSamplePoints.ToArray();
-            
+
             if (SamplePoints.Length == 0)
             {
                 SamplePoints = new Transform[1];

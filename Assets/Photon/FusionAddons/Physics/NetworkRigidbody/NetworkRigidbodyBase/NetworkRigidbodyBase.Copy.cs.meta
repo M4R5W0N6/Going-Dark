@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 3aa098325a65d4a1e87dac2eb5a06a8e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/Photon/FusionAddons/Physics/NetworkRigidbody/NetworkRigidbodyBase/NetworkRigidbodyBase.Copy.cs
+  uploadId: 718661

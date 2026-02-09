@@ -251,22 +251,9 @@ namespace FOW
 
         static bool quitSubscribed = false;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void OnLoad()
+        public static void OnLoad()
         {
-            if (_iterationPool != null)
-            {
-                foreach (SightIteration s in _iterationPool)
-                {
-                    if (s != null && s.RayAngles.IsCreated)
-                        s.DisposeStruct();
-                }
-            }
-
-            _iterationPool = new SightIteration[1000];
-            for (int i = 0; i < _iterationPool.Length; i++)
-                _iterationPool[i] = CreateNewExtraIteration();
-
-            _sightIterationPoolIndex = 0;
+            InitializeIterationPool();
 
             //Application.quitting -= OnShutDown;
             if (!quitSubscribed)
@@ -274,7 +261,27 @@ namespace FOW
             quitSubscribed = true;
         }
 
-        static void OnShutDown()
+        public static void OnShutDown()
+        {
+            Application.quitting -= OnShutDown;
+            CleanupIterationPool();
+        }
+
+        static void InitializeIterationPool()
+        {
+            if (_iterationPool != null)
+            {
+                CleanupIterationPool();
+            }
+
+            _iterationPool = new SightIteration[1000];
+            for (int i = 0; i < _iterationPool.Length; i++)
+                _iterationPool[i] = CreateNewExtraIteration();
+
+            _sightIterationPoolIndex = 0;
+        }
+
+        static void CleanupIterationPool()
         {
             foreach (SightIteration s in _iterationPool)
             {

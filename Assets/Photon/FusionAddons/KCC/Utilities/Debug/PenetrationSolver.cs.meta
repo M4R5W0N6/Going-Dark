@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 3d2fa6f3d2804377af7317d2a1baf75f
+timeCreated: 1720185457
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/Photon/FusionAddons/KCC/Utilities/Debug/PenetrationSolver.cs
+  uploadId: 718661

@@ -403,6 +403,11 @@ namespace FOW
             ResetStatics();
         }
 
+#if UNITY_EDITOR
+        public event Action OnRecompileStart;
+        public event Action OnRecompileFinish;
+#endif
+
         static void ResetStatics()
         {
             instance = null;
@@ -1918,7 +1923,7 @@ namespace FOW
             _revealerGridIdsBuffer = new ComputeBuffer(_maxGridIds, sizeof(int));
 
             _gridRangesBuffer.SetData(_ranges);
-            
+
             FogOfWarWorld.instance.BindSpatialHashComputeBuffersToAllMaterials();
         }
 

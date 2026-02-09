@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1a714651de5a3064b976d937ff6309c6
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/Photon/FusionAddons/Physics/Editor/Fusion.Addons.Physics.Editor.asmdef
+  uploadId: 718661

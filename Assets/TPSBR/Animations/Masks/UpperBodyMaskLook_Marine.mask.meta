@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: f854eff68247aae43848caf2564a2de5
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/TPSBR/Animations/Masks/UpperBodyMaskLook_Marine.mask
+  uploadId: 718661

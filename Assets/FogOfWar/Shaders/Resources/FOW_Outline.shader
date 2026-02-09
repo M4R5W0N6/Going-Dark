@@ -13,13 +13,14 @@ Shader "Hidden/FullScreen/FOW/Outline"
         Pass
         {
             CGPROGRAM
-            #pragma multi_compile_local IS_2D IS_3D
+            #pragma multi_compile_local _ IS_2D
 
             #pragma vertex vert
             #pragma fragment frag
 
             #include "UnityCG.cginc"
             #include_with_pragmas "../FogOfWarLogic.hlsl"
+            //#include "../FogOfWarLogic.hlsl"
 
             struct appdata
             {
@@ -69,7 +70,7 @@ Shader "Hidden/FullScreen/FOW/Outline"
                 pos+= _cameraPosition;
                 FOW_Rotate_Degrees_float(pos, _cameraPosition, -_cameraRotation, pos);
                 height = 0;
-#elif IS_3D
+#else
                 const float2 p11_22 = float2(unity_CameraProjection._11, unity_CameraProjection._22);
                 const float2 p13_31 = float2(unity_CameraProjection._13, unity_CameraProjection._23);
                 const float isOrtho = unity_OrthoParams.w;
