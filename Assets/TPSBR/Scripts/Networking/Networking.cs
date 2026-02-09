@@ -783,49 +783,52 @@ namespace TPSBR
 
 		private void UpdatePeerSwitch(GamePeer[] peers)
 		{
-			int  newID      = -1;
-			bool showOthers = false;
+			int selectedPeerID = -1;
 
 			bool canSwitchPeer = Application.isEditor == true ? true : Keyboard.current.leftCtrlKey.isPressed == true && Keyboard.current.leftShiftKey.isPressed == true;
 			if (canSwitchPeer == true)
 			{
-				if (Keyboard.current.numpad1Key.wasPressedThisFrame == true)
+				Mouse mouse = Mouse.current;
+				if (mouse == null)
+					return;
+
+				int direction = 0;
+				if (mouse.backButton.wasPressedThisFrame == true)
 				{
-					newID = 0;
+					direction = -1;
 				}
-				else if (Keyboard.current.numpad2Key.wasPressedThisFrame == true)
+				else if (mouse.forwardButton.wasPressedThisFrame == true)
 				{
-					newID = 1;
+					direction = 1;
 				}
-				else if (Keyboard.current.numpad3Key.wasPressedThisFrame == true)
+
+				if (direction != 0)
 				{
-					newID = 2;
-				}
-				else if (Keyboard.current.numpad4Key.wasPressedThisFrame == true)
-				{
-					newID = 0;
-					showOthers = true;
-				}
-				else if (Keyboard.current.numpad5Key.wasPressedThisFrame == true)
-				{
-					newID = 1;
-					showOthers = true;
-				}
-				else if (Keyboard.current.numpad6Key.wasPressedThisFrame == true)
-				{
-					newID = 2;
-					showOthers = true;
+					int currentPeerIndex = 0;
+					for (int i = 0; i < peers.Length; i++)
+					{
+						if (peers[i].Context != null && peers[i].Context.HasInput == true)
+						{
+							currentPeerIndex = i;
+							break;
+						}
+					}
+
+					int nextPeerIndex = (currentPeerIndex + direction + peers.Length) % peers.Length;
+					selectedPeerID = peers[nextPeerIndex].ID;
 				}
 			}
 
-			if (newID >= 0 && newID < peers.Length)
+			if (selectedPeerID >= 0)
 			{
 				for (int i = 0; i < peers.Length; i++)
 				{
 					GamePeer peer = peers[i];
+					if (peer.Context == null)
+						continue;
 
-					peer.Context.HasInput = peer.ID == newID;
-					peer.Context.IsVisible = peer.ID == newID || showOthers == true;
+					peer.Context.HasInput = peer.ID == selectedPeerID;
+					peer.Context.IsVisible = peer.ID == selectedPeerID;
 				}
 			}
 		}
