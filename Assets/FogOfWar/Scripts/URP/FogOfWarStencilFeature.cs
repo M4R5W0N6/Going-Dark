@@ -10,41 +10,30 @@ using UnityEngine.Rendering.RenderGraphModule;
 namespace FOW
 {
     /// <summary>
-    /// Renders actor layer objects only where the current Fog Of War texture is revealed.
-    /// Keeps actor materials opaque by using a stencil prepass instead of transparent FoW shaders.
+    /// Renders layer-mask objects only where the current Fog Of War texture is revealed.
+    /// Keeps materials opaque by using a stencil prepass instead of transparent FoW shaders.
     /// </summary>
     public sealed class FogOfWarStencilFeature : ScriptableRendererFeature
     {
-        [Header("Pass")]
         public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
-        public LayerMask actorLayerMask = 1 << 24; // "FoW"
+        public LayerMask layerMask = 1 << 24;
 
-        [Header("Mask")]
-        [Range(0f, 1f)]
-        public float visibilityThreshold = 0.5f;
-
-        [Tooltip("If false, the feature is ignored for SceneView cameras.")]
-        public bool applyInSceneView = true;
-
-        private FogOfWarActorVisibilityPass _pass;
+        private FogOfWarVisibilityPass _pass;
         private Material _stencilMaterial;
 
         public override void Create()
         {
-            _pass = new FogOfWarActorVisibilityPass();
+            _pass = new FogOfWarVisibilityPass();
             _pass.renderPassEvent = renderPassEvent;
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (applyInSceneView == false && renderingData.cameraData.cameraType == CameraType.SceneView)
-                return;
-
             if (EnsureStencilMaterial() == false)
                 return;
 
             _pass.renderPassEvent = renderPassEvent;
-            _pass.Setup(_stencilMaterial, actorLayerMask, visibilityThreshold);
+            _pass.Setup(_stencilMaterial, layerMask);
 #if UNITY_6000_0_OR_NEWER
             _pass.SetupRenderGraph();
 #endif
@@ -62,7 +51,7 @@ namespace FOW
             if (_stencilMaterial != null)
                 return true;
 
-            Shader shader = Shader.Find("Hidden/FOW/URP/StencilMask");
+            Shader shader = Shader.Find("Hidden/FOW/URP/FoW_MaskStencil");
             if (shader == null)
                 return false;
 
@@ -70,14 +59,15 @@ namespace FOW
             return _stencilMaterial != null;
         }
 
-        private sealed class FogOfWarActorVisibilityPass : ScriptableRenderPass
+        private sealed class FogOfWarVisibilityPass : ScriptableRenderPass
         {
-            private static readonly ProfilingSampler ProfilingSampler = new ProfilingSampler("FOW Actor Visibility");
+            private static readonly ProfilingSampler ProfilingSampler = new ProfilingSampler("FOW Visibility");
 
-            private static readonly List<ShaderTagId> ShaderTagIds = new List<ShaderTagId>(4)
+            private static readonly List<ShaderTagId> ShaderTagIds = new List<ShaderTagId>(5)
             {
                 new ShaderTagId("UniversalForward"),
                 new ShaderTagId("UniversalForwardOnly"),
+                new ShaderTagId("UniversalGBuffer"),
                 new ShaderTagId("SRPDefaultUnlit"),
                 new ShaderTagId("LightweightForward"),
             };
@@ -86,30 +76,32 @@ namespace FOW
             private static readonly int WorldBoundsId = Shader.PropertyToID("_worldBounds");
             private static readonly int FowPlaneId = Shader.PropertyToID("_fowPlane");
             private static readonly int VisibilityThresholdId = Shader.PropertyToID("_VisibilityThreshold");
+            private static readonly int UseWorldSamplingId = Shader.PropertyToID("_UseWorldSampling");
+            private static readonly int UseDitheredSoftEdgeId = Shader.PropertyToID("_UseDitheredSoftEdge");
 
             private Material _stencilMaterial;
             private FilteringSettings _filtering;
-            private float _visibilityThreshold;
             private bool _warnedMissingFowTexture;
+            private const FogOfWarWorld.FogSampleMode FallbackSamplingMode = FogOfWarWorld.FogSampleMode.Texture;
+            private const bool UseDitheredSoftEdge = true;
 
             private RenderStateBlock _clearStencilState;
             private RenderStateBlock _writeStencilState;
             private RenderStateBlock _testStencilState;
 
-            public FogOfWarActorVisibilityPass()
+            public FogOfWarVisibilityPass()
             {
-                _filtering = new FilteringSettings(RenderQueueRange.opaque, ~0);
+                _filtering = new FilteringSettings(RenderQueueRange.all, ~0);
 
                 _clearStencilState = CreateStencilState(0, CompareFunction.Always, StencilOp.Replace);
                 _writeStencilState = CreateStencilState(1, CompareFunction.Always, StencilOp.Replace);
                 _testStencilState = CreateStencilState(1, CompareFunction.Equal, StencilOp.Keep);
             }
 
-            public void Setup(Material stencilMaterial, LayerMask actorLayerMask, float visibilityThreshold)
+            public void Setup(Material stencilMaterial, LayerMask selectedLayerMask)
             {
                 _stencilMaterial = stencilMaterial;
-                _filtering = new FilteringSettings(RenderQueueRange.opaque, actorLayerMask);
-                _visibilityThreshold = visibilityThreshold;
+                _filtering = new FilteringSettings(RenderQueueRange.all, selectedLayerMask);
             }
 
 #if UNITY_6000_0_OR_NEWER
@@ -119,12 +111,12 @@ namespace FOW
                 public RendererListHandle fallbackRendererList;
                 public RendererListHandle clearStencilRendererList;
                 public RendererListHandle writeStencilRendererList;
-                public RendererListHandle drawActorsRendererList;
+                public RendererListHandle drawVisibleRendererList;
             }
 
             private static readonly ShaderTagId[] RenderStateTagValues = { ShaderTagId.none };
             private static readonly RenderStateBlock[] RenderStateBlocks = new RenderStateBlock[1];
-            private const string RenderGraphPassName = "FOW Actor Visibility";
+            private const string RenderGraphPassName = "FOW Visibility";
 
             public void SetupRenderGraph()
             {
@@ -149,18 +141,21 @@ namespace FOW
                 UniversalRenderingData renderingData = frameData.Get<UniversalRenderingData>();
                 UniversalLightData lightData = frameData.Get<UniversalLightData>();
 
-                bool hasFowTexture = SetupStencilMaterialForCurrentFoW();
+                bool hasFowData = SetupStencilMaterialForCurrentFoW();
 
                 using (var builder = renderGraph.AddRasterRenderPass<RenderGraphPassData>(RenderGraphPassName, out RenderGraphPassData passData, ProfilingSampler))
                 {
                     builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
                     builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.ReadWrite);
 
-                    if (hasFowTexture == false)
+                    if (hasFowData == false)
                     {
                         if (_warnedMissingFowTexture == false)
                         {
-                            Debug.LogWarning("[FogOfWarStencilFeature] FOW texture is unavailable. Set FogOfWarWorld sampling to Texture Storage for stencil actor masking.");
+                            FogOfWarWorld.FogSampleMode mode = GetEffectiveSamplingMode(null);
+                            Debug.LogWarning(mode == FogOfWarWorld.FogSampleMode.Texture
+                                ? "[FogOfWarStencilFeature] FOW texture is unavailable. Set FogOfWarWorld sampling to Texture or Both for stencil masking."
+                                : "[FogOfWarStencilFeature] FoW world-space data is unavailable for Pixel-Perfect stencil masking.");
                             _warnedMissingFowTexture = true;
                         }
 
@@ -182,21 +177,21 @@ namespace FOW
                     passData.hasFowTexture = true;
                     passData.clearStencilRendererList = CreateRendererList(renderGraph, renderingData, cameraData, lightData, _filtering, _stencilMaterial, 0, applyRenderState: true, _clearStencilState);
                     passData.writeStencilRendererList = CreateRendererList(renderGraph, renderingData, cameraData, lightData, _filtering, _stencilMaterial, 1, applyRenderState: true, _writeStencilState);
-                    passData.drawActorsRendererList = CreateRendererList(renderGraph, renderingData, cameraData, lightData, _filtering, null, 0, applyRenderState: true, _testStencilState);
+                    passData.drawVisibleRendererList = CreateRendererList(renderGraph, renderingData, cameraData, lightData, _filtering, null, 0, applyRenderState: true, _testStencilState);
 
                     if (!passData.clearStencilRendererList.IsValid() ||
                         !passData.writeStencilRendererList.IsValid() ||
-                        !passData.drawActorsRendererList.IsValid())
+                        !passData.drawVisibleRendererList.IsValid())
                         return;
 
                     builder.UseRendererList(passData.clearStencilRendererList);
                     builder.UseRendererList(passData.writeStencilRendererList);
-                    builder.UseRendererList(passData.drawActorsRendererList);
+                    builder.UseRendererList(passData.drawVisibleRendererList);
                     builder.SetRenderFunc(static (RenderGraphPassData data, RasterGraphContext context) =>
                     {
                         context.cmd.DrawRendererList(data.clearStencilRendererList);
                         context.cmd.DrawRendererList(data.writeStencilRendererList);
-                        context.cmd.DrawRendererList(data.drawActorsRendererList);
+                        context.cmd.DrawRendererList(data.drawVisibleRendererList);
                     });
                 }
             }
@@ -269,27 +264,30 @@ namespace FOW
                     {
                         if (_warnedMissingFowTexture == false)
                         {
-                            Debug.LogWarning("[FogOfWarStencilFeature] FOW texture is unavailable. Set FogOfWarWorld sampling to Texture Storage for stencil actor masking.");
+                            FogOfWarWorld.FogSampleMode mode = GetEffectiveSamplingMode(null);
+                            Debug.LogWarning(mode == FogOfWarWorld.FogSampleMode.Texture
+                                ? "[FogOfWarStencilFeature] FOW texture is unavailable. Set FogOfWarWorld sampling to Texture or Both for stencil masking."
+                                : "[FogOfWarStencilFeature] FoW world-space data is unavailable for Pixel-Perfect stencil masking.");
                             _warnedMissingFowTexture = true;
                         }
 
-                        // Fallback: if FoW texture is unavailable, render actors normally.
+                        // Fallback: if FoW texture is unavailable, render selected layer normally.
                         context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref _filtering);
                     }
                     else
                     {
                         _warnedMissingFowTexture = false;
 
-                        // 1) Clear actor stencil footprint to 0.
+                        // 1) Clear stencil footprint to 0.
                         drawingSettings.overrideMaterial = _stencilMaterial;
                         drawingSettings.overrideMaterialPassIndex = 0;
                         context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref _filtering, ref _clearStencilState);
 
-                        // 2) Write stencil = 1 only where actor pixels are inside revealed FoW.
+                        // 2) Write stencil = 1 only where selected-layer pixels are inside revealed FoW.
                         drawingSettings.overrideMaterialPassIndex = 1;
                         context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref _filtering, ref _writeStencilState);
 
-                        // 3) Render actors with their original materials, but only on stencil==1.
+                        // 3) Render selected-layer objects with original materials, but only on stencil==1.
                         drawingSettings.overrideMaterial = null;
                         drawingSettings.overrideMaterialPassIndex = 0;
                         context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref _filtering, ref _testStencilState);
@@ -306,16 +304,36 @@ namespace FOW
                 if (world == null || world.enabled == false)
                     return false;
 
+                FogOfWarWorld.FogSampleMode mode = GetEffectiveSamplingMode(world);
+                bool useWorldSampling = mode != FogOfWarWorld.FogSampleMode.Texture;
+                _stencilMaterial.SetFloat(UseWorldSamplingId, useWorldSampling ? 1f : 0f);
+                _stencilMaterial.SetFloat(UseDitheredSoftEdgeId, UseDitheredSoftEdge ? 1f : 0f);
+
+                world.InitializeFogProperties(_stencilMaterial);
+                world.UpdateMaterialProperties(_stencilMaterial);
+
+                _stencilMaterial.SetVector(WorldBoundsId, FogOfWarWorld.CachedFowShaderBounds);
+                _stencilMaterial.SetInt(FowPlaneId, GetFowPlane(world));
+                _stencilMaterial.SetFloat(VisibilityThresholdId, Mathf.Clamp01(world.HiderSeenThreshold));
+
+                if (useWorldSampling)
+                    return true;
+
                 RenderTexture fowRt = world.GetFOWRT();
                 if (fowRt == null)
                     return false;
 
                 _stencilMaterial.SetTexture(FowRtId, fowRt);
-                _stencilMaterial.SetVector(WorldBoundsId, FogOfWarWorld.CachedFowShaderBounds);
-                _stencilMaterial.SetInt(FowPlaneId, GetFowPlane(world));
-                _stencilMaterial.SetFloat(VisibilityThresholdId, _visibilityThreshold);
 
                 return true;
+            }
+
+            private FogOfWarWorld.FogSampleMode GetEffectiveSamplingMode(FogOfWarWorld world)
+            {
+                if (world != null)
+                    return world.FOWSamplingMode;
+
+                return FallbackSamplingMode;
             }
 
             private static int GetFowPlane(FogOfWarWorld world)

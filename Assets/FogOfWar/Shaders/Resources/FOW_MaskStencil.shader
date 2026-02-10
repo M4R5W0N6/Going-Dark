@@ -1,4 +1,4 @@
-Shader "Hidden/FOW/URP/StencilMask"
+Shader "Hidden/FOW/URP/FoW_MaskStencil"
 {
     Properties
     {
@@ -6,6 +6,8 @@ Shader "Hidden/FOW/URP/StencilMask"
         _worldBounds ("FoW Bounds", Vector) = (1,0,1,0)
         _fowPlane ("FoW Plane", Int) = 1
         _VisibilityThreshold ("Visibility Threshold", Range(0,1)) = 0.5
+        _UseWorldSampling ("Use World Sampling", Float) = 0
+        _UseDitheredSoftEdge ("Use Dithered Soft Edge", Float) = 1
     }
 
     SubShader
@@ -64,11 +66,11 @@ Shader "Hidden/FOW/URP/StencilMask"
             #pragma fragment fragMask
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include_with_pragmas "../FogOfWarLogic.hlsl"
 
-            sampler2D _FowRT;
-            float4 _worldBounds;
-            int _fowPlane;
             float _VisibilityThreshold;
+            float _UseWorldSampling;
+            float _UseDitheredSoftEdge;
 
             struct Attributes
             {
@@ -129,8 +131,34 @@ Shader "Hidden/FOW/URP/StencilMask"
                 uv.x = ((position.x - _worldBounds.y) + halfX) / max(_worldBounds.x, 0.0001);
                 uv.y = ((position.y - _worldBounds.w) + halfY) / max(_worldBounds.z, 0.0001);
 
-                float visibility = 1.0 - tex2D(_FowRT, uv).r;
-                clip(visibility - _VisibilityThreshold);
+                float visibility = 0;
+                if (_UseWorldSampling > 0.5)
+                {
+                    FOW_Sample_WS_float(input.positionWS, visibility);
+                }
+                else
+                {
+                    visibility = 1.0 - tex2D(_FowRT, uv).r;
+                }
+
+                if (_UseDitheredSoftEdge > 0.5)
+                {
+                    float2 pixel = floor(input.positionHCS.xy);
+                    static const float bayer4x4[16] =
+                    {
+                        1.0 / 17.0, 9.0 / 17.0, 3.0 / 17.0, 11.0 / 17.0,
+                        13.0 / 17.0, 5.0 / 17.0, 15.0 / 17.0, 7.0 / 17.0,
+                        4.0 / 17.0, 12.0 / 17.0, 2.0 / 17.0, 10.0 / 17.0,
+                        16.0 / 17.0, 8.0 / 17.0, 14.0 / 17.0, 6.0 / 17.0
+                    };
+                    int index = ((int)pixel.x & 3) * 4 + ((int)pixel.y & 3);
+                    float ditherThreshold = bayer4x4[index];
+                    clip(visibility - ditherThreshold);
+                }
+                else
+                {
+                    clip(visibility - _VisibilityThreshold);
+                }
 
                 return half4(0, 0, 0, 0);
             }

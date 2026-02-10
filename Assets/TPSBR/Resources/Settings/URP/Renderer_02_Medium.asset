@@ -57,7 +57,7 @@ MonoBehaviour:
   - {fileID: -6884793648353976226}
   - {fileID: -2811437670674916294}
   - {fileID: 120001002}
-  m_RendererFeatureMap: 5ee0fe6da74c74a03a1c458b55c4fbd8
+  m_RendererFeatureMap: 5ee0fe6da74c74a03a1c458b55c4fbd8ea11270700000000
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -100,8 +100,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarStencilFeature
   m_Active: 1
   renderPassEvent: 300
-  actorLayerMask:
+  layerMask:
     serializedVersion: 2
-    m_Bits: 16777216
-  visibilityThreshold: 0.5
-  applyInSceneView: 1
+    m_Bits: 553648128
