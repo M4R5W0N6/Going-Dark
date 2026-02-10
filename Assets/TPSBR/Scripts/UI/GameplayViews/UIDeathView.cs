@@ -15,6 +15,9 @@ namespace TPSBR.UI
 
 		[SerializeField]
 		private Transform       _spectatorGroup;
+		private InputActionAsset _actionsAsset;
+		private InputAction _spectatePrevAction;
+		private InputAction _spectateNextAction;
 
 		// UIView INTERAFCE
 
@@ -34,6 +37,8 @@ namespace TPSBR.UI
 
 		private void Refresh()
 		{
+			ResolveInputActions();
+
 			if (Context.Runner == null || Context.Runner.Exists(Context.GameplayMode.Object) == false)
 				return;
 
@@ -52,15 +57,29 @@ namespace TPSBR.UI
 				_respawnGroup.SetActive(false);
 				_spectatorGroup.SetActive(true);
 
-				if (Keyboard.current.xKey.wasPressedThisFrame == true)
+				if (_spectateNextAction != null && _spectateNextAction.WasPressedThisFrame())
 				{
 					Context.GameplayMode.ChangeSpectatorTarget(true);
 				}
-				else if (Keyboard.current.zKey.wasPressedThisFrame == true)
+				else if (_spectatePrevAction != null && _spectatePrevAction.WasPressedThisFrame())
 				{
 					Context.GameplayMode.ChangeSpectatorTarget(false);
 				}
 			}
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_spectatePrevAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "SpectatePrev");
+			_spectateNextAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "SpectateNext");
 		}
 	}
 }

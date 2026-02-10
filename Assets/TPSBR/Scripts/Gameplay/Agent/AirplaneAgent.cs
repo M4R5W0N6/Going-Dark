@@ -28,7 +28,9 @@ namespace TPSBR
 		private bool              _isParented;
 		private Vector2           _lookRotationDelta;
 		private SmoothVector2     _smoothLookRotationDelta = new SmoothVector2(256);
-		private UIMobileInputView _mobileInputView;
+		private InputActionAsset  _actionsAsset;
+		private InputAction       _lookAction;
+		private InputAction       _jumpAction;
 
 		// NetworkBehaviour INTERFACE
 
@@ -126,33 +128,12 @@ namespace TPSBR
 			if ((Context.Input.IsCursorVisible == true && Context.Settings.SimulateMobileInput == false) || Context.GameplayMode.State != GameplayMode.EState.Active)
 				return;
 
-			Vector2 mouseDelta = default;
+			ResolveInputActions();
 
-			if ((Application.isMobilePlatform == false || Application.isEditor == true) && Context.Settings.SimulateMobileInput == false)
-			{
-				mouseDelta = Mouse.current.delta.ReadValue() * 0.075f;
-				_jump |= Keyboard.current.spaceKey.wasPressedThisFrame;
-			}
-			else
-			{
-				if (_mobileInputView == null)
-				{
-					if (Context.UI != null)
-					{
-						_mobileInputView = Context.UI.Get<UIMobileInputView>();
-						_mobileInputView.Look = default;
-					}
-				}
-				else
-				{
-					const float mobileSensitivityMultiplier = 32.0f;
-					mouseDelta = _mobileInputView.Look * mobileSensitivityMultiplier;
-					_mobileInputView.Look = default;
-					_jump |= _mobileInputView.Jump;
-				}
-			}
+			Vector2 lookDelta = _lookAction != null ? _lookAction.ReadValue<Vector2>() * 0.075f : default;
+			_jump |= _jumpAction != null && _jumpAction.WasPressedThisFrame();
 
-			_lookRotationDelta += InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-mouseDelta.y, mouseDelta.x), Global.RuntimeSettings.Sensitivity, 0.025f);
+			_lookRotationDelta += InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), Global.RuntimeSettings.Sensitivity, 0.025f);
 		}
 
 		// PRIVATE METHODS
@@ -190,6 +171,20 @@ namespace TPSBR
 
 			transform.localRotation = newRotation;
 			return newRotation;
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_lookAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Look");
+			_jumpAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Jump");
 		}
 	}
 }

@@ -16,6 +16,8 @@ namespace TPSBR.UI
 
 		private UIScoreboard _board;
 		private float _targetAlpha;
+		private InputActionAsset _actionsAsset;
+		private InputAction _scoreboardAction;
 
 		// PUBLIC METHODS
 
@@ -60,8 +62,9 @@ namespace TPSBR.UI
 		protected override void OnTick()
 		{
 			base.OnTick();
+			ResolveInputActions();
 
-			if (Keyboard.current.tabKey.isPressed == true && IsTopView(true) == true)
+			if (_scoreboardAction != null && _scoreboardAction.IsPressed() == true && IsTopView(true) == true)
 			{
 				Show();
 			}
@@ -76,6 +79,19 @@ namespace TPSBR.UI
 				return;
 
 			_gameInfo.UpdateInfo(Context.Runner);
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_scoreboardAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Scoreboard");
 		}
 	}
 }

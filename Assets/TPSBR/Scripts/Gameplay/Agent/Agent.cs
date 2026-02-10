@@ -266,7 +266,15 @@ namespace TPSBR
 
 			kcc.SetInputDirection(input.MoveDirection.IsZero() == true ? Vector3.zero : kcc.FixedData.TransformRotation * input.MoveDirection.X0Y());
 
-			if (_agentInput.WasActivated(EGameplayInputAction.ToggleSide, input) == true)
+			if (_agentInput.WasActivated(EGameplayInputAction.LeanLeft, input) == true && LeftSide == false)
+			{
+				LeftSide = true;
+			}
+			else if (_agentInput.WasActivated(EGameplayInputAction.LeanRight, input) == true && LeftSide == true)
+			{
+				LeftSide = false;
+			}
+			else if (_agentInput.WasActivated(EGameplayInputAction.ToggleSide, input) == true)
 			{
 				LeftSide = !LeftSide;
 			}

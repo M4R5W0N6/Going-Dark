@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using Fusion;
+using UnityEngine.InputSystem;
 
 namespace TPSBR
 {
@@ -9,6 +10,7 @@ namespace TPSBR
 	public class GlobalSettings : ScriptableObject
 	{
 		public NetworkRunner        RunnerPrefab;
+		public InputActionAsset     PlayerInputActions;
 		public string               LoadingScene = "LoadingScene";
 		public string               MenuScene = "Menu";
 		public bool                 SimulateMobileInput;

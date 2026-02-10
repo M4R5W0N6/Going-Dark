@@ -25,6 +25,8 @@ namespace TPSBR
 		private UIYesNoDialogView _dialog;
 
 		private UIFader _activeFader;
+		private InputActionAsset _actionsAsset;
+		private InputAction _escapeAction;
 
 		// PUBLIC METHODS
 
@@ -58,10 +60,12 @@ namespace TPSBR
 
 		protected void Update()
 		{
+			ResolveInputActions();
+
 			_status.text = Global.Networking.Status;
 			_statusDescription.text = Global.Networking.StatusDescription;
 
-			if (Keyboard.current.escapeKey.wasPressedThisFrame == true)
+			if (_escapeAction != null && _escapeAction.WasPressedThisFrame())
 			{
 				_dialog.Open_Internal();
 
@@ -84,6 +88,19 @@ namespace TPSBR
 			{
 				_dialog.Deinitialize();
 			}
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_escapeAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Escape");
 		}
 	}
 }

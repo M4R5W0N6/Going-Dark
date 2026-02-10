@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: GlobalSettings
   m_EditorClassIdentifier: 
   RunnerPrefab: {fileID: 3427936558554746844, guid: 36ba3480ded34f441a0d952459870465, type: 3}
+  PlayerInputActions: {fileID: -944628639613478452, guid: 4e6a36f9e59ffde49ae9b20c58edd3b9, type: 3}
   LoadingScene: LoadingScene
   MenuScene: Menu
   SimulateMobileInput: 0

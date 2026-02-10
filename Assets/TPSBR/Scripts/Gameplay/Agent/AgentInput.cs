@@ -86,6 +86,19 @@ namespace TPSBR
 		private int               _logMissingInputFromTick;
 		private float             _grenadesCyclingStartTime;
 		private UIMobileInputView _mobileInputView;
+		private InputActionAsset  _actionsAsset;
+		private InputAction       _moveAction;
+		private InputAction       _lookAction;
+		private InputAction       _fireAction;
+		private InputAction       _reloadAction;
+		private InputAction       _aimAction;
+		private InputAction       _jumpAction;
+		private InputAction       _interactAction;
+		private InputAction       _abilityAction;
+		private InputAction       _cycleGrenadeAction;
+		private InputAction       _cycleWeaponAction;
+		private InputAction       _leanLeftAction;
+		private InputAction       _leanRightAction;
 
 		// PUBLIC METHODS
 
@@ -512,6 +525,7 @@ namespace TPSBR
 
 			// Storing the accumulated input for reference.
 			GameplayInput previousAccumulatedInput = _accumulatedInput;
+			ResolveInputActions();
 
 			if ((Application.isMobilePlatform == false || Application.isEditor == true) && Context.Settings.SimulateMobileInput == false)
 			{
@@ -608,20 +622,32 @@ namespace TPSBR
 			}
 		}
 
-		private byte GetWeaponInput(Keyboard keyboard)
+		private byte GetWeaponInput()
 		{
-			if (keyboard.qKey.wasPressedThisFrame == true)
-				return (byte)(_agent.Weapons.PreviousWeaponSlot + 1); // Fast switch
+			if (_cycleWeaponAction != null && _cycleWeaponAction.WasPressedThisFrame())
+			{
+				int pendingWeaponSlot = _agent.Weapons.PendingWeaponSlot;
+
+				if (pendingWeaponSlot >= 4)
+				{
+					int previousWeaponSlot = _agent.Weapons.PreviousWeaponSlot;
+					if (previousWeaponSlot >= 1 && previousWeaponSlot <= 3 &&
+						_agent.Weapons.HasWeapon(previousWeaponSlot, true) == true)
+					{
+						return (byte)(previousWeaponSlot + 1);
+					}
+				}
+
+				int startSlot = pendingWeaponSlot >= 1 && pendingWeaponSlot <= 3 ? pendingWeaponSlot : 0;
+				int nextWeaponSlot = GetNextStandardWeaponSlot(startSlot, pendingWeaponSlot);
+
+				if (nextWeaponSlot > 0)
+					return (byte)(nextWeaponSlot + 1);
+			}
 
 			int weaponSlot = -1;
 
-			if (keyboard.digit1Key.wasPressedThisFrame == true) { weaponSlot = 0; }
-			if (keyboard.digit2Key.wasPressedThisFrame == true) { weaponSlot = 1; }
-			if (keyboard.digit3Key.wasPressedThisFrame == true) { weaponSlot = 2; }
-			if (keyboard.digit4Key.wasPressedThisFrame == true) { weaponSlot = 3; }
-			if (keyboard.digit5Key.wasPressedThisFrame == true) { weaponSlot = 4; }
-
-			if (weaponSlot < 0 && keyboard.gKey.wasPressedThisFrame == true)
+			if (_cycleGrenadeAction != null && _cycleGrenadeAction.WasPressedThisFrame())
 			{
 				weaponSlot = 3; // Cycle grenades
 			}
@@ -649,6 +675,45 @@ namespace TPSBR
 			}
 
 			return 0;
+		}
+
+		private int GetNextStandardWeaponSlot(int fromSlot, int ignoreSlot)
+		{
+			for (int i = 1; i <= 3; ++i)
+			{
+				int slot = ((fromSlot + i - 1) % 3) + 1;
+				if (slot == ignoreSlot)
+					continue;
+
+				if (_agent.Weapons.HasWeapon(slot, true) == true)
+					return slot;
+			}
+
+			return 0;
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_moveAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Move");
+			_lookAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Look");
+			_fireAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Fire");
+			_reloadAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Reload");
+			_aimAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Aim");
+			_jumpAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Jump");
+			_interactAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Interact");
+			_abilityAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Ability");
+			_cycleGrenadeAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "CycleGrenade");
+			_cycleWeaponAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "CycleWeapon");
+			_leanLeftAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "LeanLeft");
+			_leanRightAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "LeanRight");
 		}
 
 		private void SetDefaults()

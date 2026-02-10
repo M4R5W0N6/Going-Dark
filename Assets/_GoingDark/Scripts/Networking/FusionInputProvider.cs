@@ -27,8 +27,8 @@ public class FusionInputProvider : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField]
     private string aimActionName = "Aim";
 
-    [SerializeField]
-    private string leanActionName = "Lean";
+	[SerializeField]
+	private string leanActionName = "CompositeLean";
 
     [SerializeField]
     private string sprintActionName = "Sprint";

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem.UI;
 using Fusion;
 using Fusion.Plugin;
 using Fusion.Sockets;
@@ -63,6 +64,10 @@ namespace TPSBR
 		private bool       _stopGameOnDisconnect;
 		private string     _loadingScene;
 		private Coroutine  _coroutine;
+		private InputActionAsset _actionsAsset;
+		private InputAction _spectatePrevAction;
+		private InputAction _spectateNextAction;
+		private PlayerInput _persistentPlayerInput;
 
 		// PUBLIC METHODS
 
@@ -147,6 +152,7 @@ namespace TPSBR
 		protected void Awake()
 		{
 			_loadingScene = Global.Settings.LoadingScene;
+			TryInitializePersistentPlayerInput();
 		}
 
 		protected void Update()
@@ -181,10 +187,16 @@ namespace TPSBR
 			}
 		}
 
+		protected void OnDestroy()
+		{
+		}
+
 		// PRIVATE MEMBERS
 
 		public void UpdateCurrentSession()
 		{
+			ResolveInputActions();
+
 			if (_currentSession == null)
 			{
 				Status = string.Empty;
@@ -785,19 +797,14 @@ namespace TPSBR
 		{
 			int selectedPeerID = -1;
 
-			bool canSwitchPeer = Application.isEditor == true ? true : Keyboard.current.leftCtrlKey.isPressed == true && Keyboard.current.leftShiftKey.isPressed == true;
-			if (canSwitchPeer == true)
+			if (CanUsePeerSwitch(peers))
 			{
-				Mouse mouse = Mouse.current;
-				if (mouse == null)
-					return;
-
 				int direction = 0;
-				if (mouse.backButton.wasPressedThisFrame == true)
+				if (_spectatePrevAction != null && _spectatePrevAction.WasPressedThisFrame())
 				{
 					direction = -1;
 				}
-				else if (mouse.forwardButton.wasPressedThisFrame == true)
+				else if (_spectateNextAction != null && _spectateNextAction.WasPressedThisFrame())
 				{
 					direction = 1;
 				}
@@ -831,6 +838,61 @@ namespace TPSBR
 					peer.Context.IsVisible = peer.ID == selectedPeerID;
 				}
 			}
+		}
+
+		private bool CanUsePeerSwitch(GamePeer[] peers)
+		{
+			for (int i = 0; i < peers.Length; i++)
+			{
+				GamePeer peer = peers[i];
+				if (peer.Context == null || peer.Context.HasInput == false)
+					continue;
+				if (peer.Context.NetworkGame == null)
+					return true;
+
+				Player player = peer.Context.NetworkGame.GetPlayer(peer.Context.LocalPlayerRef);
+				PlayerStatistics statistics = player != null ? player.Statistics : default;
+				return statistics.IsEliminated == false;
+			}
+
+			return false;
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null && Global.Settings != null && Global.Settings.PlayerInputActions != null)
+			{
+				_actionsAsset = Global.Settings.PlayerInputActions;
+			}
+
+			if (_actionsAsset == null && _persistentPlayerInput != null)
+			{
+				_actionsAsset = _persistentPlayerInput.actions;
+			}
+
+			if (_actionsAsset == null)
+			{
+				PlayerInput playerInput = FindFirstObjectByType<PlayerInput>(FindObjectsInactive.Include);
+				if (playerInput != null)
+				{
+					_actionsAsset = playerInput.actions;
+				}
+			}
+
+			if (_actionsAsset == null)
+			{
+				InputSystemUIInputModule inputModule = FindFirstObjectByType<InputSystemUIInputModule>(FindObjectsInactive.Include);
+				if (inputModule != null)
+				{
+					_actionsAsset = inputModule.actionsAsset;
+				}
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_spectatePrevAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "SpectatePrev");
+			_spectateNextAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "SpectateNext");
 		}
 
 		private void ValidateMultiPeers(GamePeer[] peers)
@@ -881,6 +943,62 @@ namespace TPSBR
 					peers[0].Context.IsVisible = true;
 				}
 			}
+		}
+
+		private void TryInitializePersistentPlayerInput()
+		{
+			InputActionAsset configuredActions = Global.Settings != null ? Global.Settings.PlayerInputActions : null;
+			if (_persistentPlayerInput != null)
+			{
+				ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, configuredActions);
+				return;
+			}
+
+			PlayerInput[] playerInputs = FindObjectsByType<PlayerInput>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+			for (int i = 0; i < playerInputs.Length; i++)
+			{
+				PlayerInput playerInput = playerInputs[i];
+				if (playerInput == null)
+					continue;
+
+				if (playerInput.gameObject.scene.name == "DontDestroyOnLoad")
+				{
+					_persistentPlayerInput = playerInput;
+					break;
+				}
+			}
+
+			if (_persistentPlayerInput != null)
+			{
+				ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, configuredActions);
+				return;
+			}
+
+			InputActionAsset actions = configuredActions != null ? configuredActions : InputActionsResolver.ResolveActionAsset();
+
+			if (actions == null)
+				return;
+
+			GameObject inputHost = new GameObject("Persistent Player Input");
+			DontDestroyOnLoad(inputHost);
+
+			_persistentPlayerInput = inputHost.AddComponent<PlayerInput>();
+			ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, actions);
+		}
+
+		private void ApplyPersistentPlayerInputConfiguration(PlayerInput playerInput, InputActionAsset configuredActions)
+		{
+			if (playerInput == null)
+				return;
+
+			if (configuredActions != null && playerInput.actions != configuredActions)
+			{
+				playerInput.actions = configuredActions;
+			}
+
+			playerInput.neverAutoSwitchControlSchemes = false;
+			playerInput.enabled = true;
+			_actionsAsset = playerInput.actions;
 		}
 
 		private Dictionary<string, SessionProperty> CreateSessionProperties(SessionRequest request)

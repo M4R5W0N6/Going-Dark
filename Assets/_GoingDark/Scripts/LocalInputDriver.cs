@@ -53,7 +53,7 @@ public class LocalInputDriver : MonoBehaviour
         fireAction = actions.FindAction("Fire", false);
         reloadAction = actions.FindAction("Reload", false);
         aimAction = actions.FindAction("Aim", false);
-        leanAction = actions.FindAction("Lean", false);
+		leanAction = actions.FindAction("CompositeLean", false);
         sprintAction = actions.FindAction("Sprint", false);
     }
 

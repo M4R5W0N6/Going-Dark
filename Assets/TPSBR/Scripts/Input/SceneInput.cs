@@ -26,6 +26,9 @@ namespace TPSBR
 		private ECursorStateSource _cursorVisibilitySources;
 
 		private bool _hasInput;
+		private InputActionAsset _actionsAsset;
+		private InputAction _escapeAction;
+		private InputAction _middleClickAction;
 
 		// PUBLIC METHODS
 
@@ -67,6 +70,7 @@ namespace TPSBR
 		protected override void OnTick()
 		{
 			base.OnTick();
+			ResolveInputActions();
 
 			if (Context.Runner != null)
 			{
@@ -82,7 +86,7 @@ namespace TPSBR
 
 			if (Context.HasInput == true || Scene is Menu)
 			{
-				if (Keyboard.current.escapeKey.wasPressedThisFrame == true)
+				if (_escapeAction != null && _escapeAction.WasPressedThisFrame())
 				{
 					BackAction();
 				}
@@ -90,10 +94,8 @@ namespace TPSBR
 
 			if (Context.HasInput == true)
 			{
-				bool toggleCursor = Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame;
-#if !UNITY_EDITOR
-				toggleCursor &= Keyboard.current.leftCtrlKey.isPressed;
-#endif
+				ResolveInputActions();
+				bool toggleCursor = _middleClickAction != null && _middleClickAction.WasPressedThisFrame();
 				if (toggleCursor == true)
 				{
 					RequestCursorVisibility(IsCursorVisible == false, ECursorStateSource.Agent);
@@ -107,6 +109,20 @@ namespace TPSBR
 
 				_hasInput = Context.HasInput;
 			}
+		}
+
+		private void ResolveInputActions()
+		{
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
+				return;
+
+			_escapeAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Escape");
+			_middleClickAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "MiddleClick");
 		}
 
 		// PRIVATE METHODS
