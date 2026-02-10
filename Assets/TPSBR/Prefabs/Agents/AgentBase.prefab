@@ -2658,13 +2658,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4512244569365991248}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.12, y: 0.1, z: -1}
+  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994670034043224433}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!1 &4615604339238093075
 GameObject:
   m_ObjectHideFlags: 0
@@ -5241,9 +5241,9 @@ MonoBehaviour:
     LeftFoot: {fileID: 0}
     RightFoot: {fileID: 0}
   _cameraChangeDuration: 0.15
-  _defaultFOV: 60
-  _aimFOV: 35
-  _fovChangeSpeed: 20
+  _defaultFOV: 90
+  _aimFOV: 45
+  _fovChangeSpeed: 5
   _aimDispersionMultiplier: 0.3
   _airDispersionMultiplier: 4
   _runDispersionMultiplier: 5
@@ -5565,18 +5565,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _disableOnDedicatedServer: 1
-  _disableWhenPeerNotVisible: 1
+  _disableWhenPeerNotVisible: 0
   _revealers: []
-  _hiders: []
-  _useHiderComponents: 0
-  _usePartialHiderMaterials: 0
-  _assignVisualRenderersToFoWLayer: 1
-  _visualRendererLayerName: FoW
+  SyncFov: 1
+  FovMultiplier: 0.5
+  _viewAngleClamp: {x: 1, y: 360}
+  _autoAssignVisualLayers: 1
+  _visualLayerName: FoW
   _visualsRoot: {fileID: 4348347289748489880}
-  _partialHiderOpaqueTemplate: {fileID: 2100000, guid: 74bdf2f4a40cc9240a485da3ae79912d, type: 2}
-  _partialHiderTransparentTemplate: {fileID: 2100000, guid: 764a5f43ae94c0b41b40a010eb361e85, type: 2}
-  _forceTransparentPartialShader: 1
-  _swapMaterialsAtRuntime: 1
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0
@@ -5601,13 +5597,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8107021845495828554}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.12, y: 0.1, z: -0.8}
+  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0.25, y: 0.25, z: -1.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994670034043224433}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!1 &8298593716179246041
 GameObject:
   m_ObjectHideFlags: 0

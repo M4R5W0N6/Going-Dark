@@ -49,6 +49,9 @@ namespace TPSBR
 		public KCC                          CharacterController => _characterController;
 		public CharacterAnimationController AnimationController => _animationController;
 		public CharacterView                ThirdPersonView     => _thirdPersonView;
+		public float                        DesiredFOV          => GetDesiredFOV();
+		public float                        CurrentFOV          => GetCurrentFOV();
+		public float                        BaseFOV             => _defaultFOV;
 
 		public float DispersionMultiplier { get; private set; }
 
@@ -378,6 +381,26 @@ namespace TPSBR
 			}
 
 			return multiplier;
+		}
+
+		private float GetCurrentFOV()
+		{
+			if (_camera != null && _camera.Camera != null)
+				return _camera.Camera.fieldOfView;
+
+			return GetDesiredFOV();
+		}
+
+		private float GetDesiredFOV()
+		{
+			float aimFOV = _aimFOV;
+			if (_agent != null && _agent.Weapons != null && _agent.Weapons.CurrentWeapon != null && _agent.Weapons.CurrentWeapon.AimFOV > 1.0f)
+			{
+				aimFOV = _agent.Weapons.CurrentWeapon.AimFOV;
+			}
+
+			bool isAiming = _characterController != null && _characterController.Data.Aim == true;
+			return isAiming ? aimFOV : _defaultFOV;
 		}
 
 		private void RefreshCameraHeadPosition()

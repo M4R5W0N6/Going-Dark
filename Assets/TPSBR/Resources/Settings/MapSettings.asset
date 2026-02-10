@@ -23,7 +23,7 @@ MonoBehaviour:
     _image: {fileID: 21300000, guid: 0b6b50553bdbe9e43a2f32aaa5da3754, type: 3}
     _recommendedPlayers: 25
     _maxPlayers: 50
-    _showInMapSelection: 1
+    _showInMapSelection: 0
   - _id: Map.GenArea3
     _scenePath: TPSBR/Scenes/GenArea3
     _displayName: GenArea 3
@@ -34,7 +34,7 @@ MonoBehaviour:
     _image: {fileID: 21300000, guid: 573a7cee2e9e60a4490e5163b67beb62, type: 3}
     _recommendedPlayers: 60
     _maxPlayers: 120
-    _showInMapSelection: 1
+    _showInMapSelection: 0
   - _id: Map.GenArea5
     _scenePath: TPSBR/Scenes/GenArea5
     _displayName: GenArea 5
@@ -45,7 +45,7 @@ MonoBehaviour:
     _image: {fileID: 21300000, guid: 5539104c5263e264181992dabfa29c6f, type: 3}
     _recommendedPlayers: 120
     _maxPlayers: 200
-    _showInMapSelection: 1
+    _showInMapSelection: 0
   - _id: Map.GenArea7
     _scenePath: TPSBR/Scenes/GenArea7
     _displayName: GenArea 7
@@ -56,7 +56,7 @@ MonoBehaviour:
     _image: {fileID: 21300000, guid: b229bcec050f1f043a9c5a841d540f5b, type: 3}
     _recommendedPlayers: 200
     _maxPlayers: 200
-    _showInMapSelection: 1
+    _showInMapSelection: 0
   - _id: Map.Game
     _scenePath: TPSBR/Scenes/Game
     _displayName: Debug Game
@@ -64,4 +64,4 @@ MonoBehaviour:
     _image: {fileID: 21300000, guid: f3a98a44addd7bd4c920c80dcfd4eed3, type: 3}
     _recommendedPlayers: 200
     _maxPlayers: 200
-    _showInMapSelection: 0
+    _showInMapSelection: 1
