@@ -125,18 +125,13 @@
 			var targetPoint = cameraTransform.Position + cameraDirection * 500f;
 			bool canUseLagCompensation = Object != null && Runner.LagCompensation != null && Runner.LagCompensation.enabled == true;
 
-			if (canUseLagCompensation == true)
-			{
+				// Step 1: reticle target from camera.
+				if (canUseLagCompensation == true)
+				{
 				if (Runner.LagCompensation.Raycast(cameraTransform.Position, cameraDirection, 500f, Object.InputAuthority,
 					out LagCompensatedHit lagCompensatedHit, _weapons.HitMask, HitOptions.IncludePhysX | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority) == true)
 				{
-					var firingDirection = (lagCompensatedHit.Point - fireTransform.Position).normalized;
-
-					// Check angle
-					if (Vector3.Dot(cameraDirection, firingDirection) > 0.95f)
-					{
-						targetPoint = lagCompensatedHit.Point;
-					}
+					targetPoint = lagCompensatedHit.Point;
 				}
 			}
 			else
@@ -144,20 +139,43 @@
 				var physicsScene = Runner.GetPhysicsScene();
 				if (physicsScene.Raycast(cameraTransform.Position, cameraDirection, out RaycastHit hitInfo, 500f, _weapons.HitMask, QueryTriggerInteraction.Ignore) == true)
 				{
-					var firingDirection = (hitInfo.point - fireTransform.Position).normalized;
+					targetPoint = hitInfo.point;
+					}
+				}
 
-					// Check angle
-					if (Vector3.Dot(cameraDirection, firingDirection) > 0.95f)
+				Vector3 desiredTargetPoint = targetPoint;
+
+				// Step 2: clamp reticle target to what fire origin can actually see.
+				Vector3 fireDirection = targetPoint - fireTransform.Position;
+			float fireDistance = fireDirection.magnitude;
+			if (fireDistance > 0.001f)
+			{
+				fireDirection /= fireDistance;
+
+				if (canUseLagCompensation == true)
+				{
+					if (Runner.LagCompensation.Raycast(fireTransform.Position, fireDirection, fireDistance, Object.InputAuthority,
+						out LagCompensatedHit lagCompensatedHit, _weapons.HitMask, HitOptions.IncludePhysX | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority) == true)
+					{
+						targetPoint = lagCompensatedHit.Point;
+					}
+				}
+				else
+				{
+					var physicsScene = Runner.GetPhysicsScene();
+					if (physicsScene.Raycast(fireTransform.Position, fireDirection, out RaycastHit hitInfo, fireDistance, _weapons.HitMask, QueryTriggerInteraction.Ignore) == true)
 					{
 						targetPoint = hitInfo.point;
 					}
 				}
 			}
 
-			if (checkReachability == true)
-			{
-				IsUndesiredTargetPoint = _weapons.CurrentWeapon != null && _weapons.CurrentWeapon.CanFireToPosition(fireTransform.Position, ref targetPoint, _weapons.HitMask) == false;
-			}
+				if (checkReachability == true)
+				{
+					bool isOccludedFromFireOrigin = (desiredTargetPoint - targetPoint).sqrMagnitude > 0.01f;
+					bool cannotReach = _weapons.CurrentWeapon != null && _weapons.CurrentWeapon.CanFireToPosition(fireTransform.Position, ref targetPoint, _weapons.HitMask) == false;
+					IsUndesiredTargetPoint = isOccludedFromFireOrigin || cannotReach;
+				}
 
 			return targetPoint;
 		}

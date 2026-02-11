@@ -77,22 +77,11 @@ namespace TPSBR
 
 			var hitRoots = ListPool.Get<int>(16);
 
-			float ignoreDistanceMin = 3f;
-			float ignoreDistanceMax = Mathf.Max(distanceToTarget - 1f, ignoreDistanceMin);
-
 			Sort(hits, hitCount);
 
 			for (int i = 0; i < hits.Count; i++)
 			{
 				var hit = hits[i];
-
-				if (distanceToTarget > 0f)
-				{
-					// For 3rd person cast it is possible that we want to shoot through environment objects a little bit if we already know the destination point
-					// => ray from camera is different than ray from 3rd person character
-					if (hit.Distance >= ignoreDistanceMin && hit.Distance < ignoreDistanceMax && hit.GameObject != null && ObjectLayerMask.Environment.value.IsBitSet(hit.GameObject.layer))
-						continue;
-				}
 
 				int hitRootID = hit.Hitbox != null ? hit.Hitbox.Root.gameObject.GetInstanceID() : 0;
 

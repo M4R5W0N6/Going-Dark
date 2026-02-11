@@ -111,7 +111,7 @@ MonoBehaviour:
   UseDithering: 0
   DitherSize: 10
   SightExtraAmount: 0.05
-  EdgeSoftenDistance: 0.2
+  EdgeSoftenDistance: 1
   MaxFogDistance: 10000
   FogAppearance: 1
   UnknownColor: {r: 0.14117648, g: 0.14117648, b: 0.14117648, a: 1}
@@ -135,7 +135,7 @@ MonoBehaviour:
   WorldBoundsInfluence: 1
   InvertFowEffect: 0
   AllowBleeding: 0
-  FOWSamplingMode: 1
+  FOWSamplingMode: 0
   HidersUseFogTexture: 1
   HiderSeenThreshold: 0.5
   AsyncReadbackFogDataToCpu: 0
@@ -143,8 +143,8 @@ MonoBehaviour:
   ConstantTextureBlurQuality: 2
   ConstantTextureBlurAmount: 0.75
   UseMiniMap: 0
-  FowResX: 512
-  FowResY: 512
+  FowResX: 4096
+  FowResY: 4096
   UseRegrow: 0
   RevealerFadeIn: 0
   RevealerFadeInSpeed: 0.5

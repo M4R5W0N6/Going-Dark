@@ -597,11 +597,11 @@ Transform:
   m_GameObject: {fileID: 399003674434399152}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8847045542829627438}
+  m_Father: {fileID: 7479170632602112611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5716663943389591712
 MonoBehaviour:
@@ -624,7 +624,7 @@ MonoBehaviour:
   visionHeightSoftenDistance: 1
   viewAngle: 100
   opacity: 1
-  EyeOffset: 1.65
+  EyeOffset: 0
   ShaderEyeOffset: 0
   StartRevealerAsStatic: 0
   revealHiderInFadeOutZonePercentage: 0.5
@@ -3453,7 +3453,8 @@ Transform:
   m_LocalPosition: {x: 0.094, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 9172693248228467897}
   m_Father: {fileID: 1017189828939367048}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5759263036869587392
@@ -5106,7 +5107,6 @@ Transform:
   - {fileID: 4348347289748489880}
   - {fileID: 8445182958723416279}
   - {fileID: 69384455409016092}
-  - {fileID: 9172693248228467897}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5990956033835523603
@@ -5568,7 +5568,6 @@ MonoBehaviour:
   _disableWhenPeerNotVisible: 0
   _revealers: []
   SyncFov: 1
-  FovMultiplier: 0.5
   _viewAngleClamp: {x: 1, y: 360}
   _autoAssignVisualLayers: 1
   _visualLayerName: FoW
