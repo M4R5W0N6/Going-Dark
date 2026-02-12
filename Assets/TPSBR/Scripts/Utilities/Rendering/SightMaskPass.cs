@@ -23,7 +23,14 @@
 
 		protected override void Setup(ScriptableRenderContext renderContext, CommandBuffer cmd)
 		{
-			_material = CoreUtils.CreateEngineMaterial(Shader.Find(SHADER_NAME));
+			Shader shader = Shader.Find(SHADER_NAME);
+			if (shader == null)
+			{
+				Debug.LogError($"[SightMaskPass] Shader not found: {SHADER_NAME}. It may be stripped from the player build.");
+				return;
+			}
+
+			_material = CoreUtils.CreateEngineMaterial(shader);
 			_propertyBlock = new MaterialPropertyBlock();
 			clearFlags = ClearFlag.None;
 		}

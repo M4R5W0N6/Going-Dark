@@ -4,7 +4,7 @@ Shader "Hidden/TPSBR/HDRP/SightMask"
 
 	#pragma vertex Vert
 	#pragma target 4.5
-	#pragma only_renderers d3d11 playstation xboxone xboxseries vulkan metal switch
+	#pragma only_renderers d3d11 d3d12 playstation xboxone xboxseries vulkan metal switch
 	#pragma multi_compile USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
 	#pragma multi_compile_fragment PUNCTUAL_SHADOW_LOW PUNCTUAL_SHADOW_MEDIUM PUNCTUAL_SHADOW_HIGH
 	#pragma multi_compile_fragment DIRECTIONAL_SHADOW_LOW DIRECTIONAL_SHADOW_MEDIUM DIRECTIONAL_SHADOW_HIGH
