@@ -1,4 +1,4 @@
-Shader "Hidden/TPSBR/HDRP/SightStencil"
+Shader "Hidden/TPSBR/HDRP/VisionStencil"
 {
 	HLSLINCLUDE
 

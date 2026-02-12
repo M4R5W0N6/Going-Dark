@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 7925336267680473200}
   - component: {fileID: 4237918058144582247}
   m_Layer: 0
-  m_Name: Sight Pass
+  m_Name: Vision Rendering Stack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -239,7 +239,7 @@ Transform:
   m_GameObject: {fileID: 2409266377562880722}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.8860521, y: 0.77395785, z: 5.0868144}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -261,25 +261,50 @@ MonoBehaviour:
   fadeRadius: 0
   priority: 0
   customPasses:
-  - rid: 2616474002755682595
-  injectionPoint: 3
+  - rid: 2616474014005854289
+  - rid: 2616474014005854293
+  - rid: 2616474014005854297
+  injectionPoint: 2
   m_TargetCamera: {fileID: 0}
   useTargetCamera: 0
   references:
     version: 2
     RefIds:
-    - rid: 2616474002755682595
-      type: {class: SightMaskPass, ns: TPSBR, asm: Assembly-CSharp}
+    - rid: 2616474014005854289
+      type: {class: VisionMaskPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Sight Mask
+        m_Name: Vision Mask Pass
         enabled: 1
         targetColorBuffer: 0
-        targetDepthBuffer: 2
+        targetDepthBuffer: 0
         clearFlags: 0
         passFoldout: 0
         m_Version: 0
         _lightLayerMask: 128
-        _debugDrawToCamera: 1
+    - rid: 2616474014005854293
+      type: {class: VisionHiddenPass, ns: TPSBR, asm: Assembly-CSharp}
+      data:
+        m_Name: Vision Hidden Pass
+        enabled: 1
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        _hiddenLayerMask:
+          serializedVersion: 2
+          m_Bits: 16777216
+    - rid: 2616474014005854297
+      type: {class: VisionCompositePass, ns: TPSBR, asm: Assembly-CSharp}
+      data:
+        m_Name: Vision Composite Pass
+        enabled: 1
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        _renderMode: 0
 --- !u!1 &3543721276360881922
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,6 +686,10 @@ PrefabInstance:
     - target: {fileID: 1923010081, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
       propertyPath: field of view
       value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1923010081, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4278173695
       objectReference: {fileID: 0}
     - target: {fileID: 1857658018939495220, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
       propertyPath: _precacheObjects.Array.size

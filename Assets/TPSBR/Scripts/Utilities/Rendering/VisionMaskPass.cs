@@ -1,19 +1,16 @@
-	namespace TPSBR
-	{
+namespace TPSBR
+{
 	using UnityEngine;
-	using UnityEngine.Experimental.Rendering;
 	using UnityEngine.Rendering;
 	using UnityEngine.Rendering.HighDefinition;
 
 	[System.Serializable]
-	public sealed class SightMaskPass : CustomPass
+	public sealed class VisionMaskPass : CustomPass
 	{
 		[SerializeField]
 		private uint _lightLayerMask = uint.MaxValue;
-		[SerializeField]
-		private bool _debugDrawToCamera = true;
 
-		private const string SHADER_NAME = "Hidden/TPSBR/HDRP/SightMask";
+		private const string SHADER_NAME = "Hidden/TPSBR/HDRP/VisionMask";
 		private static readonly int TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_TargetLightLayerMask");
 
 		private Material _material;
@@ -26,7 +23,7 @@
 			Shader shader = Shader.Find(SHADER_NAME);
 			if (shader == null)
 			{
-				Debug.LogError($"[SightMaskPass] Shader not found: {SHADER_NAME}. It may be stripped from the player build.");
+				Debug.LogError($"[VisionMaskPass] Shader not found: {SHADER_NAME}. It may be stripped from the player build.");
 				return;
 			}
 
@@ -40,13 +37,12 @@
 			if (_material == null || _propertyBlock == null)
 				return;
 
+			VisionPassBuffers.Ensure();
+
 			_propertyBlock.Clear();
 			_propertyBlock.SetInt(TARGET_LIGHT_LAYER_MASK, unchecked((int)_lightLayerMask));
 
-			if (_debugDrawToCamera == false)
-				return;
-
-			CoreUtils.SetRenderTarget(ctx.cmd, ctx.cameraColorBuffer, ClearFlag.None);
+			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.VisionMask, ClearFlag.Color);
 			CoreUtils.DrawFullScreen(ctx.cmd, _material, _propertyBlock, shaderPassId: 0);
 		}
 

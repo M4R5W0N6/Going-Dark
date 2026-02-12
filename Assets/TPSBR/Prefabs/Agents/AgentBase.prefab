@@ -2610,7 +2610,7 @@ GameObject:
   - component: {fileID: 8896334061692998194}
   - component: {fileID: 112233445566778899}
   m_Layer: 0
-  m_Name: Sight Cone
+  m_Name: Vision Cone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3624,6 +3624,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5f8a8db8e0a4b7b8f2096361d4e8c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _remoteVisualObjectLayerMask:
+    serializedVersion: 2
+    m_Bits: 16777216
 --- !u!1 &5718875130150570468
 GameObject:
   m_ObjectHideFlags: 0

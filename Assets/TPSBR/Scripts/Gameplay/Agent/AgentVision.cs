@@ -4,14 +4,14 @@ using UnityEngine.Rendering.HighDefinition;
 
 namespace TPSBR
 {
-	[AddComponentMenu("GOING DARK/Agent Sight")]
+	[AddComponentMenu("GOING DARK/Agent Vision")]
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(Light))]
-	public sealed class AgentSight : MonoBehaviour
+	public sealed class AgentVision : MonoBehaviour
 	{
 		private const float TPSBR_TARGET_RAY_DISTANCE = 500.0f;
 
-		public uint SightLightLayerMask
+		public uint VisionLightLayerMask
 		{
 			get
 			{
@@ -99,7 +99,7 @@ namespace TPSBR
 		{
 			if (_spotLight == null)
 			{
-				Debug.LogWarning("[AgentSight] No Light found on this GameObject.", this);
+				Debug.LogWarning("[AgentVision] No Light found on this GameObject.", this);
 				enabled = false;
 				return false;
 			}
@@ -108,7 +108,7 @@ namespace TPSBR
 			{
 				if (_didLogMissingAgent == false)
 				{
-					Debug.LogWarning("[AgentSight] No Agent found in parent hierarchy. Disabling.", this);
+					Debug.LogWarning("[AgentVision] No Agent found in parent hierarchy. Disabling.", this);
 					_didLogMissingAgent = true;
 				}
 

@@ -1,4 +1,4 @@
-Shader "Hidden/TPSBR/HDRP/SightMask"
+Shader "Hidden/TPSBR/HDRP/VisionMask"
 {
 	HLSLINCLUDE
 
