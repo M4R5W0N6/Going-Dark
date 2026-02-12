@@ -20,7 +20,6 @@ namespace TPSBR
 		private ShakeEffect _shakeEffect;
 
 		private int _cameraCullingMask;
-		private int _fowLayer = -1;
 
 		// SceneService INTERFACE
 
@@ -29,11 +28,6 @@ namespace TPSBR
 			base.OnInitialize();
 
 			_cameraCullingMask = _camera.cullingMask;
-			_fowLayer = LayerMask.NameToLayer("FoW");
-			if (_fowLayer >= 0)
-			{
-				_cameraCullingMask |= 1 << _fowLayer;
-			}
 		}
 
 		protected override void OnTick()
@@ -45,10 +39,6 @@ namespace TPSBR
 
 				// We are just switching culling mask as disabling would mean more complex camera setup to not stop UI rendering
 				int cullingMask = _cameraCullingMask;
-				if (_fowLayer >= 0)
-				{
-					cullingMask |= 1 << _fowLayer;
-				}
 				_camera.cullingMask = EnableCamera == true ? cullingMask : 0;
 			}
 		}

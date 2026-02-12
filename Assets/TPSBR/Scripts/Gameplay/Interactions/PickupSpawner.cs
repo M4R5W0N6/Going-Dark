@@ -11,6 +11,9 @@ namespace TPSBR
 		private StaticPickup[] _pickupPrefabs;
 		[SerializeField]
 		private float _refillTime = 30;
+		private bool _didLogMissingSpawnPoint;
+		private bool _didLogMissingPrefabArray;
+		private bool _didLogNullPrefabEntry;
 
 		[Networked]
 		private TickTimer _refillCooldown { get; set; }
@@ -37,7 +40,37 @@ namespace TPSBR
 			if (_refillCooldown.ExpiredOrNotRunning(Runner) == false)
 				return;
 
+			if (_spawnPoint == null)
+			{
+				if (_didLogMissingSpawnPoint == false)
+				{
+					Debug.LogWarning("[PickupSpawner] Missing spawn point.", this);
+					_didLogMissingSpawnPoint = true;
+				}
+				return;
+			}
+
+			if (_pickupPrefabs == null || _pickupPrefabs.Length == 0)
+			{
+				if (_didLogMissingPrefabArray == false)
+				{
+					Debug.LogWarning("[PickupSpawner] No pickup prefabs configured.", this);
+					_didLogMissingPrefabArray = true;
+				}
+				return;
+			}
+
 			var prefab = _pickupPrefabs[Random.Range(0, _pickupPrefabs.Length)];
+			if (prefab == null)
+			{
+				if (_didLogNullPrefabEntry == false)
+				{
+					Debug.LogWarning("[PickupSpawner] Pickup prefab entry is null.", this);
+					_didLogNullPrefabEntry = true;
+				}
+				return;
+			}
+
 			_activePickup = Runner.Spawn(prefab, _spawnPoint.position, _spawnPoint.rotation);
 		}
 	}

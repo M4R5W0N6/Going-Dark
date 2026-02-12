@@ -1,5 +1,4 @@
 using Fusion;
-using FOW;
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -19,8 +18,6 @@ public class FusionPlayerBridge : NetworkBehaviour
 
     [SerializeField]
     private Rigidbody characterRigidbody;
-    private FogOfWarRevealer[] fogRevealers;
-    private FogOfWarHider[] fogHiders;
     private GrounderFBBIK grounderIK;
 
     [Networked]
@@ -137,12 +134,6 @@ public class FusionPlayerBridge : NetworkBehaviour
         if (characterRigidbody == null)
             TryGetComponent(out characterRigidbody);
 
-        if (fogRevealers == null || fogRevealers.Length == 0)
-            fogRevealers = GetComponentsInChildren<FogOfWarRevealer>(true);
-
-        if (fogHiders == null || fogHiders.Length == 0)
-            fogHiders = GetComponentsInChildren<FogOfWarHider>(true);
-
         if (grounderIK == null)
             grounderIK = GetComponentInChildren<GrounderFBBIK>(true);
     }
@@ -182,26 +173,6 @@ public class FusionPlayerBridge : NetworkBehaviour
         if (grounderIK != null)
         {
             grounderIK.enabled = hasInputAuthority && isPresentationRunner;
-        }
-
-        if (fogRevealers != null)
-        {
-            for (int i = 0; i < fogRevealers.Length; i++)
-            {
-                FogOfWarRevealer revealer = fogRevealers[i];
-                if (revealer != null)
-                    revealer.enabled = hasInputAuthority && isPresentationRunner;
-            }
-        }
-
-        if (fogHiders != null)
-        {
-            for (int i = 0; i < fogHiders.Length; i++)
-            {
-                FogOfWarHider hider = fogHiders[i];
-                if (hider != null)
-                    hider.enabled = !hasInputAuthority && isPresentationRunner;
-            }
         }
     }
 

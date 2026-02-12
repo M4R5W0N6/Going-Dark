@@ -16,6 +16,7 @@ namespace TPSBR
 		public Transform CameraTransformHead;
 		public Transform DefaultCameraTransform;
 		public Transform AimCameraTransform;
+		public Transform SniperAimCameraTransform;
 		public Transform JetpackCameraTransform;
 
 		public Transform FireTransformRoot;
@@ -338,7 +339,9 @@ namespace TPSBR
 					cameraTransform = _thirdPersonView.DefaultCameraTransform;
 					break;
 				case ECameraState.Aim:
-					cameraTransform = _thirdPersonView.AimCameraTransform;
+					cameraTransform = IsSniperAiming() == true && _thirdPersonView.SniperAimCameraTransform != null
+						? _thirdPersonView.SniperAimCameraTransform
+						: _thirdPersonView.AimCameraTransform;
 					break;
 				case ECameraState.Jetpack:
 					cameraTransform = _thirdPersonView.JetpackCameraTransform;
@@ -440,6 +443,16 @@ namespace TPSBR
 			vector.y *= y;
 			vector.z *= z;
 			return vector;
+		}
+
+		private bool IsSniperAiming()
+		{
+			if (_characterController == null || _characterController.Data.Aim == false)
+				return false;
+			if (_agent == null || _agent.Weapons == null || _agent.Weapons.CurrentWeapon == null)
+				return false;
+
+			return _agent.Weapons.CurrentWeapon.HitType == EHitType.Sniper;
 		}
 
 		// HELPERS

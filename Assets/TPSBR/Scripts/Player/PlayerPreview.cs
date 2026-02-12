@@ -1,5 +1,4 @@
 using UnityEngine;
-using Plugins.Outline;
 
 namespace TPSBR
 {
@@ -17,8 +16,6 @@ namespace TPSBR
 		private string _agentID;
 		private GameObject _agentInstance;
 
-		private OutlineBehaviour _outline;
-
 		// PUBLIC METHODS
 
 		public void ShowAgent(string agentID, bool force = false)
@@ -32,7 +29,7 @@ namespace TPSBR
 
 		public void ShowOutline(bool value)
 		{
-			_outline.enabled = value;
+			// Outline plugin has been removed.
 		}
 
 		public void HideAgent()
@@ -44,8 +41,6 @@ namespace TPSBR
 
 		protected void Awake()
 		{
-			_outline = GetComponentInChildren<OutlineBehaviour>(true);
-			_outline.enabled = false;
 		}
 
 		// PRIVATE METHODS
@@ -70,8 +65,6 @@ namespace TPSBR
 
 			if (_agentInstance == null)
 				return;
-
-			_outline.enabled = false;
 
 			Destroy(_agentInstance);
 			_agentInstance = null;

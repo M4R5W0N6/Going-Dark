@@ -1,7 +1,6 @@
 using Fusion;
 using Fusion.Addons.Physics;
 using UnityEngine;
-using Plugins.Outline;
 
 namespace TPSBR
 {
@@ -28,10 +27,6 @@ namespace TPSBR
 
 		[SerializeField]
 		private float _despawnTime = 60f;
-		[SerializeField]
-		private float _fullOutlineDistance = 5f;
-		[SerializeField]
-		private float _noOutlineDistance = 20f;
 
 		[Networked]
 		private NetworkId _dynamicObjectID { get; set; }
@@ -44,10 +39,6 @@ namespace TPSBR
 
 		private string _name;
 		private string _description;
-
-		private OutlineBehaviour _outline;
-		private Color _defaultOutlineColor;
-		private Color _noOutlineColor;
 
 		// PUBLIC MEMBERS
 
@@ -173,19 +164,6 @@ namespace TPSBR
 		private void Awake()
 		{
 			_networkRigidbody = GetComponent<NetworkRigidbody3D>();
-			_outline = GetComponent<OutlineBehaviour>();
-
-			if (_outline != null)
-			{
-				_defaultOutlineColor = _outline.Settings.Color;
-				_noOutlineColor = _defaultOutlineColor;
-				_noOutlineColor.a = 0f;
-			}
-		}
-
-		private void Update()
-		{
-			UpdateOutline();
 		}
 
 		// IPickup INTERFACE
@@ -210,37 +188,5 @@ namespace TPSBR
 			}
 		}
 
-		private void UpdateOutline()
-		{
-			if (Runner == null)
-				return;
-
-			if (Runner.IsPlayer == false)
-				return;
-
-			if (_outline == null)
-				return;
-
-			if (_dynamicObject == null)
-				return;
-
-			var agent = Context.ObservedAgent;
-			if (agent == null)
-				return;
-
-			float sqrDistance = (agent.transform.position - transform.position).sqrMagnitude;
-
-			if (sqrDistance > _noOutlineDistance * _noOutlineDistance)
-			{
-				_outline.enabled = false;
-				return;
-			}
-
-			float distance = Mathf.Sqrt(sqrDistance);
-			float progress = (distance - _fullOutlineDistance) / (_noOutlineDistance - _fullOutlineDistance);
-
-			_outline.enabled = true;
-			_outline.Settings.Color = Color.Lerp(_defaultOutlineColor, _noOutlineColor, progress);
-		}
 	}
 }

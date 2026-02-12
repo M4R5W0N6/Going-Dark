@@ -155,7 +155,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3264939406063625526}
-  - component: {fileID: 4872937510134192250}
   m_Layer: 0
   m_Name: FireTransform
   m_TagString: Untagged
@@ -178,18 +177,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7374905818507450736}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4872937510134192250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5456393775106428515}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2befa8c70a95e1e4d915bca0fa3a1389, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6541554458687429442
 GameObject:
   m_ObjectHideFlags: 0
