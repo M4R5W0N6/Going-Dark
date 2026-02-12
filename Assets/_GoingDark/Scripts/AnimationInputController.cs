@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
 using RootMotion.FinalIK;
 using System.Collections;
 
 [RequireComponent(typeof(Animator))]
-public class AnimationInputController : MonoBehaviour, IEventListener
+public class AnimationInputController : MonoBehaviour
 {
     private Animator animationController;
     private Vector2 currentMove;
@@ -27,16 +25,21 @@ public class AnimationInputController : MonoBehaviour, IEventListener
     private float blendGoal, blendValue;
     private bool reloadPressedLastFrame;
     private Coroutine reloadCoroutine;
+    private PlayerData playerData;
 
     private void Awake()
     {
         TryGetComponent(out animationController);
         TryGetComponent(out fullBodyIK);
+        playerData = GetComponentInParent<PlayerData>();
     }
 
     private void Update()
     {
-        var player = PlayerData.OwnerPlayer;
+        if (playerData == null)
+            playerData = GetComponentInParent<PlayerData>();
+
+        var player = playerData;
         if (player == null || animationController == null || fullBodyIK == null)
         {
             reloadPressedLastFrame = false;
@@ -71,7 +74,10 @@ public class AnimationInputController : MonoBehaviour, IEventListener
 
     private void FixedUpdate()
     {
-        var player = PlayerData.OwnerPlayer;
+        if (playerData == null)
+            playerData = GetComponentInParent<PlayerData>();
+
+        var player = playerData;
         if (player == null || animationController == null || fullBodyIK == null || targetIKAim == null || targetIKLean == null)
             return;
         Vector3 posIK = Vector3.Lerp(player.CharacterTargetPosition.Value, player.CharacterRaycastPosition.Value,
@@ -119,7 +125,7 @@ public class AnimationInputController : MonoBehaviour, IEventListener
         if (!currentValue)
             return;
 
-        TryStartReload(PlayerData.OwnerPlayer);
+        TryStartReload(playerData);
     }
 
     private void TryStartReload(PlayerData player)

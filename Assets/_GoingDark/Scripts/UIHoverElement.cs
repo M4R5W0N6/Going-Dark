@@ -33,27 +33,30 @@ public class UIHoverElement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        PlayerData player = PlayerData.OwnerPlayer;
+        isActive = false;
+
         Vector3 trackedPosition = transform.position;
         switch (typeToTrack)
         {
             case TrackedObjectType.NONE:
                 break;
             case TrackedObjectType.PLAYER_ORIGIN:
-                if (PlayerData.OwnerPlayer)
-                    trackedPosition = PlayerData.OwnerPlayer.CharacterOriginPosition.Value;
+                if (player != null)
+                    trackedPosition = player.CharacterOriginPosition.Value;
                 break;
             case TrackedObjectType.PLAYER_TARGET:
-                if (PlayerData.OwnerPlayer)
+                if (player != null)
                 {
-                    isActive = GameManager.IsInRound && PlayerData.OwnerPlayer.CharacterIsOnTarget.Value;
-                    trackedPosition = PlayerData.OwnerPlayer.CharacterTargetPosition.Value;
+                    isActive = GameManager.IsInRound && player.CharacterIsOnTarget.Value;
+                    trackedPosition = player.CharacterTargetPosition.Value;
                 }
                 break;
             case TrackedObjectType.PLAYER_RAYCAST:
-                if (PlayerData.OwnerPlayer)
+                if (player != null)
                 {
-                    isActive = GameManager.IsInRound && !PlayerData.OwnerPlayer.CharacterIsOnTarget.Value;
-                    trackedPosition = PlayerData.OwnerPlayer.CharacterRaycastPosition.Value;
+                    isActive = GameManager.IsInRound && !player.CharacterIsOnTarget.Value;
+                    trackedPosition = player.CharacterRaycastPosition.Value;
                 }
                 break;
             default:

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour, IEventListener
+public class GameManager : MonoBehaviour
 {
     public static bool IsInRound = true; // kept for compatibility; default true in single-player
 

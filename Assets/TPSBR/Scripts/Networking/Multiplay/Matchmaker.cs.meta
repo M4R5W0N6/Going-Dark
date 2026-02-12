@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: f82464372c4d4433b01304107245565b
+timeCreated: 1657150303
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/TPSBR/Scripts/Networking/Multiplay/Matchmaker.cs
+  uploadId: 718661

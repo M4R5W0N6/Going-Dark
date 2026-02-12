@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: aa60404ef833409ba49a30a163d84b93
+timeCreated: 1629882985
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/TPSBR/Scripts/Gameplay/Interactions/StaticPickup.cs
+  uploadId: 718661

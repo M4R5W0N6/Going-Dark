@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
+using Fusion;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CharacterInputController : MonoBehaviour, IEventListener
+public class CharacterInputController : MonoBehaviour
 {
     private static List<CharacterInputController> characters;
     public static List<CharacterInputController> Characters
@@ -22,14 +21,41 @@ public class CharacterInputController : MonoBehaviour, IEventListener
     {
         get
         {
-            if (ownerCharacter)
+            PlayerData localPlayer = PlayerData.LocalPlayer;
+            if (IsValidOwnerCharacter(ownerCharacter) && ownerCharacter.playerData == localPlayer)
                 return ownerCharacter;
 
+            ownerCharacter = null;
+
             List<CharacterInputController> characters = Characters;
+            if (localPlayer != null)
+            {
+                for (int i = 0; i < characters.Count; i++)
+                {
+                    if (!IsValidOwnerCharacter(characters[i]))
+                        continue;
 
-            // Single-player: first instance is the owner
+                    if (characters[i].playerData == localPlayer)
+                    {
+                        ownerCharacter = characters[i];
+                        return ownerCharacter;
+                    }
+                }
+            }
 
-            ownerCharacter = characters.Count > 0 ? characters[0] : null;
+            for (int i = 0; i < characters.Count; i++)
+            {
+                if (!IsValidOwnerCharacter(characters[i]))
+                    continue;
+
+                if (characters[i].playerData.IsLocalPlayer)
+                {
+                    ownerCharacter = characters[i];
+                    return ownerCharacter;
+                }
+            }
+
+            ownerCharacter = GetSingleActiveFallback(characters);
 
             return ownerCharacter;
         }
@@ -37,7 +63,13 @@ public class CharacterInputController : MonoBehaviour, IEventListener
     public static CharacterInputController GetCharacter(ulong ownerId)
     {
         List<CharacterInputController> characters = Characters;
-        return characters.Count > 0 ? characters[0] : null;
+        for (int i = 0; i < characters.Count; i++)
+        {
+            if (characters[i] != null && characters[i].playerData != null && characters[i].playerData.NetworkOwnerId == ownerId)
+                return characters[i];
+        }
+
+        return GetSingleActiveFallback(characters);
     }
 
     [SerializeField]
@@ -57,23 +89,34 @@ public class CharacterInputController : MonoBehaviour, IEventListener
     private float currentPitch;
 
     private Rigidbody characterRigidbody;
+    private PlayerData playerData;
+    private NetworkObject networkObject;
 
     private void Awake()
     {
         TryGetComponent(out characterRigidbody);
-        // Ensure a PlayerData exists on the player
-        if (!TryGetComponent<PlayerData>(out _))
-        {
-            gameObject.AddComponent<PlayerData>();
-        }
+        TryGetComponent(out networkObject);
+
+        if (!TryGetComponent(out playerData))
+            playerData = gameObject.AddComponent<PlayerData>();
     }
 
     private void Start() { }
-    private void OnDestroy() { }
+    private void OnDisable()
+    {
+        if (ownerCharacter == this)
+            ownerCharacter = null;
+    }
+
+    private void OnDestroy()
+    {
+        if (ownerCharacter == this)
+            ownerCharacter = null;
+    }
 
     private void Update()
     {
-        var player = PlayerData.OwnerPlayer;
+        var player = playerData;
         if (player == null)
             return;
 
@@ -83,7 +126,15 @@ public class CharacterInputController : MonoBehaviour, IEventListener
 
     private void FixedUpdate()
     {
-        var player = PlayerData.OwnerPlayer;
+        if (IsDrivenByFusionRunner())
+            return;
+
+        SimulateStateAuthorityStep();
+    }
+
+    public void SimulateStateAuthorityStep()
+    {
+        var player = playerData;
         if (player == null)
             return;
 
@@ -98,47 +149,113 @@ public class CharacterInputController : MonoBehaviour, IEventListener
         if (pitchOrigin)
             pitchOrigin.localRotation = Quaternion.Euler(player.CharacterTurn.Value.x, 0f, 0f);
 
-        PlayerData.LocalPlayer.CharacterMove.Value = currentMove * moveSpeed * (player.InputSprint.Value ? sprintSpeed : 1f);
+        player.CharacterMove.Value = currentMove * moveSpeed * (player.InputSprint.Value ? sprintSpeed : 1f);
 
         currentPitch += currentLook.y * pitchSpeed * GameSettings.Sensitivity;
         currentPitch = Mathf.Clamp(currentPitch, pitchMin, pitchMax);
 
-        PlayerData.LocalPlayer.CharacterTurn.Value = new Vector2(currentPitch, currentLook.x * GameSettings.Sensitivity);
+        player.CharacterTurn.Value = new Vector2(currentPitch, currentLook.x * GameSettings.Sensitivity);
 
         // setup raycast
         int layerMask = 1 << LayerMask.NameToLayer("Player");
         layerMask = ~layerMask;
 
+        Vector3 origin = pitchOrigin ? pitchOrigin.position : transform.position;
+        Vector3 cameraPosition = player.CameraPosition.Value;
+        Camera camera = player.IsLocalPlayer ? CustomUtilities.GetBestCamera(transform) : null;
+        if (camera != null)
+        {
+            cameraPosition = camera.transform.position;
+            player.CameraPosition.Value = cameraPosition;
+        }
+        else if (cameraPosition == Vector3.zero)
+        {
+            Vector3 fallbackDirection = pitchOrigin ? pitchOrigin.forward : transform.forward;
+            cameraPosition = origin + fallbackDirection;
+        }
+
         if (pitchOrigin)
-            player.CharacterTargetPosition.Value = (pitchOrigin.forward * CustomUtilities.DefaultScalarDistance) + transform.position;
-        Vector3 forward = Vector3.Normalize(player.CharacterTargetPosition.Value - player.CameraPosition.Value);
+            player.CharacterTargetPosition.Value = origin + (pitchOrigin.forward * CustomUtilities.DefaultScalarDistance);
+        else
+            player.CharacterTargetPosition.Value = origin + (transform.forward * CustomUtilities.DefaultScalarDistance);
+
+        Vector3 forward = Vector3.Normalize(player.CharacterTargetPosition.Value - cameraPosition);
 
         // check if camera has line of sight to reticle
         RaycastHit screenHit;
-        if (!Physics.Raycast(player.CameraPosition.Value, forward, out screenHit, Mathf.Infinity, layerMask))
-        {
-            screenHit.point = player.CameraPosition.Value + forward * CustomUtilities.DefaultScalarDistance;
-        }
+        if (!TryRaycast(cameraPosition, forward, out screenHit, Mathf.Infinity, layerMask))
+            screenHit.point = cameraPosition + forward * CustomUtilities.DefaultScalarDistance;
 
         // check if origin has line of sight
         Vector3 muzzlePoint = screenHit.point;
-        if (pitchOrigin)
+        forward = Vector3.Normalize(screenHit.point - origin);
+        RaycastHit tmpHit;
+        if (TryRaycast(origin, forward, out tmpHit, Mathf.Infinity, layerMask))
+            muzzlePoint = tmpHit.point;
+
+        player.CharacterOriginPosition.Value = origin;
+        player.CharacterRaycastPosition.Value = muzzlePoint;
+        player.CharacterIsOnTarget.Value = Vector3.Distance(screenHit.point, muzzlePoint) <= CustomUtilities.DefaultRaycastThreshold;
+    }
+
+    private static bool IsValidOwnerCharacter(CharacterInputController character)
+    {
+        if (character == null || !character.isActiveAndEnabled || !character.gameObject.activeInHierarchy)
+            return false;
+
+        if (character.playerData == null)
+            character.TryGetComponent(out character.playerData);
+
+        return character.playerData != null;
+    }
+
+    private bool TryRaycast(Vector3 origin, Vector3 direction, out RaycastHit hit, float maxDistance, int layerMask)
+    {
+        if (TryGetRunnerPhysicsScene(out PhysicsScene physicsScene))
+            return physicsScene.Raycast(origin, direction, out hit, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+
+        return Physics.Raycast(origin, direction, out hit, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+    }
+
+    private bool TryGetRunnerPhysicsScene(out PhysicsScene physicsScene)
+    {
+        physicsScene = default;
+
+        if (networkObject == null)
+            TryGetComponent(out networkObject);
+
+        if (networkObject == null || networkObject.Runner == null)
+            return false;
+
+        physicsScene = networkObject.Runner.GetPhysicsScene();
+        return physicsScene.IsValid();
+    }
+
+    private bool IsDrivenByFusionRunner()
+    {
+        if (networkObject == null)
+            TryGetComponent(out networkObject);
+
+        return networkObject != null && networkObject.Runner != null && networkObject.Runner.IsRunning;
+    }
+
+    private static CharacterInputController GetSingleActiveFallback(List<CharacterInputController> currentCharacters)
+    {
+        CharacterInputController fallback = null;
+        int activeCount = 0;
+
+        for (int i = 0; i < currentCharacters.Count; i++)
         {
-            forward = Vector3.Normalize(screenHit.point - pitchOrigin.position);
-            RaycastHit tmpHit;
-            if (Physics.Raycast(pitchOrigin.position, forward, out tmpHit, Mathf.Infinity, layerMask))
-            {
-                muzzlePoint = tmpHit.point;
-            }
-            else
-            {
-                muzzlePoint = screenHit.point;
-            }
+            CharacterInputController character = currentCharacters[i];
+            if (!IsValidOwnerCharacter(character))
+                continue;
+
+            fallback = character;
+            activeCount++;
+            if (activeCount > 1)
+                return null;
         }
 
-        if (pitchOrigin)
-            player.CharacterOriginPosition.Value = pitchOrigin.position;
-        player.CharacterRaycastPosition.Value = muzzlePoint;
-        player.CharacterIsOnTarget.Value = Vector3.Distance(screenHit.point, muzzlePoint) < CustomUtilities.DefaultRaycastThreshold;
+        return fallback;
     }
 }

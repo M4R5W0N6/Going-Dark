@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
+using Fusion;
 using UnityEngine;
 using LocalData;
 
-public class PlayerData : MonoBehaviour, IEventListener
+public class PlayerData : MonoBehaviour
 {
     private static List<PlayerData> players;
     public static List<PlayerData> Players
@@ -18,8 +18,14 @@ public class PlayerData : MonoBehaviour, IEventListener
 
     public static PlayerData GetPlayer(ulong ownerId)
     {
-        // Single-player: just return the first player
-        return Players.Count > 0 ? Players[0] : null;
+        List<PlayerData> currentPlayers = Players;
+        for (int i = 0; i < currentPlayers.Count; i++)
+        {
+            if (currentPlayers[i] != null && currentPlayers[i].NetworkOwnerId == ownerId)
+                return currentPlayers[i];
+        }
+
+        return GetSingleActiveFallback(currentPlayers);
     }
 
     private static PlayerData ownerPlayer;
@@ -27,10 +33,7 @@ public class PlayerData : MonoBehaviour, IEventListener
     {
         get
         {
-            if (ownerPlayer)
-                return ownerPlayer;
-
-            ownerPlayer = Players.Count > 0 ? Players[0] : null;
+            ownerPlayer = LocalPlayer;
             return ownerPlayer;
         }
     }
@@ -40,20 +43,69 @@ public class PlayerData : MonoBehaviour, IEventListener
     {
         get
         {
-            if (localPlayer)
-                return localPlayer;
-
-            localPlayer = Players.Count > 0 ? Players[0] : null;
+            List<PlayerData> currentPlayers = Players;
+            localPlayer = ResolveLocalPlayer(currentPlayers, localPlayer);
             return localPlayer;
         }
     }
 
+    [SerializeField]
+    private bool isLocalPlayer;
+    public bool IsLocalPlayer
+    {
+        get => isLocalPlayer;
+        set
+        {
+            isLocalPlayer = value;
+
+            if (value)
+                SetLocalPlayer(this);
+            else if (localPlayer == this)
+                localPlayer = null;
+        }
+    }
+
+    [SerializeField]
+    private ulong networkOwnerId;
+    public ulong NetworkOwnerId => networkOwnerId;
+
+    public static void SetLocalPlayer(PlayerData player)
+    {
+        localPlayer = player;
+        ownerPlayer = player;
+    }
+
+    public void SetNetworkOwnerId(ulong ownerId)
+    {
+        networkOwnerId = ownerId;
+    }
+
     private void Start() { }
-    private void OnDestroy() { }
+    private void OnDisable()
+    {
+        if (localPlayer == this)
+            localPlayer = null;
+
+        if (ownerPlayer == this)
+            ownerPlayer = null;
+    }
+
+    private void OnDestroy()
+    {
+        if (localPlayer == this)
+            localPlayer = null;
+
+        if (ownerPlayer == this)
+            ownerPlayer = null;
+    }
 
     private void Update()
     {
-        CameraPosition.Value = Camera.main ? Camera.main.transform.position : Vector3.zero;
+        if (LocalPlayer != this)
+            return;
+
+        Camera camera = CustomUtilities.GetBestCamera(transform);
+        CameraPosition.Value = camera ? camera.transform.position : Vector3.zero;
     }
 
     public void CharacterSpawnCallback(ulong playerID)
@@ -114,4 +166,122 @@ public class PlayerData : MonoBehaviour, IEventListener
     public ObservableVariable<bool> CharacterIsOnTarget = new ObservableVariable<bool>(false); // whether the player is going to shoot where they're aiming
     public ObservableVariable<bool> CharacterIsReloading = new ObservableVariable<bool>(false); // if the player is done reloading (in worldspace)
     #endregion
+
+    private static bool IsValidCachedLocalPlayer(PlayerData player)
+    {
+        return player != null && player.isActiveAndEnabled && player.gameObject.activeInHierarchy;
+    }
+
+    private static PlayerData ResolveLocalPlayer(List<PlayerData> currentPlayers, PlayerData previousSelection)
+    {
+        List<PlayerData> localCandidates = new List<PlayerData>();
+
+        for (int i = 0; i < currentPlayers.Count; i++)
+        {
+            PlayerData player = currentPlayers[i];
+            if (player == null || !player.isLocalPlayer || !player.isActiveAndEnabled || !player.gameObject.activeInHierarchy)
+                continue;
+
+            localCandidates.Add(player);
+        }
+
+        if (localCandidates.Count == 1)
+            return localCandidates[0];
+
+        if (localCandidates.Count > 1)
+        {
+            PlayerData sceneMatch = FindCandidateInPresentationScene(localCandidates);
+            if (sceneMatch != null)
+                return sceneMatch;
+
+            if (previousSelection != null)
+            {
+                for (int i = 0; i < localCandidates.Count; i++)
+                {
+                    if (localCandidates[i] == previousSelection)
+                        return previousSelection;
+                }
+            }
+
+            PlayerData lowestOwnerIdCandidate = null;
+            ulong lowestOwnerId = ulong.MaxValue;
+            for (int i = 0; i < localCandidates.Count; i++)
+            {
+                PlayerData candidate = localCandidates[i];
+                if (candidate == null)
+                    continue;
+
+                if (candidate.networkOwnerId < lowestOwnerId)
+                {
+                    lowestOwnerId = candidate.networkOwnerId;
+                    lowestOwnerIdCandidate = candidate;
+                }
+            }
+
+            if (lowestOwnerIdCandidate != null)
+                return lowestOwnerIdCandidate;
+        }
+
+        return GetSingleActiveFallback(currentPlayers);
+    }
+
+    private static PlayerData FindCandidateInPresentationScene(List<PlayerData> localCandidates)
+    {
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+            return null;
+
+        int cameraSceneHandle = mainCamera.gameObject.scene.handle;
+        for (int i = 0; i < localCandidates.Count; i++)
+        {
+            PlayerData candidate = localCandidates[i];
+            if (candidate == null)
+                continue;
+
+            if (candidate.gameObject.scene.handle == cameraSceneHandle)
+                return candidate;
+
+            if (!candidate.TryGetOwningRunner(out NetworkRunner runner))
+                continue;
+
+            if (runner.gameObject.scene.handle == cameraSceneHandle || runner.SimulationUnityScene.handle == cameraSceneHandle)
+                return candidate;
+        }
+
+        return null;
+    }
+
+    private bool TryGetOwningRunner(out NetworkRunner runner)
+    {
+        runner = null;
+
+        if (!TryGetComponent(out NetworkObject networkObject) || networkObject == null)
+            return false;
+
+        if (networkObject.Runner == null || !networkObject.Runner.IsRunning)
+            return false;
+
+        runner = networkObject.Runner;
+        return true;
+    }
+
+    private static PlayerData GetSingleActiveFallback(List<PlayerData> currentPlayers)
+    {
+        PlayerData fallback = null;
+        int activeCount = 0;
+
+        for (int i = 0; i < currentPlayers.Count; i++)
+        {
+            PlayerData player = currentPlayers[i];
+            if (player == null || !player.isActiveAndEnabled || !player.gameObject.activeInHierarchy)
+                continue;
+
+            fallback = player;
+            activeCount++;
+            if (activeCount > 1)
+                return null;
+        }
+
+        return fallback;
+    }
 }
