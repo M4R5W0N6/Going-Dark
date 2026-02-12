@@ -28,9 +28,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        AndroidSharedLibraryType: Executable
         CPU: ARM64
-        Is16KbAligned: true
   - first:
       Any: 
     second:
@@ -82,8 +80,8 @@ PluginImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 267958
-  packageName: Photon Fusion
-  packageVersion: 2.0.9
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
   assetPath: Assets/Photon/Fusion/Plugins/NanoSockets/Android/arm64-v8a/libnanosockets.so
-  uploadId: 832254
+  uploadId: 718661

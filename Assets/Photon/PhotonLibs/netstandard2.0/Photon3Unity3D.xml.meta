@@ -9,8 +9,8 @@ TextScriptImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 267958
-  packageName: Photon Fusion
-  packageVersion: 2.0.9
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
   assetPath: Assets/Photon/PhotonLibs/netstandard2.0/Photon3Unity3D.xml
-  uploadId: 832254
+  uploadId: 718661

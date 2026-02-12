@@ -22,7 +22,6 @@ PluginImporter:
         Exclude OSXUniversal: 1
         Exclude PS4: 0
         Exclude PS5: 0
-        Exclude Ounce: 0
         Exclude Switch: 0
         Exclude VisionOS: 0
         Exclude WebGL: 1
@@ -51,11 +50,6 @@ PluginImporter:
         CPU: AnyCPU
         DefaultValueInitialized: true
         OS: AnyOS
-  - first:
-      Nintendo Switch: Ounce
-    second:
-      enabled: 1
-      settings: {}
   - first:
       Nintendo Switch: Switch
     second:
@@ -136,8 +130,8 @@ PluginImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 267958
-  packageName: Photon Fusion
-  packageVersion: 2.0.9
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
   assetPath: Assets/Photon/Fusion/Plugins/NanoSockets/NanoSockets/Static/NanoSockets.dll
-  uploadId: 832254
+  uploadId: 718661

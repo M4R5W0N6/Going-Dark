@@ -2,6 +2,13 @@ fileFormatVersion: 2
 guid: 199be15ee65b8a74f863e38d995b3039
 labels:
 - FusionDefaultGlobal
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/Photon/Fusion/Resources/NetworkProjectConfig.fusion
+  uploadId: 718661
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
