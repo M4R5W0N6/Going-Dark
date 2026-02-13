@@ -4,7 +4,6 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 
 	#pragma vertex Vert
 	#pragma target 4.5
-	#pragma only_renderers d3d11 d3d12 playstation xboxone xboxseries vulkan metal switch
 	#pragma multi_compile USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
 	#pragma multi_compile_fragment PUNCTUAL_SHADOW_LOW PUNCTUAL_SHADOW_MEDIUM PUNCTUAL_SHADOW_HIGH
 	#pragma multi_compile_fragment DIRECTIONAL_SHADOW_LOW DIRECTIONAL_SHADOW_MEDIUM DIRECTIONAL_SHADOW_HIGH
@@ -19,7 +18,17 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 
 	CBUFFER_START(UnityPerMaterial)
 	int _TargetLightLayerMask;
+	float _PunctualAttenuationPower;
+	float _UseLinearDepthTex;
 	CBUFFER_END
+
+	TEXTURE2D_X(_LinearDepthTex);
+
+	float DeviceDepthFromLinearEyeDepth(float linearEyeDepth)
+	{
+		float z = max(linearEyeDepth, 1e-5);
+		return (rcp(z) - _ZBufferParams.w) / _ZBufferParams.z;
+	}
 
 	float ComputeDirectionalVisibility(PositionInputs posInput, float3 normalWS, LightLoopContext lightLoopContext, uint targetLayerMask)
 	{
@@ -67,12 +76,18 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 			float4 distances;
 			GetPunctualLightVectors(posInput.positionWS, light, L, distances);
 
-			float punctualAttenuation = PunctualLightAttenuation(
-				distances,
-				light.rangeAttenuationScale,
-				light.rangeAttenuationBias,
-				light.angleScale,
-				light.angleOffset);
+			float distSq = distances.y;
+			float distRcp = distances.z;
+			float dist = max(distances.x, 1e-5);
+			float cosFwd = distances.w / dist;
+
+			float rangeAttenuation = min(distRcp, 1.0 / PUNCTUAL_LIGHT_THRESHOLD);
+			rangeAttenuation *= DistanceWindowing(distSq, light.rangeAttenuationScale, light.rangeAttenuationBias);
+			rangeAttenuation = Sq(rangeAttenuation);
+			rangeAttenuation = pow(saturate(rangeAttenuation), _PunctualAttenuationPower);
+
+			float angleAttenuation = Sq(AngleAttenuation(cosFwd, light.angleScale, light.angleOffset));
+			float punctualAttenuation = rangeAttenuation * angleAttenuation;
 
 			if (distances.x >= light.range || punctualAttenuation <= 0.0)
 				continue;
@@ -99,13 +114,27 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 	{
 		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(varyings);
 
-		float depth = LoadCameraDepth(varyings.positionCS.xy);
+		uint2 pixelCoord = uint2(varyings.positionCS.xy);
+
+		float depth;
+		if (_UseLinearDepthTex > 0.5)
+		{
+			float linearEyeDepth = LOAD_TEXTURE2D_X(_LinearDepthTex, pixelCoord).r;
+			if (linearEyeDepth <= 0.0)
+				return float4(0.0, 0.0, 0.0, 1.0);
+
+			depth = DeviceDepthFromLinearEyeDepth(linearEyeDepth);
+		}
+		else
+		{
+			depth = LoadCameraDepth(varyings.positionCS.xy);
+		}
+
 		if (depth == UNITY_RAW_FAR_CLIP_VALUE)
 		{
 			return float4(0.0, 0.0, 0.0, 1.0);
 		}
 
-		uint2 pixelCoord = uint2(varyings.positionCS.xy);
 		uint2 tileCoord = pixelCoord / GetTileSize();
 		PositionInputs posInput = GetPositionInput(
 			varyings.positionCS.xy,
@@ -117,9 +146,23 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 
 		ApplyCameraRelativeXR(posInput.positionWS);
 
-		NormalData normalData;
-		DecodeFromNormalBuffer(posInput.positionSS.xy, normalData);
-		float3 normalWS = normalData.normalWS;
+		float3 normalWS;
+		if (_UseLinearDepthTex > 0.5)
+		{
+			float3 dpdx = ddx(posInput.positionWS);
+			float3 dpdy = ddy(posInput.positionWS);
+			normalWS = normalize(cross(dpdy, dpdx));
+			if (!all(isfinite(normalWS)))
+			{
+				normalWS = float3(0.0, 1.0, 0.0);
+			}
+		}
+		else
+		{
+			NormalData normalData;
+			DecodeFromNormalBuffer(posInput.positionSS.xy, normalData);
+			normalWS = normalData.normalWS;
+		}
 
 		LightLoopContext lightLoopContext;
 		lightLoopContext.shadowContext = InitShadowContext();

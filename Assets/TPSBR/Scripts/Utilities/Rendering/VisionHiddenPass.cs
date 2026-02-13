@@ -9,6 +9,16 @@ namespace TPSBR
 	{
 		[SerializeField]
 		private LayerMask _hiddenLayerMask;
+		private const string VISION_MASK_SHADER_NAME = "Hidden/TPSBR/HDRP/VisionMask";
+		private static readonly int TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_TargetLightLayerMask");
+		private static readonly int PUNCTUAL_ATTENUATION_POWER = Shader.PropertyToID("_PunctualAttenuationPower");
+		private static readonly int USE_LINEAR_DEPTH_TEX = Shader.PropertyToID("_UseLinearDepthTex");
+		private static readonly int LINEAR_DEPTH_TEX = Shader.PropertyToID("_LinearDepthTex");
+		private static readonly int GLOBAL_TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_VisionMaskGlobalTargetLightLayerMask");
+		private static readonly int GLOBAL_PUNCTUAL_ATTENUATION_POWER = Shader.PropertyToID("_VisionMaskGlobalPunctualAttenuationPower");
+
+		private Material _visionMaskMaterial;
+		private MaterialPropertyBlock _visionMaskProperties;
 
 		protected override bool executeInSceneView => true;
 
@@ -22,6 +32,16 @@ namespace TPSBR
 					_hiddenLayerMask = 1 << hiddenLayer;
 				}
 			}
+
+			Shader visionMaskShader = Shader.Find(VISION_MASK_SHADER_NAME);
+			if (visionMaskShader == null)
+			{
+				Debug.LogError($"[VisionHiddenPass] Shader not found: {VISION_MASK_SHADER_NAME}.");
+				return;
+			}
+
+			_visionMaskMaterial = CoreUtils.CreateEngineMaterial(visionMaskShader);
+			_visionMaskProperties = new MaterialPropertyBlock();
 		}
 
 		protected override void AggregateCullingParameters(ref ScriptableCullingParameters cullingParameters, HDCamera hdCamera)
@@ -33,20 +53,43 @@ namespace TPSBR
 		{
 			if (_hiddenLayerMask.value == 0)
 				return;
+			if (_visionMaskMaterial == null || _visionMaskProperties == null)
+				return;
 
 			VisionPassBuffers.Ensure();
 
-			// Step 1: merge hidden depth into the camera depth so hidden objects are depth-tested against world geometry.
+			// Step 1: write visible hidden eye depth (depth-tested against world) into an offscreen depth texture.
 			CustomPassUtils.RenderDepthFromCamera(
 				ctx,
 				ctx.hdCamera.camera,
-				VisionPassBuffers.HiddenColor,
+				VisionPassBuffers.HiddenDepth,
 				ctx.cameraDepthBuffer,
-				ClearFlag.None,
+				ClearFlag.Color,
 				_hiddenLayerMask,
 				RenderQueueType.All);
 
-			// Step 2: render hidden color offscreen while using camera depth for correct occlusion.
+			// Step 2: evaluate the vision mask at hidden-pixel depth so hidden composition doesn't sample background mask.
+			int lightLayerMask = Shader.GetGlobalInt(GLOBAL_TARGET_LIGHT_LAYER_MASK);
+			if (lightLayerMask == 0)
+			{
+				lightLayerMask = -1;
+			}
+
+			float punctualAttenuationPower = Shader.GetGlobalFloat(GLOBAL_PUNCTUAL_ATTENUATION_POWER);
+			if (punctualAttenuationPower <= 0.0f)
+			{
+				punctualAttenuationPower = 1.0f;
+			}
+
+			_visionMaskProperties.Clear();
+			_visionMaskProperties.SetInt(TARGET_LIGHT_LAYER_MASK, lightLayerMask);
+			_visionMaskProperties.SetFloat(PUNCTUAL_ATTENUATION_POWER, punctualAttenuationPower);
+			_visionMaskProperties.SetFloat(USE_LINEAR_DEPTH_TEX, 1.0f);
+			_visionMaskProperties.SetTexture(LINEAR_DEPTH_TEX, VisionPassBuffers.HiddenDepth);
+			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.HiddenMask, ClearFlag.Color);
+			CoreUtils.DrawFullScreen(ctx.cmd, _visionMaskMaterial, _visionMaskProperties, shaderPassId: 0);
+
+			// Step 3: render hidden color offscreen while using camera depth for correct occlusion.
 			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.HiddenColor, ctx.cameraDepthBuffer, ClearFlag.Color);
 			var colorState = new RenderStateBlock(RenderStateMask.Depth)
 			{
@@ -54,6 +97,13 @@ namespace TPSBR
 			};
 
 			CustomPassUtils.DrawRenderers(ctx, _hiddenLayerMask, RenderQueueType.All, overrideRenderState: colorState);
+		}
+
+		protected override void Cleanup()
+		{
+			CoreUtils.Destroy(_visionMaskMaterial);
+			_visionMaskMaterial = null;
+			_visionMaskProperties = null;
 		}
 	}
 }

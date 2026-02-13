@@ -1662,7 +1662,6 @@ GameObject:
   m_Component:
   - component: {fileID: 299999027}
   - component: {fileID: 299999026}
-  - component: {fileID: 299999028}
   - component: {fileID: 299999029}
   m_Layer: 0
   m_Name: Directional Light
@@ -1682,7 +1681,7 @@ Light:
   serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 100000
+  m_Intensity: 90784.3
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1744,25 +1743,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 299999025}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.36599812, y: 0.45315394, z: -0.2113091, w: 0.78488564}
+  m_LocalRotation: {x: 0.8780834, y: 0.18279366, z: -0.27042946, w: 0.34989122}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: 60, z: 0}
---- !u!114 &299999028
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299999025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_LocalEulerAnglesHint: {x: 45.507, y: 209.679, z: 169.162}
 --- !u!114 &299999029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3443,7 +3430,7 @@ GameObject:
   - component: {fileID: 619633299}
   - component: {fileID: 619633298}
   - component: {fileID: 619633297}
-  m_Layer: 24
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

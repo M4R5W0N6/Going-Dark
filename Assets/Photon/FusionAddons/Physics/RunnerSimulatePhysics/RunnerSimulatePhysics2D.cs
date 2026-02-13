@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 namespace Fusion.Addons.Physics {
@@ -58,3 +59,4 @@ namespace Fusion.Addons.Physics {
     }
   }
 }
+

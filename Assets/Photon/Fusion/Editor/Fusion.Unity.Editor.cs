@@ -1,3 +1,4 @@
+
 #if !FUSION_DEV
 
 #region Assets/Photon/Fusion/Editor/AssetObjectEditor.cs
@@ -1213,6 +1214,7 @@ namespace Fusion.Editor {
     }
   }
 #endif
+
 
 }
 

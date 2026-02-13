@@ -1,3 +1,4 @@
+
 #if !FUSION_DEV
 
 #region Assets/Photon/Fusion/Runtime/FusionAssetSource.Common.cs
@@ -148,6 +149,7 @@ namespace Fusion {
     /// <inheritdoc cref="NetworkAssetSourceResource{T}.EditorInstance"/>
     public T EditorInstance => (T)FusionAddressablesUtils.LoadEditorInstance(RuntimeKey);
 #endif
+
   }
 }
 #endif

@@ -21,6 +21,7 @@ namespace TPSBR
 		private const string SHADER_NAME = "Hidden/TPSBR/HDRP/VisionComposite";
 		private static readonly int SCENE_COLOR_TEX = Shader.PropertyToID("_SceneColorTex");
 		private static readonly int VISION_MASK_TEX = Shader.PropertyToID("_VisionMaskTex");
+		private static readonly int HIDDEN_MASK_TEX = Shader.PropertyToID("_HiddenMaskTex");
 		private static readonly int HIDDEN_COLOR_TEX = Shader.PropertyToID("_HiddenColorTex");
 
 		private Material _material;
@@ -52,9 +53,19 @@ namespace TPSBR
 			if (_renderMode == RenderMode.None)
 				return;
 
+			_propertyBlock.Clear();
+			_propertyBlock.SetTexture(SCENE_COLOR_TEX, VisionPassBuffers.SceneColorCopy);
+			_propertyBlock.SetTexture(VISION_MASK_TEX, VisionPassBuffers.VisionMask);
+			_propertyBlock.SetTexture(HIDDEN_MASK_TEX, VisionPassBuffers.HiddenMask);
+			_propertyBlock.SetTexture(HIDDEN_COLOR_TEX, VisionPassBuffers.HiddenColor);
+
+			// Build the exact final mask used by composition once, then share with later post passes.
+			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.FinalMask, ClearFlag.Color);
+			CoreUtils.DrawFullScreen(ctx.cmd, _material, _propertyBlock, shaderPassId: 1);
+
 			if (_renderMode == RenderMode.Vision)
 			{
-				CustomPassUtils.Copy(ctx, VisionPassBuffers.VisionMask, ctx.cameraColorBuffer);
+				CustomPassUtils.Copy(ctx, VisionPassBuffers.FinalMask, ctx.cameraColorBuffer);
 				return;
 			}
 
@@ -65,11 +76,7 @@ namespace TPSBR
 			}
 
 			CustomPassUtils.Copy(ctx, ctx.cameraColorBuffer, VisionPassBuffers.SceneColorCopy);
-
-			_propertyBlock.Clear();
 			_propertyBlock.SetTexture(SCENE_COLOR_TEX, VisionPassBuffers.SceneColorCopy);
-			_propertyBlock.SetTexture(VISION_MASK_TEX, VisionPassBuffers.VisionMask);
-			_propertyBlock.SetTexture(HIDDEN_COLOR_TEX, VisionPassBuffers.HiddenColor);
 
 			CoreUtils.SetRenderTarget(ctx.cmd, ctx.cameraColorBuffer, ClearFlag.None);
 			CoreUtils.DrawFullScreen(ctx.cmd, _material, _propertyBlock, shaderPassId: 0);

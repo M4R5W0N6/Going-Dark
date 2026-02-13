@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using Fusion.Analyzer;
 
@@ -88,3 +89,4 @@ namespace Fusion.Addons.Physics {
     }
   }
 }
+
