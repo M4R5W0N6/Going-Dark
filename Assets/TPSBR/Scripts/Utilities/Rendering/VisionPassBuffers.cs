@@ -14,6 +14,7 @@ namespace TPSBR
 		public static RTHandle HiddenMask { get; private set; }
 		public static RTHandle FinalMask { get; private set; }
 		public static RTHandle HiddenDepth { get; private set; }
+		public static RTHandle LocalDepth { get; private set; }
 		public static RTHandle HiddenColor { get; private set; }
 		public static RTHandle SceneColorCopy { get; private set; }
 
@@ -74,6 +75,17 @@ namespace TPSBR
 					name: "VisionHiddenDepthBuffer");
 			}
 
+			if (LocalDepth == null)
+			{
+				LocalDepth = RTHandles.Alloc(
+					Vector2.one,
+					TextureXR.slices,
+					dimension: TextureXR.dimension,
+					colorFormat: GraphicsFormat.R32_SFloat,
+					useDynamicScale: true,
+					name: "VisionLocalDepthBuffer");
+			}
+
 			if (SceneColorCopy == null)
 			{
 				SceneColorCopy = RTHandles.Alloc(
@@ -103,6 +115,7 @@ namespace TPSBR
 			RTHandles.Release(HiddenMask);
 			RTHandles.Release(FinalMask);
 			RTHandles.Release(HiddenDepth);
+			RTHandles.Release(LocalDepth);
 			RTHandles.Release(HiddenColor);
 			RTHandles.Release(SceneColorCopy);
 
@@ -110,6 +123,7 @@ namespace TPSBR
 			HiddenMask = null;
 			FinalMask = null;
 			HiddenDepth = null;
+			LocalDepth = null;
 			HiddenColor = null;
 			SceneColorCopy = null;
 			LastCompositeFrame = -1;

@@ -9,6 +9,9 @@ namespace TPSBR
 	[DisallowMultipleComponent]
 	public sealed class AgentVisionVisuals : MonoBehaviour
 	{
+		private const string LOCAL_OBJECT_LAYER_NAME = "Local";
+		private const uint DEFAULT_LIGHT_LAYER_MASK = 1u;
+
 		private readonly Dictionary<Renderer, uint> _originalRendererMasks = new Dictionary<Renderer, uint>(64);
 		private readonly Dictionary<Renderer, int> _originalObjectLayers = new Dictionary<Renderer, int>(64);
 		private readonly List<Renderer> _renderers = new List<Renderer>(64);
@@ -22,6 +25,7 @@ namespace TPSBR
 		private Weapons _weapons;
 		private bool _didLogMissingAgent;
 		private bool _didLogMissingVision;
+		private bool _didLogMissingLocalLayer;
 
 		private void Awake()
 		{
@@ -100,6 +104,7 @@ namespace TPSBR
 			bool isLocalControlled = context != null ? (_agent.HasInputAuthority && context.HasInput) : _agent.HasInputAuthority;
 			uint visionMask = _agentVision.VisionLightLayerMask;
 			int overrideObjectLayer = ResolveSingleLayer(_remoteVisualObjectLayerMask);
+			int localObjectLayer = ResolveLocalObjectLayer();
 
 			CollectRenderers();
 
@@ -118,15 +123,24 @@ namespace TPSBR
 					_originalObjectLayers.Add(renderer, renderer.gameObject.layer);
 				}
 
-				uint originalMask = _originalRendererMasks[renderer];
-				uint desiredMask = isLocalControlled ? visionMask : (originalMask | visionMask);
+				uint originalMask = _originalRendererMasks[renderer] | DEFAULT_LIGHT_LAYER_MASK;
+				uint desiredMask = isLocalControlled ? (originalMask & ~visionMask) : (originalMask | visionMask);
 				if (renderer.renderingLayerMask != desiredMask)
 				{
 					renderer.renderingLayerMask = desiredMask;
 				}
 
 				int originalObjectLayer = _originalObjectLayers[renderer];
-				int desiredObjectLayer = isLocalControlled == true ? originalObjectLayer : (overrideObjectLayer >= 0 ? overrideObjectLayer : originalObjectLayer);
+				int desiredObjectLayer = originalObjectLayer;
+				if (isLocalControlled == true && localObjectLayer >= 0)
+				{
+					desiredObjectLayer = localObjectLayer;
+				}
+				else if (isLocalControlled == false && overrideObjectLayer >= 0)
+				{
+					desiredObjectLayer = overrideObjectLayer;
+				}
+
 				if (renderer.gameObject.layer != desiredObjectLayer)
 				{
 					renderer.gameObject.layer = desiredObjectLayer;
@@ -194,6 +208,21 @@ namespace TPSBR
 			{
 				if ((bits & (1 << i)) != 0)
 					return i;
+			}
+
+			return -1;
+		}
+
+		private int ResolveLocalObjectLayer()
+		{
+			int localLayer = LayerMask.NameToLayer(LOCAL_OBJECT_LAYER_NAME);
+			if (localLayer >= 0)
+				return localLayer;
+
+			if (_didLogMissingLocalLayer == false)
+			{
+				Debug.LogWarning($"[AgentVisionVisuals] Object layer '{LOCAL_OBJECT_LAYER_NAME}' not found. Local visuals will keep original object layers.", this);
+				_didLogMissingLocalLayer = true;
 			}
 
 			return -1;

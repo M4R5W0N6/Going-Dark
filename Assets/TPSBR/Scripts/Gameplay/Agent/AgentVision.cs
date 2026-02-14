@@ -10,6 +10,7 @@ namespace TPSBR
 	public sealed class AgentVision : MonoBehaviour
 	{
 		private const float TPSBR_TARGET_RAY_DISTANCE = 500.0f;
+		private const string LOCAL_OBJECT_LAYER_NAME = "Local";
 
 		public uint VisionLightLayerMask
 		{
@@ -40,6 +41,7 @@ namespace TPSBR
 		private float _initialInnerOuterDelta;
 		private bool _hasCachedInitialAngles;
 		private bool _didLogMissingAgent;
+		private bool _didLogMissingLocalLayer;
 
 		private void Awake()
 		{
@@ -66,6 +68,7 @@ namespace TPSBR
 			if (EnsureReady() == false)
 				return;
 
+			ApplyLocalLayerCullingMask();
 			SyncSpotLightViewAngle();
 			ApplyState(force: false);
 		}
@@ -90,9 +93,29 @@ namespace TPSBR
 				_agent = GetComponentInParent<Agent>();
 			if (_character == null && _agent != null)
 				_character = _agent.Character;
+			ApplyLocalLayerCullingMask();
 
 			CacheInitialSpotlightAngles();
 			EnsureReady();
+		}
+
+		private void ApplyLocalLayerCullingMask()
+		{
+			if (_spotLight == null)
+				return;
+
+			int localLayer = LayerMask.NameToLayer(LOCAL_OBJECT_LAYER_NAME);
+			if (localLayer >= 0)
+			{
+				_spotLight.cullingMask &= ~(1 << localLayer);
+				return;
+			}
+
+			if (_didLogMissingLocalLayer == false)
+			{
+				Debug.LogWarning($"[AgentVision] Object layer '{LOCAL_OBJECT_LAYER_NAME}' not found. Vision light will not exclude local visuals by culling mask.", this);
+				_didLogMissingLocalLayer = true;
+			}
 		}
 
 		private bool EnsureReady()

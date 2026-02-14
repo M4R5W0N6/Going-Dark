@@ -19,9 +19,11 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 	CBUFFER_START(UnityPerMaterial)
 	int _TargetLightLayerMask;
 	float _UseLinearDepthTex;
+	float _UseLocalDepthTex;
 	CBUFFER_END
 
 	TEXTURE2D_X(_LinearDepthTex);
+	TEXTURE2D_X(_LocalDepthTex);
 
 	float DeviceDepthFromLinearEyeDepth(float linearEyeDepth)
 	{
@@ -116,9 +118,10 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 		uint2 pixelCoord = uint2(varyings.positionCS.xy);
 
 		float depth;
+		float linearEyeDepth;
 		if (_UseLinearDepthTex > 0.5)
 		{
-			float linearEyeDepth = LOAD_TEXTURE2D_X(_LinearDepthTex, pixelCoord).r;
+			linearEyeDepth = LOAD_TEXTURE2D_X(_LinearDepthTex, pixelCoord).r;
 			if (linearEyeDepth <= 0.0)
 				return float4(0.0, 0.0, 0.0, 1.0);
 
@@ -127,11 +130,25 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 		else
 		{
 			depth = LoadCameraDepth(varyings.positionCS.xy);
+			linearEyeDepth = LinearEyeDepth(depth, _ZBufferParams);
 		}
 
 		if (depth == UNITY_RAW_FAR_CLIP_VALUE)
 		{
 			return float4(0.0, 0.0, 0.0, 1.0);
+		}
+
+		if (_UseLocalDepthTex > 0.5)
+		{
+			float localDepth = LOAD_TEXTURE2D_X(_LocalDepthTex, pixelCoord).r;
+			if (localDepth > 0.0)
+			{
+				float depthEpsilon = max(0.01, linearEyeDepth * 0.001);
+				if (abs(localDepth - linearEyeDepth) <= depthEpsilon)
+				{
+					return float4(0.0, 0.0, 0.0, 1.0);
+				}
+			}
 		}
 
 		uint2 tileCoord = pixelCoord / GetTileSize();
