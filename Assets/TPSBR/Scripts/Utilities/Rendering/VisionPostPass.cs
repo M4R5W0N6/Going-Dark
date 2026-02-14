@@ -7,18 +7,14 @@ namespace TPSBR
 	[System.Serializable]
 	public class VisionPostPass : CustomPass
 	{
-		private enum RenderMode
-		{
-			Both = 0,
-			Vision = 1,
-			Hidden = 2,
-			None = 3
-		}
-
 		[SerializeField]
 		private Shader _shader;
 		[SerializeField]
-		private RenderMode _renderMode = RenderMode.Hidden;
+		[Range(-1.0f, 1.0f)]
+		private float _vision = 0.0f;
+		[SerializeField]
+		[Range(0.0f, 1.0f)]
+		private float _hidden = 0.0f;
 		[SerializeField, Range(-1.0f, 1.0f)]
 		private float _strength = 1.0f;
 		[SerializeField]
@@ -50,7 +46,7 @@ namespace TPSBR
 		private static readonly int HIDDEN_MASK_TEX = Shader.PropertyToID("_HiddenMaskTex");
 		private static readonly int HIDDEN_DEPTH_TEX = Shader.PropertyToID("_HiddenDepthTex");
 		private static readonly int STRENGTH = Shader.PropertyToID("_Strength");
-		private static readonly int MODE_MASK = Shader.PropertyToID("_ModeMask");
+		private static readonly int MODE_WEIGHTS = Shader.PropertyToID("_ModeWeights");
 		private static readonly int TINT_COLOR = Shader.PropertyToID("_TintColor");
 		private static readonly int SATURATION_STRENGTH = Shader.PropertyToID("_SaturationStrength");
 		private static readonly int OVERLAY_TEX = Shader.PropertyToID("_OverlayTex");
@@ -81,6 +77,9 @@ namespace TPSBR
 
 			if (_material == null || _propertyBlock == null)
 				return;
+			int cameraId = ctx.hdCamera.camera != null ? ctx.hdCamera.camera.GetInstanceID() : -1;
+			if (!VisionPassBuffers.WasCompositeExecutedThisFrame(cameraId))
+				return;
 
 			VisionPassBuffers.Ensure();
 
@@ -94,7 +93,7 @@ namespace TPSBR
 			_propertyBlock.SetTexture(HIDDEN_MASK_TEX, VisionPassBuffers.HiddenMask);
 			_propertyBlock.SetTexture(HIDDEN_DEPTH_TEX, VisionPassBuffers.HiddenDepth);
 			_propertyBlock.SetFloat(STRENGTH, _strength);
-			_propertyBlock.SetFloat(MODE_MASK, GetModeMaskValue());
+			_propertyBlock.SetVector(MODE_WEIGHTS, GetModeWeights());
 			_propertyBlock.SetColor(TINT_COLOR, _tintColor);
 			_propertyBlock.SetFloat(SATURATION_STRENGTH, _saturationStrength);
 			_propertyBlock.SetTexture(OVERLAY_TEX, _overlayTexture != null ? _overlayTexture : Texture2D.whiteTexture);
@@ -127,15 +126,9 @@ namespace TPSBR
 			_activeShader = selectedShader;
 		}
 
-		private float GetModeMaskValue()
+		private Vector4 GetModeWeights()
 		{
-			switch (_renderMode)
-			{
-				case RenderMode.Both: return 1.0f;
-				case RenderMode.Vision: return 2.0f;
-				case RenderMode.Hidden: return 3.0f;
-				default: return 0.0f;
-			}
+			return new Vector4(_vision, _hidden, 0.0f, 0.0f);
 		}
 
 		protected override void Cleanup()

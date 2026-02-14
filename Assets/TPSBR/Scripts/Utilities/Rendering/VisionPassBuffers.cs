@@ -7,6 +7,9 @@ namespace TPSBR
 
 	internal static class VisionPassBuffers
 	{
+		public static int LastCompositeFrame { get; private set; } = -1;
+		public static int LastCompositeCameraId { get; private set; } = -1;
+
 		public static RTHandle VisionMask { get; private set; }
 		public static RTHandle HiddenMask { get; private set; }
 		public static RTHandle FinalMask { get; private set; }
@@ -83,6 +86,17 @@ namespace TPSBR
 			}
 		}
 
+		public static void MarkCompositeExecuted(int cameraId)
+		{
+			LastCompositeFrame = Time.frameCount;
+			LastCompositeCameraId = cameraId;
+		}
+
+		public static bool WasCompositeExecutedThisFrame(int cameraId)
+		{
+			return LastCompositeFrame == Time.frameCount && LastCompositeCameraId == cameraId;
+		}
+
 		public static void Release()
 		{
 			RTHandles.Release(VisionMask);
@@ -98,6 +112,8 @@ namespace TPSBR
 			HiddenDepth = null;
 			HiddenColor = null;
 			SceneColorCopy = null;
+			LastCompositeFrame = -1;
+			LastCompositeCameraId = -1;
 		}
 	}
 }

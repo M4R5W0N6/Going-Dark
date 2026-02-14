@@ -11,8 +11,7 @@ namespace TPSBR
 		{
 			Both = 0,
 			Vision = 1,
-			Hidden = 2,
-			None = 3
+			Hidden = 2
 		}
 
 		[SerializeField]
@@ -49,9 +48,7 @@ namespace TPSBR
 				return;
 
 			VisionPassBuffers.Ensure();
-
-			if (_renderMode == RenderMode.None)
-				return;
+			VisionPassBuffers.MarkCompositeExecuted(ctx.hdCamera.camera != null ? ctx.hdCamera.camera.GetInstanceID() : -1);
 
 			_propertyBlock.Clear();
 			_propertyBlock.SetTexture(SCENE_COLOR_TEX, VisionPassBuffers.SceneColorCopy);

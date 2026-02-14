@@ -18,7 +18,6 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 
 	CBUFFER_START(UnityPerMaterial)
 	int _TargetLightLayerMask;
-	float _PunctualAttenuationPower;
 	float _UseLinearDepthTex;
 	CBUFFER_END
 
@@ -84,7 +83,7 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 			float rangeAttenuation = min(distRcp, 1.0 / PUNCTUAL_LIGHT_THRESHOLD);
 			rangeAttenuation *= DistanceWindowing(distSq, light.rangeAttenuationScale, light.rangeAttenuationBias);
 			rangeAttenuation = Sq(rangeAttenuation);
-			rangeAttenuation = pow(saturate(rangeAttenuation), _PunctualAttenuationPower);
+			rangeAttenuation = pow(saturate(rangeAttenuation), 0.1);
 
 			float angleAttenuation = Sq(AngleAttenuation(cosFwd, light.angleScale, light.angleOffset));
 			float punctualAttenuation = rangeAttenuation * angleAttenuation;

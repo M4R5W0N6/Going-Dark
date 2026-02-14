@@ -9,14 +9,10 @@ namespace TPSBR
 	{
 		[SerializeField]
 		private uint _lightLayerMask = uint.MaxValue;
-		[SerializeField, Min(0.01f)]
-		private float _punctualAttenuationPower = 1.0f;
 
 		private const string SHADER_NAME = "Hidden/TPSBR/HDRP/VisionMask";
 		private static readonly int GLOBAL_TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_VisionMaskGlobalTargetLightLayerMask");
-		private static readonly int GLOBAL_PUNCTUAL_ATTENUATION_POWER = Shader.PropertyToID("_VisionMaskGlobalPunctualAttenuationPower");
 		private static readonly int TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_TargetLightLayerMask");
-		private static readonly int PUNCTUAL_ATTENUATION_POWER = Shader.PropertyToID("_PunctualAttenuationPower");
 		private static readonly int USE_LINEAR_DEPTH_TEX = Shader.PropertyToID("_UseLinearDepthTex");
 
 		private Material _material;
@@ -47,10 +43,8 @@ namespace TPSBR
 
 			_propertyBlock.Clear();
 			_propertyBlock.SetInt(TARGET_LIGHT_LAYER_MASK, unchecked((int)_lightLayerMask));
-			_propertyBlock.SetFloat(PUNCTUAL_ATTENUATION_POWER, _punctualAttenuationPower);
 			_propertyBlock.SetFloat(USE_LINEAR_DEPTH_TEX, 0.0f);
 			Shader.SetGlobalInt(GLOBAL_TARGET_LIGHT_LAYER_MASK, unchecked((int)_lightLayerMask));
-			Shader.SetGlobalFloat(GLOBAL_PUNCTUAL_ATTENUATION_POWER, _punctualAttenuationPower);
 
 			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.VisionMask, ClearFlag.Color);
 			CoreUtils.DrawFullScreen(ctx.cmd, _material, _propertyBlock, shaderPassId: 0);

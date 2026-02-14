@@ -10,7 +10,8 @@ namespace TPSBR.EditorTools
 		protected override PassUIFlag commonPassUIFlags => PassUIFlag.Name;
 
 		private SerializedProperty _shader;
-		private SerializedProperty _renderMode;
+		private SerializedProperty _vision;
+		private SerializedProperty _hidden;
 		private SerializedProperty _strength;
 		private SerializedProperty _tintColor;
 		private SerializedProperty _saturationStrength;
@@ -27,7 +28,8 @@ namespace TPSBR.EditorTools
 		protected override void Initialize(SerializedProperty customPass)
 		{
 			_shader = customPass.FindPropertyRelative("_shader");
-			_renderMode = customPass.FindPropertyRelative("_renderMode");
+			_vision = customPass.FindPropertyRelative("_vision");
+			_hidden = customPass.FindPropertyRelative("_hidden");
 			_strength = customPass.FindPropertyRelative("_strength");
 			_tintColor = customPass.FindPropertyRelative("_tintColor");
 			_saturationStrength = customPass.FindPropertyRelative("_saturationStrength");
@@ -51,9 +53,15 @@ namespace TPSBR.EditorTools
 				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 			}
 
-			if (_renderMode != null)
+			if (_vision != null)
 			{
-				EditorGUI.PropertyField(rect, _renderMode, new GUIContent("Render Mode"));
+				_vision.floatValue = EditorGUI.Slider(rect, new GUIContent("Vision"), _vision.floatValue, -1.0f, 1.0f);
+				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+			}
+
+			if (_hidden != null)
+			{
+				_hidden.floatValue = EditorGUI.Slider(rect, new GUIContent("Hidden"), _hidden.floatValue, 0.0f, 1.0f);
 				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 			}
 
@@ -127,7 +135,7 @@ namespace TPSBR.EditorTools
 		protected override float GetPassHeight(SerializedProperty customPass)
 		{
 			Shader activeShader = GetActiveShader();
-			int lineCount = 3; // Shader + Render Mode + Strength are always shown.
+			int lineCount = 4; // Shader + Vision + Hidden + Strength are always shown.
 			if (ShaderHasProperty(activeShader, "_TintColor")) lineCount++;
 			if (ShaderHasProperty(activeShader, "_SaturationStrength")) lineCount++;
 			if (ShaderHasProperty(activeShader, "_OverlayTex")) lineCount++;
