@@ -5387,22 +5387,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0036123097
-      value: 0.0006981045
+      time: 0
+      value: 0
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
-      time: 1.0036123
-      value: 0.0006981045
+      time: 1
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -5684,25 +5684,8 @@ MonoBehaviour:
   _jetpackAnimation: {fileID: 5847991256170199405}
   _visualsRoot: {fileID: 4348347289748489880}
   _centerOfGravityOffset: {x: 0, y: 1.5, z: 0}
-  _cameraPositionShake:
-    Duration: 10000
-    Magnitude: 0.0025
-    Frequency: 20
-    FadeIn: 0.2
-    FadeOut: 0.5
-    Ease: 4
-    Axis: {x: 1, y: 1, z: 0}
-    Target: 1
-  _cameraRotationShake:
-    Duration: 10000
-    Magnitude: 0.06
-    Frequency: 20
-    FadeIn: 0.2
-    FadeOut: 0.5
-    Ease: 4
-    Axis: {x: 0, y: 0, z: 1}
-    Target: 2
-  _fullThrustShakeMultiplier: 2
+  _cameraShake:
+    SourceKey: JETPACK
   _rightMount: {fileID: 4895308386272494670}
   _leftMount: {fileID: 4895650901372230456}
   _rightPropeller: {fileID: 4895880196309264614}
@@ -5825,7 +5808,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16777481
   _spawnDebugHitPointProxies: 0
-  _debugHitPointProxyScale: 0.15
+  _debugHitPointProxyScale: 0.2
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0

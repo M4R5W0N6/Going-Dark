@@ -199,13 +199,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 2609528540
   ObjectInterest: 0
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
   Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5070084778634236966}
   - {fileID: 5660633326291460765}
+  ForceRemoteRenderTimeframe: 0
 --- !u!114 &5070084778634236966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,6 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecff45261f75b014fb16db195df51219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0.15
   _positionSource: {fileID: 0}
 --- !u!114 &5660633326291460765
 MonoBehaviour:
@@ -252,24 +252,8 @@ MonoBehaviour:
   _reloadTime: 0.8
   _fireOnKeyDownOnly: 0
   _projectilesPerShot: 1
-  _cameraShakePosition:
-    Duration: 0
-    Magnitude: 0
-    Frequency: 10
-    FadeIn: 0.1
-    FadeOut: 0.2
-    Ease: 1
-    Axis: {x: 1, y: 1, z: 1}
-    Target: 1
-  _cameraShakeRotation:
-    Duration: 0
-    Magnitude: 0
-    Frequency: 10
-    FadeIn: 0.1
-    FadeOut: 0.2
-    Ease: 1
-    Axis: {x: 1, y: 1, z: 1}
-    Target: 1
+  _cameraShake:
+    SourceKey: GRENADE
   _supressReloadWhileAimed: 0
   _minDispersion: 0.05
   _minFireDispersion: 0.2
@@ -287,6 +271,7 @@ MonoBehaviour:
     Clips:
     - {fileID: 8300000, guid: af5ece47ac7f6d741b0b1402c52eac1f, type: 3}
     Volume: 0.2
+    PitchShift: 0
     MaxPitchChange: 0.1
     Delay: 0
     Loop: 0
@@ -299,6 +284,7 @@ MonoBehaviour:
     Clips:
     - {fileID: 8300000, guid: 42321e5846e61c44ba561f9b3d499f70, type: 3}
     Volume: 1
+    PitchShift: 0
     MaxPitchChange: 0
     Delay: 0
     Loop: 0
@@ -311,6 +297,7 @@ MonoBehaviour:
     Clips:
     - {fileID: 8300000, guid: 42321e5846e61c44ba561f9b3d499f70, type: 3}
     Volume: 1
+    PitchShift: 0
     MaxPitchChange: 0
     Delay: 0
     Loop: 0
@@ -330,6 +317,7 @@ MonoBehaviour:
     Clips:
     - {fileID: 8300000, guid: fc5b6cb057057e243b92fc5eadf08bb4, type: 3}
     Volume: 1
+    PitchShift: 0
     MaxPitchChange: 0.1
     Delay: 0
     Loop: 0
@@ -382,6 +370,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -5052030855387608183, guid: 5fe66330c489e4544ba809ba6cc86e2b, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -518,6 +507,7 @@ MonoBehaviour:
   _defaultSetup:
     Clips: []
     Volume: 1
+    PitchShift: 0
     MaxPitchChange: 0
     Delay: 0
     Loop: 0

@@ -180,18 +180,16 @@ namespace TPSBR
 
 		public override void Render()
 		{
-			if (HasInputAuthority == true || IsObserved == true)
+			// Keep camera handle pitch synchronized for all agents so camera anchor
+			// transforms used by aim/crosshair remain consistent in multipeer.
+			Quaternion currentLookRotation = _character.CharacterController.RenderData.LookRotation;
+			if (_cachedLookRotation.ComponentEquals(currentLookRotation) == false)
 			{
-				// Performance optimization, unnecessary euler call
-				Quaternion currentLookRotation = _character.CharacterController.RenderData.LookRotation;
-				if (_cachedLookRotation.ComponentEquals(currentLookRotation) == false)
-				{
-					_cachedLookRotation  = currentLookRotation;
-					_cachedPitchRotation = Quaternion.Euler(_character.CharacterController.RenderData.LookPitch, 0.0f, 0.0f);
-				}
-
-				_character.GetCameraHandle().transform.localRotation = _cachedPitchRotation;
+				_cachedLookRotation  = currentLookRotation;
+				_cachedPitchRotation = Quaternion.Euler(_character.CharacterController.RenderData.LookPitch, 0.0f, 0.0f);
 			}
+
+			_character.GetCameraHandle().transform.localRotation = _cachedPitchRotation;
 
 			_character.OnAgentRender();
 			_footsteps.OnAgentRender();

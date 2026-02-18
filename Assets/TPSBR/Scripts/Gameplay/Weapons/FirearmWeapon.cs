@@ -46,9 +46,7 @@ namespace TPSBR
 		[SerializeField]
 		private int           _projectilesPerShot = 1;
 		[SerializeField]
-		private ShakeSetup    _cameraShakePosition;
-		[SerializeField]
-		private ShakeSetup    _cameraShakeRotation;
+		private ShakeSetup    _cameraShake;
 		[SerializeField]
 		private bool          _supressReloadWhileAimed;
 
@@ -411,8 +409,7 @@ namespace TPSBR
 
 				if (Context.ObservedAgent.Object == Owner)
 				{
-					Context.Camera.ShakeEffect.Play(_cameraShakePosition, EShakeForce.ReplaceSame);
-					Context.Camera.ShakeEffect.Play(_cameraShakeRotation, EShakeForce.ReplaceSame);
+					Context.Camera.ShakeEffect.Play(_cameraShake, EShakeForce.ReplaceSame);
 				}
 			}
 		}

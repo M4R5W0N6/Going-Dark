@@ -556,6 +556,7 @@ namespace TPSBR
 
 			ProcessGamepadInput(isInputPoll);
 			UpdateAutomaticLeaning();
+			UpdateAimRayInput();
 
 			AccumulateRenderInput();
 
@@ -634,11 +635,37 @@ namespace TPSBR
 			_accumulatedInput.Actions            = new NetworkButtons(_accumulatedInput.Actions.Bits | _renderInput.Actions.Bits);
 			_accumulatedInput.MoveDirection      = _accumulatedMoveDirection / _accumulatedMoveDirectionSize;
 			_accumulatedInput.LookRotationDelta += _renderInput.LookRotationDelta;
+			_accumulatedInput.HasAimRay          = _renderInput.HasAimRay;
+			_accumulatedInput.AimRayOrigin       = _renderInput.AimRayOrigin;
+			_accumulatedInput.AimRayDirection    = _renderInput.AimRayDirection;
 
 			if (_renderInput.Weapon != default)
 			{
 				_accumulatedInput.Weapon = _renderInput.Weapon;
 			}
+		}
+
+		private void UpdateAimRayInput()
+		{
+			_renderInput.HasAimRay = false;
+			_renderInput.AimRayOrigin = default;
+			_renderInput.AimRayDirection = default;
+
+			if (Context == null || Context.Camera == null)
+				return;
+
+			Context.Camera.SyncForGameplayRender();
+			Context.Camera.GetPostBlendCameraPose(out Vector3 cameraPosition, out Quaternion cameraRotation, out _);
+
+			Vector3 cameraForward = cameraRotation * Vector3.forward;
+			bool invalidPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
+			if (invalidPosition == true || cameraForward.sqrMagnitude <= 0.0001f)
+				return;
+
+			cameraForward.Normalize();
+			_renderInput.HasAimRay = true;
+			_renderInput.AimRayOrigin = cameraPosition;
+			_renderInput.AimRayDirection = cameraForward;
 		}
 
 		private byte GetWeaponInput()

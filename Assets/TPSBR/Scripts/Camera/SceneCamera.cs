@@ -75,6 +75,7 @@ namespace TPSBR
 
 		private int _cameraCullingMask;
 		private CinemachineThirdPersonFollow _thirdPersonFollow;
+		private CinemachineImpulseListener _impulseListener;
 		private Agent _rigStateAgent;
 		private Transform _rigStateAnchor;
 		private bool _rigStateLeftSide;
@@ -618,6 +619,7 @@ namespace TPSBR
 			{
 				_thirdPersonFollow = runtimeCamera.GetComponent<CinemachineThirdPersonFollow>();
 			}
+			EnsureImpulseListener(runtimeCamera);
 		}
 
 		private Camera GetOutputCamera()
@@ -909,6 +911,33 @@ namespace TPSBR
 
 			Transform searchRoot = transform.parent != null ? transform.parent : transform;
 			return searchRoot.GetComponentInChildren<CinemachineCamera>(true);
+		}
+
+		private void EnsureImpulseListener(CinemachineCamera runtimeCamera)
+		{
+			if (runtimeCamera == null)
+			{
+				_impulseListener = null;
+				return;
+			}
+
+			if (_impulseListener == null || _impulseListener.ComponentOwner != runtimeCamera)
+			{
+				_impulseListener = runtimeCamera.GetComponent<CinemachineImpulseListener>();
+				if (_impulseListener == null)
+				{
+					_impulseListener = runtimeCamera.gameObject.AddComponent<CinemachineImpulseListener>();
+				}
+			}
+
+			if (_impulseListener != null)
+			{
+				_impulseListener.ChannelMask = ~0;
+				_impulseListener.Gain = 1.0f;
+				_impulseListener.Use2DDistance = false;
+				_impulseListener.UseCameraSpace = true;
+				_impulseListener.ApplyAfter = CinemachineCore.Stage.Noise;
+			}
 		}
 
 		public void SetFieldOfView(float fieldOfView)

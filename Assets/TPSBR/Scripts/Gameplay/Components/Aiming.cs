@@ -113,53 +113,36 @@ namespace TPSBR
 			position = default;
 			direction = default;
 
-			if (_character == null || Context == null || Context.Camera == null || _character.HasInputAuthority == false)
+			if (_character == null)
 				return false;
 
-			if (resolveRenderHistory == false)
+			bool hasLocalInputAuthority = _character.HasInputAuthority == true &&
+				Context != null &&
+				Context.HasInput == true &&
+				Context.Camera != null;
+
+			if (resolveRenderHistory == false && hasLocalInputAuthority == true)
 			{
 				Context.Camera.SyncForGameplayRender();
 				Context.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out Quaternion postBlendRotation, out _);
 				position = postBlendPosition;
 				direction = postBlendRotation * Vector3.forward;
-				if (direction.sqrMagnitude > 0.0001f)
+				bool invalidLocalPosition = float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z);
+				if (invalidLocalPosition == false && direction.sqrMagnitude > 0.0001f)
 				{
 					direction.Normalize();
 					return true;
 				}
+
+				return false;
 			}
 
-			TransformData fallbackCamera = _character.GetCameraTransform(resolveRenderHistory);
-			Camera projectionCamera = resolveRenderHistory == false ? Context.Camera.Camera : null;
-			if (projectionCamera == null)
-			{
-				position = fallbackCamera.Position;
-				if (TryGetAimDirection(resolveRenderHistory, out direction) == false)
-				{
-					direction = transform.forward;
-				}
-				return direction.sqrMagnitude > 0.0001f;
-			}
-
-			Transform cameraTransform = projectionCamera.transform;
-			position = cameraTransform.position;
-			direction = cameraTransform.forward;
-			if (direction.sqrMagnitude <= 0.0001f && TryGetAimDirection(resolveRenderHistory, out direction) == false)
-			{
-				direction = transform.forward;
-			}
+			TransformData replicatedCamera = _character.GetCameraTransform(resolveRenderHistory);
+			position = replicatedCamera.Position;
+			direction = replicatedCamera.Rotation * Vector3.forward;
 
 			bool invalidPosition = float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z);
 			if (invalidPosition == true || direction.sqrMagnitude <= 0.0001f)
-			{
-				position = fallbackCamera.Position;
-				if (TryGetAimDirection(resolveRenderHistory, out direction) == false)
-				{
-					direction = transform.forward;
-				}
-			}
-
-			if (direction.sqrMagnitude <= 0.0001f)
 				return false;
 
 			direction.Normalize();
@@ -175,12 +158,18 @@ namespace TPSBR
 		{
 			if (_character == null || _health == null)
 				return;
-			if (_character.HasInputAuthority == false)
-				return;
 			if (_health.IsAlive == false)
 				return;
 
-			GetTargetPoint(true, false);
+			bool hasAimPipeline = TryGetAimPipeline(false, out _, out _, out _, out _, out bool isUndesiredTargetPoint);
+			if (hasAimPipeline == true)
+			{
+				IsUndesiredTargetPoint = isUndesiredTargetPoint;
+				return;
+			}
+
+			IsUndesiredTargetPoint = true;
+			SetDebugHitPointProxiesActive(false);
 		}
 
 		private void Awake()
@@ -205,7 +194,7 @@ namespace TPSBR
 			if (_character.CharacterController != null)
 			{
 				Quaternion lookRotation;
-				if (_character.HasInputAuthority == true && resolveRenderHistory == false)
+				if (resolveRenderHistory == false)
 				{
 					lookRotation = _character.CharacterController.RenderData.LookRotation;
 				}
@@ -246,39 +235,92 @@ namespace TPSBR
 		{
 			cameraPosition = default;
 			point = default;
-			bool hasPostBlendCameraPosition = false;
+			Vector3 cameraRayDirection = default;
+			bool hasExplicitCameraRayDirection = false;
 
-			if (Context == null || Context.Camera == null)
-				return false;
+			bool requiresAuthoritativeInputRay = resolveRenderHistory == true &&
+				Object != null &&
+				Object.InputAuthority != PlayerRef.None;
 
-			if (resolveRenderHistory == false)
+			if (requiresAuthoritativeInputRay == true)
+			{
+				if (TryGetAuthoritativeInputAimRay(out cameraPosition, out cameraRayDirection) == false)
+					return false;
+
+				hasExplicitCameraRayDirection = true;
+			}
+
+			bool hasLocalInputAuthority = _character != null &&
+				_character.HasInputAuthority == true &&
+				Context != null &&
+				Context.HasInput == true;
+
+			// Use local post-blend CM pose only for the locally controlled agent.
+			// Remote agents must use their own replicated camera transform.
+			if (hasExplicitCameraRayDirection == false &&
+				resolveRenderHistory == false &&
+				hasLocalInputAuthority == true &&
+				Context != null &&
+				Context.Camera != null)
 			{
 				Context.Camera.SyncForGameplayRender();
 				Context.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out _, out _);
 				cameraPosition = postBlendPosition;
-				hasPostBlendCameraPosition = true;
 			}
-
-			Camera outputCamera = Context.Camera.Camera;
-			if (outputCamera == null)
-				return false;
-
-			if (hasPostBlendCameraPosition == false)
+			else if (hasExplicitCameraRayDirection == false)
 			{
-				cameraPosition = outputCamera.transform.position;
+				if (_character == null)
+					return false;
+
+				TransformData observedCamera = _character.GetCameraTransform(resolveRenderHistory);
+				cameraPosition = observedCamera.Position;
 			}
+
+			if (float.IsNaN(cameraPosition.x) == true || float.IsNaN(cameraPosition.y) == true || float.IsNaN(cameraPosition.z) == true)
+				return false;
 
 			LayerMask cameraHitMask = ResolveCameraHitMask();
-			Vector3 cameraToTarget = targetPosition - cameraPosition;
-			if (cameraToTarget.sqrMagnitude <= 0.0001f)
-				return false;
+			if (hasExplicitCameraRayDirection == false)
+			{
+				Vector3 cameraToTarget = targetPosition - cameraPosition;
+				if (cameraToTarget.sqrMagnitude <= 0.0001f)
+					return false;
 
-			point = targetPosition;
-			if (TryResolveRaycastHitPoint(resolveRenderHistory, cameraPosition, targetPosition, cameraHitMask, out Vector3 targetHitPoint) == true)
+				cameraRayDirection = cameraToTarget.normalized;
+			}
+
+			float cameraRayDistance = Mathf.Max(1.0f, _cameraRayDistance);
+			Vector3 cameraRayTarget = cameraPosition + cameraRayDirection * cameraRayDistance;
+
+			point = cameraRayTarget;
+			if (TryResolveRaycastHitPoint(resolveRenderHistory, cameraPosition, cameraRayTarget, cameraHitMask, out Vector3 targetHitPoint) == true)
 			{
 				point = targetHitPoint;
 			}
 
+			return true;
+		}
+
+		private bool TryGetAuthoritativeInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection)
+		{
+			rayOrigin = default;
+			rayDirection = default;
+
+			if (_character == null || _character.Agent == null || _character.Agent.AgentInput == null)
+				return false;
+
+			GameplayInput fixedInput = _character.Agent.AgentInput.FixedInput;
+			if (fixedInput.HasAimRay == false)
+				return false;
+
+			rayOrigin = fixedInput.AimRayOrigin;
+			rayDirection = fixedInput.AimRayDirection;
+
+			bool invalidOrigin = float.IsNaN(rayOrigin.x) || float.IsNaN(rayOrigin.y) || float.IsNaN(rayOrigin.z);
+			if (invalidOrigin == true || rayDirection.sqrMagnitude <= 0.0001f)
+				return false;
+
+			rayDirection.Normalize();
 			return true;
 		}
 
@@ -351,15 +393,9 @@ namespace TPSBR
 			}
 
 			Vector3 rawScreenHitPoint = default;
-			bool canUseLocalRenderCamera = _character.HasInputAuthority == true &&
-				Context != null &&
-				Context.HasInput == true;
-			bool hasCameraHitPoint = canUseLocalRenderCamera == true &&
-				TryGetCameraAimHitPoint(resolveRenderHistory, targetPosition, out _, out rawScreenHitPoint);
+			bool hasCameraHitPoint = TryGetCameraAimHitPoint(resolveRenderHistory, targetPosition, out _, out rawScreenHitPoint);
 			if (hasCameraHitPoint == false)
-			{
-				rawScreenHitPoint = targetPosition;
-			}
+				return false;
 
 			Vector3 originToTarget = targetPosition - fireOrigin;
 			float originToTargetDistance = originToTarget.magnitude;
@@ -403,8 +439,7 @@ namespace TPSBR
 
 			direction /= distance;
 
-			bool canUseLagCompensation = resolveRenderHistory == true &&
-				Object != null &&
+			bool canUseLagCompensation = Object != null &&
 				Runner.LagCompensation != null &&
 				Runner.LagCompensation.enabled == true;
 
@@ -460,7 +495,6 @@ namespace TPSBR
 				SetDebugHitPointProxiesActive(false);
 				return;
 			}
-
 			if (IsLocalDebugOwner() == false)
 			{
 				SetDebugHitPointProxiesActive(false);
@@ -492,11 +526,19 @@ namespace TPSBR
 			SetDebugHitPointProxiesActive(true);
 		}
 
+		private bool IsLocalDebugOwner()
+		{
+			return _character != null &&
+				_character.HasInputAuthority == true &&
+				Context != null &&
+				Context.HasInput == true;
+		}
+
 		private void EnsureDebugHitPointProxies()
 		{
 			if (_debugProxyRoot == null)
 			{
-				GameObject root = new GameObject($"{name}_LocalAimDebug");
+				GameObject root = new GameObject($"{name}_AimDebug");
 				_debugProxyRoot = root.transform;
 
 				UnityEngine.SceneManagement.Scene owningScene = gameObject.scene;
@@ -567,21 +609,6 @@ namespace TPSBR
 			}
 
 			return proxy.transform;
-		}
-
-		private bool IsLocalDebugOwner()
-		{
-			if (Object == null || Runner == null)
-				return false;
-
-			PlayerRef runnerLocalPlayer = Runner.LocalPlayer;
-			if (runnerLocalPlayer != PlayerRef.None && Object.InputAuthority == runnerLocalPlayer)
-				return true;
-
-			if (Context != null && Context.LocalPlayerRef.IsRealPlayer == true && Object.InputAuthority == Context.LocalPlayerRef)
-				return true;
-
-			return false;
 		}
 
 		private void SetDebugHitPointProxiesActive(bool active)

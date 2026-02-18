@@ -24,6 +24,9 @@ namespace TPSBR
 
 		public Vector2        MoveDirection;
 		public Vector2        LookRotationDelta;
+		public Vector3        AimRayOrigin;
+		public Vector3        AimRayDirection;
+		public NetworkBool    HasAimRay;
 		public NetworkButtons Actions;
 		public byte           Weapon;
 		public float          LocalAlpha;            // This value is used for render-accurate actions. Valid range is 0.0 - 1.0 and represents position of the time between current and last fixed tick.

@@ -41,11 +41,7 @@ namespace TPSBR
 		[SerializeField]
 		private Vector3 _centerOfGravityOffset = new Vector3(0f, 1.5f, 0f);
 		[SerializeField]
-		private ShakeSetup _cameraPositionShake;
-		[SerializeField]
-		private ShakeSetup _cameraRotationShake;
-		[SerializeField]
-		private float _fullThrustShakeMultiplier = 2f;
+		private ShakeSetup _cameraShake;
 
 		[Header("Propellers")]
 		[SerializeField]
@@ -94,9 +90,6 @@ namespace TPSBR
 		private float _propellerSpeed;
 
 		private float _defaultPitch;
-
-		private float _positionShakeMagnitude;
-		private float _rotationShakeMagnitude;
 
 		private Vector3 _tiltAngles;
 
@@ -230,17 +223,12 @@ namespace TPSBR
 			_visualsRoot.RotateAround(transform.position + _centerOfGravityOffset, transform.forward, _tiltAngles.x);
 			_visualsRoot.RotateAround(transform.position + _centerOfGravityOffset, transform.right, _tiltAngles.z);
 
-			_cameraPositionShake.Magnitude = FullThrust == true ? _positionShakeMagnitude * _fullThrustShakeMultiplier : _positionShakeMagnitude;
-			_cameraRotationShake.Magnitude = FullThrust == true ? _rotationShakeMagnitude * _fullThrustShakeMultiplier : _rotationShakeMagnitude;
 		}
 
 		// MONOBEHAVIOUR
 
 		private void Awake()
 		{
-			_positionShakeMagnitude = _cameraPositionShake.Magnitude;
-			_rotationShakeMagnitude = _cameraRotationShake.Magnitude;
-
 			_defaultPitch = _engineSound.pitch;
 		}
 
@@ -255,8 +243,7 @@ namespace TPSBR
 			{
 				var shake = Context.Camera.ShakeEffect;
 
-				shake.Play(_cameraPositionShake);
-				shake.Play(_cameraRotationShake);
+				shake.Play(_cameraShake);
 			}
 		}
 
@@ -269,8 +256,7 @@ namespace TPSBR
 			{
 				var shake = Context.Camera.ShakeEffect;
 
-				shake.Stop(_cameraPositionShake);
-				shake.Stop(_cameraRotationShake);
+				shake.Stop(_cameraShake);
 			}
 		}
 
