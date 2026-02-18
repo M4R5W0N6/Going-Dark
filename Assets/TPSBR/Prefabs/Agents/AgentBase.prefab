@@ -5278,6 +5278,7 @@ GameObject:
   - component: {fileID: 2084853432409141758}
   - component: {fileID: 3227591614157517285}
   - component: {fileID: 42101657442118405}
+  - component: {fileID: 8058901565933001508}
   m_Layer: 8
   m_Name: AgentBase
   m_TagString: Untagged
@@ -5338,6 +5339,7 @@ MonoBehaviour:
   - {fileID: 6942872777585290701}
   - {fileID: 4264704789929423561}
   - {fileID: 2084853432409141758}
+  - {fileID: 8058901565933001508}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8106659039670942066
 MonoBehaviour:
@@ -5734,13 +5736,6 @@ MonoBehaviour:
   _interactionDistance: 5
   _interactionPrecisionRadius: 0.3
   _itemDropTime: 0.8
-  _aimDistance: 40
-  _cameraRayDistance: 500
-  _cameraHitMask:
-    serializedVersion: 2
-    m_Bits: 16777481
-  _spawnDebugHitPointProxies: 1
-  _debugHitPointProxyScale: 0.15
 --- !u!114 &2084853432409141758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5812,6 +5807,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 7479170632602112611}
   _enableLogs: 1
+--- !u!114 &8058901565933001508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edf4955d2b703c8468e2b737a1a8a1b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TPSBR.Aiming
+  _aimDistance: 40
+  _cameraRayDistance: 500
+  _cameraHitMask:
+    serializedVersion: 2
+    m_Bits: 16777481
+  _spawnDebugHitPointProxies: 0
+  _debugHitPointProxyScale: 0.15
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0

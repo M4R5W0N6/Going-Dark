@@ -13,6 +13,7 @@ namespace TPSBR
 		public bool IsObserved => Context != null && Context.ObservedAgent == this;
 
 		public AgentInput        AgentInput   => _agentInput;
+		public Aiming            Aiming       => _aiming;
 		public Interactions      Interactions => _interactions;
 		public Character         Character    => _character;
 		public Weapons           Weapons      => _weapons;
@@ -47,6 +48,7 @@ namespace TPSBR
 		private float _minFallDamageVelocity = 5f;
 
 		private AgentInput          _agentInput;
+		private Aiming              _aiming;
 		private Interactions        _interactions;
 		private AgentFootsteps      _footsteps;
 		private Character           _character;
@@ -216,7 +218,12 @@ namespace TPSBR
 		private void Awake()
 		{
 			_agentInput   = GetComponent<AgentInput>();
+			_aiming       = GetComponent<Aiming>();
 			_interactions = GetComponent<Interactions>();
+			if (_aiming == null)
+			{
+				_aiming = gameObject.AddComponent<Aiming>();
+			}
 			_footsteps    = GetComponent<AgentFootsteps>();
 			_character    = GetComponent<Character>();
 			_weapons      = GetComponent<Weapons>();

@@ -61,8 +61,6 @@ namespace TPSBR
 		private CinemachineBrain _cinemachineBrain => _camera != null ? _camera.GetComponent(typeof(CinemachineBrain)) as CinemachineBrain : null;
 		[Header("Cinemachine")]
 		[SerializeField]
-		private float _aimProxyDistance = 10.0f;
-		[SerializeField]
 		private float _leftCameraSide = 0.0f;
 		[SerializeField]
 		private float _rightCameraSide = 1.0f;
@@ -492,7 +490,7 @@ namespace TPSBR
 
 		private bool TryUpdateAimTargetGroup(Agent observedAgent)
 		{
-			if (observedAgent == null || observedAgent.Character == null)
+			if (observedAgent == null || observedAgent.Character == null || observedAgent.Aiming == null)
 				return false;
 
 			ResolveAimTargetGroupReference();
@@ -503,8 +501,7 @@ namespace TPSBR
 
 			Vector3 fireOrigin;
 			Vector3 targetPoint;
-			if (observedAgent.Interactions != null &&
-				observedAgent.Interactions.TryGetTargetPosition(false, out fireOrigin, out targetPoint) == true)
+			if (observedAgent.Aiming.TryGetTargetPosition(false, out fireOrigin, out targetPoint) == true)
 			{
 				Vector3 direction = targetPoint - fireOrigin;
 				if (direction.sqrMagnitude <= 0.0001f)
@@ -518,50 +515,18 @@ namespace TPSBR
 				_hasAimProxyData = true;
 				return true;
 			}
+			
+			observedAgent.Aiming.GetAimPose(false, out fireOrigin, out targetPoint);
+			Vector3 fallbackDirection = targetPoint - fireOrigin;
+			if (fallbackDirection.sqrMagnitude <= 0.0001f)
+			{
+				fallbackDirection = observedAgent.transform.forward;
+			}
 
-			TransformData fireTransform = observedAgent.Character.GetFireTransform(false);
-			if (TryGetAgentLookDirection(observedAgent, out Vector3 lookDirection) == false)
-				return false;
-
-			Quaternion fallbackRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-			_aimOrigin.SetPositionAndRotation(fireTransform.Position, fallbackRotation);
-
-			float proxyDistance = Mathf.Max(0.1f, _aimProxyDistance);
-			Vector3 fallbackTargetPoint = fireTransform.Position + lookDirection * proxyDistance;
-			_aimTarget.SetPositionAndRotation(fallbackTargetPoint, fallbackRotation);
+			Quaternion fallbackRotation = Quaternion.LookRotation(fallbackDirection.normalized, Vector3.up);
+			_aimOrigin.SetPositionAndRotation(fireOrigin, fallbackRotation);
+			_aimTarget.SetPositionAndRotation(targetPoint, fallbackRotation);
 			_hasAimProxyData = true;
-
-			return true;
-		}
-
-		private bool TryGetAgentLookDirection(Agent observedAgent, out Vector3 lookDirection)
-		{
-			lookDirection = default;
-
-			if (observedAgent == null || observedAgent.Character == null || observedAgent.Character.CharacterController == null)
-				return false;
-
-			Quaternion lookRotation;
-			if (observedAgent.HasInputAuthority == true && Context != null && Context.HasInput == true)
-			{
-				lookRotation = observedAgent.Character.CharacterController.RenderData.LookRotation;
-			}
-			else
-			{
-				lookRotation = observedAgent.Character.CharacterController.Data.LookRotation;
-			}
-
-			if (float.IsNaN(lookRotation.x) == true ||
-				float.IsNaN(lookRotation.y) == true ||
-				float.IsNaN(lookRotation.z) == true ||
-				float.IsNaN(lookRotation.w) == true)
-				return false;
-
-			lookDirection = lookRotation * Vector3.forward;
-			if (lookDirection.sqrMagnitude <= 0.0001f)
-				return false;
-
-			lookDirection.Normalize();
 			return true;
 		}
 

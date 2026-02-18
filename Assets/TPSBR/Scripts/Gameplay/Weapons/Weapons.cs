@@ -53,7 +53,7 @@ namespace TPSBR
 
 		private Health        _health;
 		private Character     _character;
-		private Interactions  _interactions;
+		private Aiming        _aiming;
 		private AudioEffect[] _fireAudioEffects;
 		private Weapon[]      _localWeapons = new Weapon[8];
 
@@ -378,8 +378,12 @@ namespace TPSBR
 		{
 			if (CurrentWeapon == null)
 				return false;
+			if (_aiming == null)
+			{
+				_aiming = GetComponent<Aiming>();
+			}
 
-			Vector3       targetPoint   = _interactions.GetTargetPoint(false, true);
+			Vector3       targetPoint   = _aiming != null ? _aiming.GetTargetPoint(false, true) : (transform.position + transform.forward * 500.0f);
 			TransformData fireTransform = _character.GetFireTransform(true);
 
 			CurrentWeapon.Fire(fireTransform.Position, targetPoint, _hitMask);
@@ -430,7 +434,7 @@ namespace TPSBR
 		{
 			_health = GetComponent<Health>();
 			_character = GetComponent<Character>();
-			_interactions = GetComponent<Interactions>();
+			_aiming = GetComponent<Aiming>();
 			_fireAudioEffects = _fireAudioEffectsRoot.GetComponentsInChildren<AudioEffect>();
 
 			foreach (WeaponSlot slot in _slots)

@@ -116,9 +116,9 @@ namespace TPSBR.UI
 			float crosshairDeltaScale = 1.0f;
 
 			bool canUseLocalAimData = agent != null && agent.HasInputAuthority == true && Context != null && Context.HasInput == true;
-			if (canUseLocalAimData == true && agent.Interactions != null)
+			if (canUseLocalAimData == true && agent.Aiming != null)
 			{
-				if (agent.Interactions.TryGetCrosshairAndHitPoints(false, out _, out screenHitPoint, out fireHitPoint, out isUndesiredTargetPoint) == true)
+				if (agent.Aiming.TryGetCrosshairAndHitPoints(false, out _, out screenHitPoint, out fireHitPoint, out isUndesiredTargetPoint) == true)
 				{
 					hasScreenHitPoint = true;
 					hasFireHitPoint = true;

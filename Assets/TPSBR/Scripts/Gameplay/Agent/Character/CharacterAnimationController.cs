@@ -236,15 +236,15 @@ namespace TPSBR
 
 				Quaternion handleRotation = weaponHandle.rotation;
 				Vector3 targetPoint = weaponHandle.position + transform.forward * 100.0f;
-				if (_agent.Interactions != null)
+				if (_agent.Aiming != null)
 				{
-					if (_agent.Interactions.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+					if (_agent.Aiming.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
 					{
 						targetPoint = targetPosition;
 					}
 					else
 					{
-						_agent.Interactions.GetAimPose(false, out _, out targetPoint);
+						_agent.Aiming.GetAimPose(false, out _, out targetPoint);
 					}
 				}
 				else

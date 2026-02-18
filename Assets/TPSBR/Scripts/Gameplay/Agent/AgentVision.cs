@@ -206,15 +206,15 @@ namespace TPSBR
 			}
 
 			Vector3 targetPoint = fireTransform.Position + transform.forward * TPSBR_TARGET_RAY_DISTANCE;
-			if (_agent != null && _agent.Interactions != null)
+			if (_agent != null && _agent.Aiming != null)
 			{
-				if (_agent.Interactions.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+				if (_agent.Aiming.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
 				{
 					targetPoint = targetPosition;
 				}
 				else
 				{
-					_agent.Interactions.GetAimPose(false, out _, out targetPoint);
+					_agent.Aiming.GetAimPose(false, out _, out targetPoint);
 				}
 			}
 
