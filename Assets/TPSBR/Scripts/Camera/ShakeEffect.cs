@@ -1,23 +1,15 @@
 using System;
-using UnityEngine;
-using DG.Tweening;
 using System.Collections.Generic;
+using Unity.Cinemachine;
+using UnityEngine;
 
 namespace TPSBR
 {
-	using Random = UnityEngine.Random;
-
 	[Serializable]
 	public class ShakeSetup
 	{
-		public float        Duration  = 0.5f;
-		public float        Magnitude = 0.05f;
-		public float        Frequency = 10f;
-		public float        FadeIn    = 0.1f;
-		public float        FadeOut   = 0.2f;
-		public Ease         Ease      = Ease.Linear;
-		public Vector3      Axis      = new Vector3(1f, 1f, 1f);
-		public EShakeTarget Target    = EShakeTarget.Position;
+		// Key mapped to a CinemachineImpulseSource in ShakeEffect.
+		public string SourceKey;
 	}
 
 	public enum EShakeTarget
@@ -34,260 +26,173 @@ namespace TPSBR
 		Add,
 	}
 
+	[Serializable]
+	public sealed class ShakeSourceDefinition
+	{
+		public string                   Key;
+		public CinemachineImpulseSource Source;
+	}
+
+	/// <summary>
+	/// Routes shake requests to configured CM3 impulse sources and queues emission.
+	/// Impulse tuning is authored on the CinemachineImpulseSource components.
+	/// </summary>
 	public class ShakeEffect : CoreBehaviour
 	{
-		// PUBLIC MEMBERS
-
-		public bool IsPlaying => _activeShakes.Count > 0f;
-
-		// PRIVATE MEMBERS
+		public bool IsPlaying => _activeLooping.Count > 0;
 
 		[SerializeField]
-		private ShakeSetup _defaultSetup;
+		private List<ShakeSourceDefinition> _sources = new List<ShakeSourceDefinition>(8);
 
-		private List<ShakeData> _activeShakes = new List<ShakeData>(32);
-
-		private Vector3 _defaultPosition;
-		private Quaternion _defaultRotation;
-
-		// PUBLIC MEMBERS
+		private readonly List<PendingPulse> _pendingPulses = new List<PendingPulse>(32);
+		private readonly List<LoopingShake> _activeLooping = new List<LoopingShake>(8);
 
 		public void Play(ShakeSetup setup, EShakeForce force = EShakeForce.Add)
 		{
-			if (setup == null || setup.Target == EShakeTarget.None || setup.Duration <= 0f || setup.Magnitude <= 0f)
+			if (TryResolveSource(setup, out CinemachineImpulseSource source) == false)
 				return;
 
-			if (IsPlaying == false || force == EShakeForce.Add)
-			{
-				AddShake(setup);
-			}
-			else if (force == EShakeForce.ReplaceSame)
-			{
-				for (int i = 0; i < _activeShakes.Count; i++)
-				{
-					var shake = _activeShakes[i];
+			// Always emit an immediate pulse when requested.
+			_pendingPulses.Add(new PendingPulse { Source = source });
 
-					if (shake.Setup == setup)
-					{
-						shake.Cooldown = Mathf.Max(setup.Duration - setup.FadeIn, shake.Cooldown);
-						return;
-					}
-				}
+			// ReplaceSame is used by one-shot events (e.g., weapons), so don't loop.
+			if (force == EShakeForce.ReplaceSame)
+				return;
 
-				AddShake(setup);
-			}
+			// Add/None are treated as sustained until Stop(...) is called.
+			if (TryFindLooping(source, out _) == true)
+				return;
+
+			_activeLooping.Add(new LoopingShake
+			{
+				Source = source,
+				NextEmitTime = Time.unscaledTime + GetLoopPeriod(source),
+			});
 		}
 
+		// Intentionally no default setup fallback.
 		public void Play(EShakeForce force = EShakeForce.Add)
 		{
-			Play(_defaultSetup, force);
 		}
 
 		public void Stop(ShakeSetup setup, bool immediate = false)
 		{
-			if (IsPlaying == false)
+			if (TryResolveSource(setup, out CinemachineImpulseSource source) == false)
 				return;
 
-			for (int i = 0; i < _activeShakes.Count; i++)
+			for (int i = _activeLooping.Count - 1; i >= 0; --i)
 			{
-				var shake = _activeShakes[i];
-
-				if (shake.Setup != setup)
-					continue;
-
-				if (immediate == true || shake.Setup.FadeOut <= 0f)
+				if (_activeLooping[i].Source == source)
 				{
-					RemoveShake(i);
-					return;
+					_activeLooping.RemoveAt(i);
 				}
-
-				shake.Cooldown = Mathf.Min(shake.Cooldown, shake.Setup.FadeOut);
 			}
 		}
 
 		public void Stop(bool immediate = false)
 		{
-			if (IsPlaying == false)
-				return;
-
-			for (int i = _activeShakes.Count - 1; i >= 0; i--)
-			{
-				Stop(_activeShakes[i].Setup, immediate);
-			}
-		}
-
-		// MONOBEHAVIOUR
-
-		protected void Awake()
-		{
-			_defaultPosition = transform.localPosition;
-			_defaultRotation = transform.localRotation;
+			_activeLooping.Clear();
 		}
 
 		protected void Update()
 		{
-			if (IsPlaying == false)
+			float now = Time.unscaledTime;
+
+			for (int i = 0; i < _activeLooping.Count; ++i)
 			{
-				transform.localPosition = _defaultPosition;
-				transform.localRotation = _defaultRotation;
-				return;
+				LoopingShake looping = _activeLooping[i];
+				CinemachineImpulseSource source = looping.Source;
+				if (source == null)
+					continue;
+
+				float period = GetLoopPeriod(source);
+				if (period <= 0.0001f)
+					period = 0.05f;
+
+				while (now >= looping.NextEmitTime)
+				{
+					_pendingPulses.Add(new PendingPulse { Source = source });
+					looping.NextEmitTime += period;
+				}
+
+				_activeLooping[i] = looping;
 			}
 
-			var positionOffset = Vector3.zero;
-			var rotationOffset = Vector3.zero;
-
-			for (int i = 0; i < _activeShakes.Count; i++)
-			{
-				var shake = _activeShakes[i];
-
-				if (shake.Setup.Target == EShakeTarget.Position)
-				{
-					positionOffset += shake.GetOffset(Time.deltaTime);
-				}
-				else
-				{
-					rotationOffset += shake.GetOffset(Time.deltaTime);
-				}
-			}
-
-			transform.localPosition = _defaultPosition + positionOffset;
-			transform.localRotation = _defaultRotation * Quaternion.Euler(rotationOffset);
-
-			for (int i = _activeShakes.Count - 1; i >= 0; i--)
-			{
-				if (_activeShakes[i].IsFinished == true)
-				{
-					RemoveShake(i);
-				}
-			}
+			FlushPulseQueue();
 		}
 
-		// PRIVATE METHODS
-
-		private void AddShake(ShakeSetup setup)
+		private void FlushPulseQueue()
 		{
-			var shake = Pool.Get<ShakeData>();
-
-			shake.Reset(setup);
-			_activeShakes.Add(shake);
-		}
-
-		private void RemoveShake(int index)
-		{
-			var shakeData = _activeShakes[index];
-			_activeShakes.RemoveAt(index);
-
-			Pool.Return(shakeData);
-		}
-
-		// HELPERS
-
-		private class ShakeData
-		{
-			public ShakeSetup Setup;
-			public float      Cooldown;
-
-			public bool       IsFinished => Cooldown <= 0f;
-
-
-			[NonSerialized]
-			private float     _elapsedTime;
-			[NonSerialized]
-			private float     _normalChangeDuration;
-			[NonSerialized]
-			private float     _changeDuration;
-
-			[NonSerialized]
-			private Vector3   _startPosition;
-			[NonSerialized]
-			private Vector3   _targetPosition;
-			[NonSerialized]
-			private float     _changeCooldown;
-			[NonSerialized]
-			private Vector3   _lastOffset;
-
-			private float     _changeDurationMultiplier;
-
-			public void Reset(ShakeSetup setup)
+			for (int i = 0; i < _pendingPulses.Count; ++i)
 			{
-				Setup = setup;
-				Cooldown = setup.Duration;
+				CinemachineImpulseSource source = _pendingPulses[i].Source;
+				if (source == null)
+					continue;
 
-				_elapsedTime = 0f;
-
-				_normalChangeDuration = 1f / setup.Frequency;
-				_changeDuration = _normalChangeDuration;
-				_changeCooldown = 0f;
-
-				_startPosition = Vector3.zero;
-				_targetPosition = Vector3.zero;
-				_lastOffset = Vector3.zero;
+				source.GenerateImpulse();
 			}
 
-			public Vector3 GetOffset(float deltaTime)
+			_pendingPulses.Clear();
+		}
+
+		private bool TryResolveSource(ShakeSetup setup, out CinemachineImpulseSource source)
+		{
+			source = null;
+			if (setup == null || string.IsNullOrWhiteSpace(setup.SourceKey))
+				return false;
+
+			for (int i = 0; i < _sources.Count; ++i)
 			{
-				bool isStart = _elapsedTime == 0f;
-				bool wasEnd = Cooldown <= _normalChangeDuration * 0.5f;
+				ShakeSourceDefinition definition = _sources[i];
+				if (definition == null)
+					continue;
+				if (definition.Source == null)
+					continue;
+				if (string.IsNullOrWhiteSpace(definition.Key))
+					continue;
+				if (string.Equals(definition.Key, setup.SourceKey, StringComparison.OrdinalIgnoreCase) == false)
+					continue;
 
-				_elapsedTime += deltaTime;
+				source = definition.Source;
+				return true;
+			}
 
-				Cooldown -= deltaTime;
-				_changeCooldown -= deltaTime;
+			return false;
+		}
 
-				bool isEnd = wasEnd == false && Cooldown <= _normalChangeDuration * 0.5f;
-
-				if (_changeCooldown <= 0f || isEnd == true)
+		private bool TryFindLooping(CinemachineImpulseSource source, out int index)
+		{
+			for (int i = 0; i < _activeLooping.Count; ++i)
+			{
+				if (_activeLooping[i].Source == source)
 				{
-					float magnitudeProgress = 1f;
-
-					if (Setup.FadeIn > 0f && _elapsedTime < Setup.FadeIn)
-					{
-						magnitudeProgress = _elapsedTime / Setup.FadeIn;
-					}
-					else if (Setup.FadeOut > 0f && Cooldown < Setup.FadeOut)
-					{
-						magnitudeProgress = Cooldown / Setup.FadeOut;
-					}
-
-					float magnitude = Setup.Magnitude * magnitudeProgress;
-
-					// Recalculate change duration in case frequency changed
-					_normalChangeDuration = 1f / Setup.Frequency;
-
-					if (isEnd == true)
-					{
-						_startPosition = _lastOffset;
-						_targetPosition = Vector3.zero;
-
-						_changeDuration = Cooldown + Time.deltaTime;
-						_changeCooldown = Cooldown;
-					}
-					else if (isStart == true)
-					{
-						_startPosition = Vector3.zero;
-						_targetPosition = Vector3.Scale(Random.onUnitSphere, Setup.Axis).normalized * magnitude;
-
-						// We are covering only half of shake distance on start
-						_changeDuration = _normalChangeDuration * 0.5f;
-						_changeCooldown += _changeDuration;
-					}
-					else
-					{
-						_startPosition = _targetPosition;
-
-						var randomRotation = Quaternion.Euler(Random.Range(-60, 60), Random.Range(-60, 60), Random.Range(-60, 60));
-						_targetPosition = Vector3.Scale(randomRotation * -_targetPosition, Setup.Axis).normalized * magnitude;
-
-						_changeDuration = _normalChangeDuration;
-						_changeCooldown += _changeDuration;
-					}
+					index = i;
+					return true;
 				}
-
-				float progress = 1 - _changeCooldown / _changeDuration;
-				_lastOffset = Vector3.Lerp(_startPosition, _targetPosition, DOVirtual.EasedValue(0f, 1f, progress, Setup.Ease));
-
-				return _lastOffset;
 			}
+
+			index = -1;
+			return false;
+		}
+
+		private static float GetLoopPeriod(CinemachineImpulseSource source)
+		{
+			if (source == null || source.ImpulseDefinition == null)
+				return 0.1f;
+
+			float duration = Mathf.Max(0.01f, source.ImpulseDefinition.ImpulseDuration);
+			return duration;
+		}
+
+		private struct PendingPulse
+		{
+			public CinemachineImpulseSource Source;
+		}
+
+		private struct LoopingShake
+		{
+			public CinemachineImpulseSource Source;
+			public float                    NextEmitTime;
 		}
 	}
 }

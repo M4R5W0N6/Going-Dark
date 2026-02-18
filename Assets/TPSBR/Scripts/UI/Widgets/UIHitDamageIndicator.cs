@@ -133,7 +133,11 @@ namespace TPSBR.UI
 
 		private Vector3 GetUIPosition(Vector3 worldPosition)
 		{
-			var screenPoint = Context.Camera.Camera.WorldToScreenPoint(worldPosition);
+			Camera projectionCamera = Context != null && Context.Camera != null ? Context.Camera.Camera : null;
+			if (projectionCamera == null)
+				return _canvasRectTransform.position;
+
+			var screenPoint = projectionCamera.WorldToScreenPoint(worldPosition);
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRectTransform, screenPoint, _canvas.worldCamera, out Vector2 screenPosition);
 			return _canvasRectTransform.TransformPoint(screenPosition);
 		}

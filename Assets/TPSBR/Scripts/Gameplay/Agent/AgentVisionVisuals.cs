@@ -14,6 +14,7 @@ namespace TPSBR
 
 		private readonly Dictionary<Renderer, uint> _originalRendererMasks = new Dictionary<Renderer, uint>(64);
 		private readonly Dictionary<Renderer, int> _originalObjectLayers = new Dictionary<Renderer, int>(64);
+		private readonly Dictionary<Renderer, bool> _forcedHiddenRendererEnabled = new Dictionary<Renderer, bool>(64);
 		private readonly List<Renderer> _renderers = new List<Renderer>(64);
 		private readonly List<Renderer> _weaponRenderers = new List<Renderer>(32);
 
@@ -23,9 +24,20 @@ namespace TPSBR
 		private Agent _agent;
 		private AgentVision _agentVision;
 		private Weapons _weapons;
+		private bool _forceHideLocalVisuals;
+		private bool _localRenderersForcedHidden;
 		private bool _didLogMissingAgent;
 		private bool _didLogMissingVision;
 		private bool _didLogMissingLocalLayer;
+
+		public void SetForceHideLocalVisuals(bool forceHide)
+		{
+			_forceHideLocalVisuals = forceHide;
+			if (forceHide == false)
+			{
+				RestoreForcedHiddenRenderers();
+			}
+		}
 
 		private void Awake()
 		{
@@ -51,6 +63,7 @@ namespace TPSBR
 
 		private void OnDisable()
 		{
+			RestoreForcedHiddenRenderers();
 			RestoreOriginalMasks();
 		}
 
@@ -146,6 +159,8 @@ namespace TPSBR
 					renderer.gameObject.layer = desiredObjectLayer;
 				}
 			}
+
+			ApplyForcedHiddenRenderers(isLocalControlled == true && _forceHideLocalVisuals == true);
 		}
 
 		private void CollectRenderers()
@@ -196,6 +211,55 @@ namespace TPSBR
 					renderer.gameObject.layer = pair.Value;
 				}
 			}
+		}
+
+		private void ApplyForcedHiddenRenderers(bool shouldHide)
+		{
+			if (shouldHide == false)
+			{
+				RestoreForcedHiddenRenderers();
+				return;
+			}
+
+			for (int i = 0; i < _renderers.Count; ++i)
+			{
+				Renderer renderer = _renderers[i];
+				if (renderer == null)
+					continue;
+
+				if (_forcedHiddenRendererEnabled.ContainsKey(renderer) == false)
+				{
+					_forcedHiddenRendererEnabled.Add(renderer, renderer.enabled);
+				}
+
+				if (renderer.enabled == true)
+				{
+					renderer.enabled = false;
+				}
+			}
+
+			_localRenderersForcedHidden = true;
+		}
+
+		private void RestoreForcedHiddenRenderers()
+		{
+			if (_localRenderersForcedHidden == false && _forcedHiddenRendererEnabled.Count == 0)
+				return;
+
+			foreach (KeyValuePair<Renderer, bool> pair in _forcedHiddenRendererEnabled)
+			{
+				Renderer renderer = pair.Key;
+				if (renderer == null)
+					continue;
+
+				if (renderer.enabled != pair.Value)
+				{
+					renderer.enabled = pair.Value;
+				}
+			}
+
+			_forcedHiddenRendererEnabled.Clear();
+			_localRenderersForcedHidden = false;
 		}
 
 		private static int ResolveSingleLayer(LayerMask layerMask)

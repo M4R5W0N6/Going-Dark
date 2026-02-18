@@ -1,4 +1,4 @@
-﻿namespace TPSBR
+namespace TPSBR
 {
 	using System;
 	using UnityEngine;
@@ -7,36 +7,28 @@
 	[DefaultExecutionOrder(-8)]
 	public sealed class Interactions : ContextBehaviour
 	{
-		// PUBLIC MEMBERS
-
-		public IInteraction InteractionTarget      { get; private set; }
-		public Vector3      TargetPoint            { get; private set; }
-		public bool         IsUndesiredTargetPoint { get; private set; }
-
-		public float        ItemDropTime => _itemDropTime;
+		public IInteraction InteractionTarget { get; private set; }
+		public float        ItemDropTime      => _itemDropTime;
 
 		[Networked, HideInInspector]
-		public TickTimer    DropItemTimer { get; private set; }
+		public TickTimer DropItemTimer { get; private set; }
 
 		public event Action<string> InteractionFailed;
-
-		// PRIVATE MEMBERS
 
 		[SerializeField]
 		private LayerMask _interactionMask;
 		[SerializeField]
-		private float     _interactionDistance = 2f;
+		private float _interactionDistance = 2f;
 		[SerializeField]
-		private float     _interactionPrecisionRadius = 0.3f;
+		private float _interactionPrecisionRadius = 0.3f;
 		[SerializeField]
-		private float     _itemDropTime;
+		private float _itemDropTime;
 
-		private Health       _health;
-		private Weapons      _weapons;
-		private Character    _character;
+		private Health _health;
+		private Weapons _weapons;
+		private Character _character;
+		private Aiming _aiming;
 		private RaycastHit[] _interactionHits = new RaycastHit[10];
-
-		// PUBLIC METHODS
 
 		public void TryInteract(bool interact, bool hold)
 		{
@@ -104,84 +96,6 @@
 			}
 		}
 
-		public Vector3 GetTargetPoint(bool checkReachability, bool resolveRenderHistory)
-		{
-			// Can happen during partial startup/misconfigured Fusion config.
-			// Return a deterministic fallback instead of spamming NullReference exceptions.
-			if (_character == null || _weapons == null || Runner == null)
-			{
-				var fallbackPosition = transform.position + transform.forward * 500f;
-				if (checkReachability == true)
-				{
-					IsUndesiredTargetPoint = true;
-				}
-				return fallbackPosition;
-			}
-
-			var cameraTransform = _character.GetCameraTransform(resolveRenderHistory);
-			var cameraDirection = cameraTransform.Rotation * Vector3.forward;
-
-			var fireTransform = _character.GetFireTransform(resolveRenderHistory);
-			var targetPoint = cameraTransform.Position + cameraDirection * 500f;
-			bool canUseLagCompensation = Object != null && Runner.LagCompensation != null && Runner.LagCompensation.enabled == true;
-
-				// Step 1: reticle target from camera.
-				if (canUseLagCompensation == true)
-				{
-				if (Runner.LagCompensation.Raycast(cameraTransform.Position, cameraDirection, 500f, Object.InputAuthority,
-					out LagCompensatedHit lagCompensatedHit, _weapons.HitMask, HitOptions.IncludePhysX | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority) == true)
-				{
-					targetPoint = lagCompensatedHit.Point;
-				}
-			}
-			else
-			{
-				var physicsScene = Runner.GetPhysicsScene();
-				if (physicsScene.Raycast(cameraTransform.Position, cameraDirection, out RaycastHit hitInfo, 500f, _weapons.HitMask, QueryTriggerInteraction.Ignore) == true)
-				{
-					targetPoint = hitInfo.point;
-					}
-				}
-
-				Vector3 desiredTargetPoint = targetPoint;
-
-				// Step 2: clamp reticle target to what fire origin can actually see.
-				Vector3 fireDirection = targetPoint - fireTransform.Position;
-			float fireDistance = fireDirection.magnitude;
-			if (fireDistance > 0.001f)
-			{
-				fireDirection /= fireDistance;
-
-				if (canUseLagCompensation == true)
-				{
-					if (Runner.LagCompensation.Raycast(fireTransform.Position, fireDirection, fireDistance, Object.InputAuthority,
-						out LagCompensatedHit lagCompensatedHit, _weapons.HitMask, HitOptions.IncludePhysX | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority) == true)
-					{
-						targetPoint = lagCompensatedHit.Point;
-					}
-				}
-				else
-				{
-					var physicsScene = Runner.GetPhysicsScene();
-					if (physicsScene.Raycast(fireTransform.Position, fireDirection, out RaycastHit hitInfo, fireDistance, _weapons.HitMask, QueryTriggerInteraction.Ignore) == true)
-					{
-						targetPoint = hitInfo.point;
-					}
-				}
-			}
-
-				if (checkReachability == true)
-				{
-					bool isOccludedFromFireOrigin = (desiredTargetPoint - targetPoint).sqrMagnitude > 0.01f;
-					bool cannotReach = _weapons.CurrentWeapon != null && _weapons.CurrentWeapon.CanFireToPosition(fireTransform.Position, ref targetPoint, _weapons.HitMask) == false;
-					IsUndesiredTargetPoint = isOccludedFromFireOrigin || cannotReach;
-				}
-
-			return targetPoint;
-		}
-
-		// NetworkBehaviour INTERFACE
-
 		public override void Despawned(NetworkRunner runner, bool hasState)
 		{
 			InteractionFailed = null;
@@ -202,38 +116,74 @@
 			}
 
 			UpdateInteractionTarget();
-
-			TargetPoint = GetTargetPoint(true, false);
 		}
-
-		// MonoBehaviour INTERFACE
 
 		private void Awake()
 		{
 			_health    = GetComponent<Health>();
 			_weapons   = GetComponent<Weapons>();
 			_character = GetComponent<Character>();
+			_aiming    = GetComponent<Aiming>();
 		}
-
-		// PRIVATE METHODS
 
 		private void UpdateInteractionTarget()
 		{
+			if (_aiming == null)
+			{
+				_aiming = GetComponent<Aiming>();
+			}
+
 			InteractionTarget = null;
 
-			var cameraTransform = _character.GetCameraTransform(false);
-			var cameraDirection = cameraTransform.Rotation * Vector3.forward;
+			Vector3 cameraPosition;
+			Vector3 cameraDirection;
+			if (_aiming != null && _aiming.TryGetObservedCameraPose(false, out cameraPosition, out cameraDirection) == true)
+			{
+				_aiming.GetAimPose(false, out _, out Vector3 aimPoint);
+				Vector3 directionToAimPoint = aimPoint - cameraPosition;
+				if (directionToAimPoint.sqrMagnitude > 0.0001f)
+				{
+					cameraDirection = directionToAimPoint.normalized;
+				}
+			}
+			else
+			{
+				var cameraTransform = _character.GetCameraTransform(false);
+				cameraPosition = cameraTransform.Position;
+
+				if (_aiming != null)
+				{
+					_aiming.GetAimPose(false, out _, out Vector3 aimPoint);
+					Vector3 directionToAimPoint = aimPoint - cameraPosition;
+					if (directionToAimPoint.sqrMagnitude > 0.0001f)
+					{
+						cameraDirection = directionToAimPoint.normalized;
+					}
+					else
+					{
+						cameraDirection = _character.GetCameraHandle().forward;
+					}
+				}
+				else
+				{
+					cameraDirection = _character.GetCameraHandle().forward;
+				}
+			}
+
+			if (cameraDirection.sqrMagnitude <= 0.0001f)
+			{
+				cameraDirection = transform.forward;
+			}
 
 			var physicsScene = Runner.GetPhysicsScene();
-			int hitCount = physicsScene.SphereCast(cameraTransform.Position, _interactionPrecisionRadius, cameraDirection, _interactionHits, _interactionDistance, _interactionMask, QueryTriggerInteraction.Ignore);
+			int hitCount = physicsScene.SphereCast(cameraPosition, _interactionPrecisionRadius, cameraDirection, _interactionHits, _interactionDistance, _interactionMask, QueryTriggerInteraction.Ignore);
 
 			if (hitCount == 0)
 				return;
 
 			RaycastHit validHit = default;
 
-			// Try to pick object that is directly in the center of the crosshair
-			if (physicsScene.Raycast(cameraTransform.Position, cameraDirection, out RaycastHit raycastHit, _interactionDistance, _interactionMask, QueryTriggerInteraction.Ignore) == true && raycastHit.collider.gameObject.layer == ObjectLayer.Interaction)
+			if (physicsScene.Raycast(cameraPosition, cameraDirection, out RaycastHit raycastHit, _interactionDistance, _interactionMask, QueryTriggerInteraction.Ignore) == true && raycastHit.collider.gameObject.layer == ObjectLayer.Interaction)
 			{
 				validHit = raycastHit;
 			}
@@ -246,7 +196,7 @@
 					var hit = _interactionHits[i];
 
 					if (hit.collider.gameObject.layer == ObjectLayer.Default)
-						return; // Something is blocking interaction
+						return;
 
 					if (hit.collider.gameObject.layer == ObjectLayer.Interaction)
 					{
@@ -257,7 +207,6 @@
 			}
 
 			var collider = validHit.collider;
-
 			if (collider == null)
 				return;
 
@@ -272,8 +221,6 @@
 				InteractionTarget = interaction;
 			}
 		}
-
-		// RPCs
 
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
 		private void RPC_InteractionFailed(string reason)

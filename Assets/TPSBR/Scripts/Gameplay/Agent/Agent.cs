@@ -13,6 +13,7 @@ namespace TPSBR
 		public bool IsObserved => Context != null && Context.ObservedAgent == this;
 
 		public AgentInput        AgentInput   => _agentInput;
+		public Aiming            Aiming       => _aiming;
 		public Interactions      Interactions => _interactions;
 		public Character         Character    => _character;
 		public Weapons           Weapons      => _weapons;
@@ -47,6 +48,7 @@ namespace TPSBR
 		private float _minFallDamageVelocity = 5f;
 
 		private AgentInput          _agentInput;
+		private Aiming              _aiming;
 		private Interactions        _interactions;
 		private AgentFootsteps      _footsteps;
 		private Character           _character;
@@ -178,18 +180,16 @@ namespace TPSBR
 
 		public override void Render()
 		{
-			if (HasInputAuthority == true || IsObserved == true)
+			// Keep camera handle pitch synchronized for all agents so camera anchor
+			// transforms used by aim/crosshair remain consistent in multipeer.
+			Quaternion currentLookRotation = _character.CharacterController.RenderData.LookRotation;
+			if (_cachedLookRotation.ComponentEquals(currentLookRotation) == false)
 			{
-				// Performance optimization, unnecessary euler call
-				Quaternion currentLookRotation = _character.CharacterController.RenderData.LookRotation;
-				if (_cachedLookRotation.ComponentEquals(currentLookRotation) == false)
-				{
-					_cachedLookRotation  = currentLookRotation;
-					_cachedPitchRotation = Quaternion.Euler(_character.CharacterController.RenderData.LookPitch, 0.0f, 0.0f);
-				}
-
-				_character.GetCameraHandle().transform.localRotation = _cachedPitchRotation;
+				_cachedLookRotation  = currentLookRotation;
+				_cachedPitchRotation = Quaternion.Euler(_character.CharacterController.RenderData.LookPitch, 0.0f, 0.0f);
 			}
+
+			_character.GetCameraHandle().transform.localRotation = _cachedPitchRotation;
 
 			_character.OnAgentRender();
 			_footsteps.OnAgentRender();
@@ -216,7 +216,12 @@ namespace TPSBR
 		private void Awake()
 		{
 			_agentInput   = GetComponent<AgentInput>();
+			_aiming       = GetComponent<Aiming>();
 			_interactions = GetComponent<Interactions>();
+			if (_aiming == null)
+			{
+				_aiming = gameObject.AddComponent<Aiming>();
+			}
 			_footsteps    = GetComponent<AgentFootsteps>();
 			_character    = GetComponent<Character>();
 			_weapons      = GetComponent<Weapons>();

@@ -1255,13 +1255,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 916102946370961206}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994670034043224433}
-  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &947799145683622653
 GameObject:
   m_ObjectHideFlags: 0
@@ -2590,13 +2590,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4512244569365991248}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: -2}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0.75, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994670034043224433}
-  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4529436910701508191
 GameObject:
   m_ObjectHideFlags: 0
@@ -3390,7 +3390,7 @@ Transform:
   m_GameObject: {fileID: 5223414528207980405}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.024, y: 0.239, z: -2.216}
+  m_LocalPosition: {x: 0, y: 2, z: -2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5278,6 +5278,7 @@ GameObject:
   - component: {fileID: 2084853432409141758}
   - component: {fileID: 3227591614157517285}
   - component: {fileID: 42101657442118405}
+  - component: {fileID: 8058901565933001508}
   m_Layer: 8
   m_Name: AgentBase
   m_TagString: Untagged
@@ -5338,6 +5339,7 @@ MonoBehaviour:
   - {fileID: 6942872777585290701}
   - {fileID: 4264704789929423561}
   - {fileID: 2084853432409141758}
+  - {fileID: 8058901565933001508}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8106659039670942066
 MonoBehaviour:
@@ -5355,6 +5357,58 @@ MonoBehaviour:
   _lookResponsivity: 0.02
   _maxRepeatTime: 0.25
   _logMissingInputs: 0
+  _leanSpeed: 5
+  _resetSpeed: 0.85
+  _moveWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _lookWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _weightFloor: 0.1
+  _overrideStrength: 1
 --- !u!114 &8839006879915141747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5442,7 +5496,6 @@ MonoBehaviour:
     FireTransform: {fileID: 7479170632602112611}
     LeftFoot: {fileID: 0}
     RightFoot: {fileID: 0}
-  _cameraChangeDuration: 0.15
   _defaultFOV: 90
   _aimFOV: 45
   _fovChangeSpeed: 5
@@ -5485,7 +5538,7 @@ MonoBehaviour:
   _dropWeaponImpulse: {x: 5, y: 5, z: 10}
   _hitMask:
     serializedVersion: 2
-    m_Bits: 265
+    m_Bits: 16777481
   _fireAudioEffectsRoot: {fileID: 5519487549885795405}
 --- !u!114 &1018819908989435078
 MonoBehaviour:
@@ -5631,25 +5684,8 @@ MonoBehaviour:
   _jetpackAnimation: {fileID: 5847991256170199405}
   _visualsRoot: {fileID: 4348347289748489880}
   _centerOfGravityOffset: {x: 0, y: 1.5, z: 0}
-  _cameraPositionShake:
-    Duration: 10000
-    Magnitude: 0.0025
-    Frequency: 20
-    FadeIn: 0.2
-    FadeOut: 0.5
-    Ease: 4
-    Axis: {x: 1, y: 1, z: 0}
-    Target: 1
-  _cameraRotationShake:
-    Duration: 10000
-    Magnitude: 0.06
-    Frequency: 20
-    FadeIn: 0.2
-    FadeOut: 0.5
-    Ease: 4
-    Axis: {x: 0, y: 0, z: 1}
-    Target: 2
-  _fullThrustShakeMultiplier: 2
+  _cameraShake:
+    SourceKey: JETPACK
   _rightMount: {fileID: 4895308386272494670}
   _leftMount: {fileID: 4895650901372230456}
   _rightPropeller: {fileID: 4895880196309264614}
@@ -5754,6 +5790,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 7479170632602112611}
   _enableLogs: 1
+--- !u!114 &8058901565933001508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edf4955d2b703c8468e2b737a1a8a1b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TPSBR.Aiming
+  _aimDistance: 40
+  _cameraRayDistance: 500
+  _cameraHitMask:
+    serializedVersion: 2
+    m_Bits: 16777481
+  _spawnDebugHitPointProxies: 0
+  _debugHitPointProxyScale: 0.2
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0
@@ -5778,13 +5833,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8107021845495828554}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: 0.25, y: 0.25, z: -1.25}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0.25, z: -0.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994670034043224433}
-  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8298593716179246041
 GameObject:
   m_ObjectHideFlags: 0

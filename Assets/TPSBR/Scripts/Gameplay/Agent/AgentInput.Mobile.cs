@@ -24,8 +24,10 @@ namespace TPSBR
 
 			const float mobileSensitivityMultiplier = 32.0f;
 
-			moveDirection     = _mobileInputView.Move.normalized;
-			lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-_mobileInputView.Look.y, _mobileInputView.Look.x) * mobileSensitivityMultiplier, Global.RuntimeSettings.Sensitivity, _lookResponsivity);
+			_renderMoveInputRaw = _mobileInputView.Move;
+			_renderLookInputRaw = _mobileInputView.Look;
+			moveDirection     = _renderMoveInputRaw.normalized;
+			lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-_renderLookInputRaw.y, _renderLookInputRaw.x) * mobileSensitivityMultiplier, Global.RuntimeSettings.Sensitivity, _lookResponsivity);
 
 			_mobileInputView.Look = default;
 

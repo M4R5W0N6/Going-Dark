@@ -44,6 +44,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -5052030855387608183, guid: 5fe66330c489e4544ba809ba6cc86e2b, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -301,6 +302,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 2199062556896204962}
   - {fileID: 2823422647949271355}
+  ForceRemoteRenderTimeframe: 0
 --- !u!114 &2199062556896204962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,6 +315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecff45261f75b014fb16db195df51219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0.15
   _positionSource: {fileID: 0}
 --- !u!114 &2823422647949271355
 MonoBehaviour:
@@ -347,24 +350,8 @@ MonoBehaviour:
   _reloadTime: 2
   _fireOnKeyDownOnly: 1
   _projectilesPerShot: 1
-  _cameraShakePosition:
-    Duration: 0.25
-    Magnitude: 0.005
-    Frequency: 15
-    FadeIn: 0.05
-    FadeOut: 0.2
-    Ease: 4
-    Axis: {x: 1, y: 1, z: 0}
-    Target: 1
-  _cameraShakeRotation:
-    Duration: 0.3
-    Magnitude: 0.3
-    Frequency: 10
-    FadeIn: 0.05
-    FadeOut: 0.2
-    Ease: 4
-    Axis: {x: 0, y: 0, z: 1}
-    Target: 2
+  _cameraShake:
+    SourceKey: PISTOL
   _supressReloadWhileAimed: 0
   _minDispersion: 0.4
   _minFireDispersion: 0.7
