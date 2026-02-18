@@ -157,6 +157,10 @@ namespace TPSBR.UI
 			Context.PlayerPreview.ShowAgent(Context.PlayerData.AgentID);
 
 			var setup = Context.Settings.Agent.GetAgentSetup(Context.PlayerData.AgentID);
+			if (Context.Settings.Agent.IsSelectableAgentSetup(setup) == false)
+			{
+				setup = Context.Settings.Agent.GetFirstSelectableAgentSetup();
+			}
 			_agentName.text = setup != null ? $"Playing as {setup.DisplayName}" : string.Empty;
 		}
 	}

@@ -38,49 +38,84 @@ namespace TPSBR.UI
 		{
 			base.OnInitialize();
 
-			_agentList.SelectionChanged += OnSelectionChanged;
-			_agentList.UpdateContent += OnListUpdateContent;
+			if (_agentList != null)
+			{
+				_agentList.SelectionChanged += OnSelectionChanged;
+				_agentList.UpdateContent += OnListUpdateContent;
+			}
 
-			_selectButton.onClick.AddListener(OnSelectButton);
+			if (_selectButton != null)
+			{
+				_selectButton.onClick.AddListener(OnSelectButton);
+			}
 		}
 
 		private void OnListUpdateContent(int index, MonoBehaviour content)
 		{
 			var behaviour = content as UIBehaviour;
-			var setup = Context.Settings.Agent.Agents[index];
+			var setup = GetSetupAt(index);
+			if (behaviour == null)
+				return;
 
-			behaviour.Image.sprite = setup.Icon;
+			behaviour.Image.sprite = setup != null ? setup.Icon : null;
 		}
 
 		protected override void OnOpen()
 		{
 			base.OnOpen();
 
-			_camera.enabled = true;
-			_selectedEffect.SetActive(false);
+			CancelInvoke(nameof(CloseWithBack));
+
+			if (_camera != null)
+			{
+				_camera.enabled = true;
+			}
+			if (_selectedEffect != null)
+			{
+				_selectedEffect.SetActive(false);
+			}
+
+			RepairSelectionState();
 
 			_previewAgent = Context.PlayerData.AgentID;
 
-			_agentList.Refresh(Context.Settings.Agent.Agents.Length, false);
+			if (_agentList != null)
+			{
+				int setupCount = Context.Settings.Agent.Agents != null ? Context.Settings.Agent.Agents.Length : 0;
+				_agentList.Refresh(setupCount, false);
+			}
 			
 			UpdateAgent();
 		}
 
 		protected override void OnClose()
 		{
-			_camera.enabled = false;
+			CancelInvoke(nameof(CloseWithBack));
 
-			Context.PlayerPreview.ShowAgent(Context.PlayerData.AgentID);
+			if (_camera != null)
+			{
+				_camera.enabled = false;
+			}
+			if (Context != null && Context.PlayerPreview != null && Context.PlayerData != null)
+			{
+				Context.PlayerPreview.ShowAgent(Context.PlayerData.AgentID);
+			}
 
 			base.OnClose();
 		}
 
 		protected override void OnDeinitialize()
 		{
-			_agentList.SelectionChanged -= OnSelectionChanged;
-			_agentList.UpdateContent -= OnListUpdateContent;
+			if (_agentList != null)
+			{
+				_agentList.SelectionChanged -= OnSelectionChanged;
+				_agentList.UpdateContent -= OnListUpdateContent;
+			}
 
-			_selectButton.onClick.RemoveListener(OnSelectButton);
+			if (_selectButton != null)
+			{
+				_selectButton.onClick.RemoveListener(OnSelectButton);
+			}
 
 			base.OnDeinitialize();
 		}
@@ -89,17 +124,29 @@ namespace TPSBR.UI
 
 		private void OnSelectionChanged(int index)
 		{
-			_previewAgent = Context.Settings.Agent.Agents[index].ID;
+			AgentSetup setup = GetSetupAt(index);
+			if (Context.Settings.Agent.IsSelectableAgentSetup(setup) == false)
+				return;
+
+			_previewAgent = setup.ID;
 			UpdateAgent();
 		}
 
 		private void OnSelectButton()
 		{
-			bool isSame = Context.PlayerData.AgentID == _previewAgent;
+			AgentSetup setup = ResolvePreviewAgentSetup();
+			if (setup == null)
+			{
+				UpdateAgent();
+				return;
+			}
+
+			bool isSame = Context.PlayerData.AgentID == setup.ID;
 
 			if (isSame == false)
 			{
-				Context.PlayerData.AgentID = _previewAgent;
+				Context.PlayerData.AgentID = setup.ID;
+				_previewAgent = setup.ID;
 
 				_selectedEffect.SetActive(false);
 				_selectedEffect.SetActive(true);
@@ -117,31 +164,112 @@ namespace TPSBR.UI
 
 		private void UpdateAgent()
 		{
-			var agentSetups = Context.Settings.Agent.Agents;
-			_agentList.Selection = Array.FindIndex(agentSetups, t => t.ID == _previewAgent);
-
-			if (_agentList.Selection < 0)
+			if (Context == null || Context.Settings == null || Context.Settings.Agent == null || Context.PlayerData == null)
 			{
-				_agentList.Selection = 0;
-				_previewAgent = agentSetups[_agentList.Selection].ID;
+				if (_agentName != null) _agentName.text = string.Empty;
+				if (_agentDescription != null) _agentDescription.text = string.Empty;
+				if (_selectedAgentGroup != null) _selectedAgentGroup.SetActive(false);
+				if (_selectButton != null) _selectButton.interactable = false;
+				return;
 			}
 
-			if (_previewAgent.HasValue() == false)
+			var agentSetups = Context.Settings.Agent.Agents;
+			if (agentSetups == null || agentSetups.Length == 0)
 			{
-				Context.PlayerPreview.HideAgent();
-				_agentName.text = string.Empty;
-				_agentDescription.text = string.Empty;
+				if (Context.PlayerPreview != null) Context.PlayerPreview.HideAgent();
+				if (_agentName != null) _agentName.text = string.Empty;
+				if (_agentDescription != null) _agentDescription.text = string.Empty;
+				if (_selectedAgentGroup != null) _selectedAgentGroup.SetActive(false);
+				if (_selectButton != null) _selectButton.interactable = false;
+				return;
+			}
+
+			AgentSetup selectedSetup = ResolvePreviewAgentSetup();
+			if (selectedSetup == null || _previewAgent.HasValue() == false)
+			{
+				if (Context.PlayerPreview != null) Context.PlayerPreview.HideAgent();
+				if (_agentName != null) _agentName.text = string.Empty;
+				if (_agentDescription != null) _agentDescription.text = string.Empty;
+				if (_selectedAgentGroup != null) _selectedAgentGroup.SetActive(false);
+				if (_selectButton != null) _selectButton.interactable = false;
+				return;
+			}
+
+			if (_agentList != null)
+			{
+				_agentList.Selection = Array.FindIndex(agentSetups, t => t != null && t.ID == _previewAgent);
+				if (_agentList.Selection < 0)
+				{
+					_agentList.Selection = GetFirstSelectableSetupIndex();
+				}
+			}
+
+			if (selectedSetup.MenuAgentPrefab != null)
+			{
+				Context.PlayerPreview.ShowAgent(_previewAgent);
 			}
 			else
 			{
-				var setup = Context.Settings.Agent.GetAgentSetup(_previewAgent);
-
-				Context.PlayerPreview.ShowAgent(_previewAgent);
-				_agentName.text = string.Format(_agentNameFormat, setup.DisplayName);
-				_agentDescription.text = setup.Description;
+				Context.PlayerPreview.HideAgent();
 			}
 
-			_selectedAgentGroup.SetActive(_previewAgent == Context.PlayerData.AgentID);
+			if (_agentName != null) _agentName.text = string.Format(_agentNameFormat, selectedSetup.DisplayName);
+			if (_agentDescription != null) _agentDescription.text = selectedSetup.Description;
+			if (_selectedAgentGroup != null) _selectedAgentGroup.SetActive(_previewAgent == Context.PlayerData.AgentID);
+			if (_selectButton != null) _selectButton.interactable = true;
+		}
+
+		private AgentSetup ResolvePreviewAgentSetup()
+		{
+			AgentSettings settings = Context.Settings.Agent;
+			AgentSetup setup = settings.GetAgentSetup(_previewAgent);
+			if (settings.IsSelectableAgentSetup(setup) == true)
+				return setup;
+
+			setup = settings.GetFirstSelectableAgentSetup();
+			_previewAgent = setup != null ? setup.ID : default;
+			return setup;
+		}
+
+		private int GetFirstSelectableSetupIndex()
+		{
+			AgentSetup[] setups = Context.Settings.Agent.Agents;
+			if (setups == null)
+				return -1;
+
+			for (int i = 0; i < setups.Length; ++i)
+			{
+				if (Context.Settings.Agent.IsSelectableAgentSetup(setups[i]) == true)
+					return i;
+			}
+
+			return -1;
+		}
+
+		private AgentSetup GetSetupAt(int index)
+		{
+			AgentSetup[] setups = Context.Settings.Agent.Agents;
+			if (setups == null || index < 0 || index >= setups.Length)
+				return null;
+
+			return setups[index];
+		}
+
+		private void RepairSelectionState()
+		{
+			if (Context == null || Context.Settings == null || Context.Settings.Agent == null || Context.PlayerData == null)
+				return;
+
+			AgentSettings settings = Context.Settings.Agent;
+			AgentSetup selectedSetup = settings.GetAgentSetup(Context.PlayerData.AgentID);
+			if (settings.IsSelectableAgentSetup(selectedSetup) == true)
+				return;
+
+			AgentSetup fallbackSetup = settings.GetFirstSelectableAgentSetup();
+			if (fallbackSetup != null)
+			{
+				Context.PlayerData.AgentID = fallbackSetup.ID;
+			}
 		}
 	}
 }

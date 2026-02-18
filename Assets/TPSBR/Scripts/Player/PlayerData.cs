@@ -93,11 +93,16 @@ namespace TPSBR
 
 		private NetworkPrefabRef GetAgentPrefab()
 		{
-			if (_agentID.HasValue() == false)
+			if (_agentID.HasValue() == false || Global.Settings == null || Global.Settings.Agent == null)
 				return default;
 
-			var setup = Global.Settings.Agent.GetAgentSetup(_agentID);
-			return setup != null ? setup.AgentPrefab : default;
+			AgentSettings settings = Global.Settings.Agent;
+			AgentSetup setup = settings.GetAgentSetup(_agentID);
+			if (settings.IsSpawnableAgentSetup(setup) == true)
+				return setup.AgentPrefab;
+
+			AgentSetup fallbackSetup = settings.GetFirstSpawnableAgentSetup();
+			return fallbackSetup != null ? fallbackSetup.AgentPrefab : default;
 		}
 	}
 }
