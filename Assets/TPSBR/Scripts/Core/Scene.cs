@@ -51,6 +51,18 @@ namespace TPSBR
 		public Agent            ObservedAgent;
 		[HideInInspector]
 		public Transform        WaitingAgentTransform;
+		[HideInInspector]
+		public bool             HasUICrosshairViewportX;
+		[HideInInspector]
+		public float            UICrosshairViewportX;
+		[HideInInspector]
+		public bool             HasUICrosshairViewport;
+		[HideInInspector]
+		public Vector2          UICrosshairViewport;
+		[HideInInspector]
+		public bool             HasAutoLeanSide;
+		[HideInInspector]
+		public float            AutoLeanSide;
 
 		[HideInInspector]
 		public SceneMap         Map;
@@ -221,6 +233,12 @@ namespace TPSBR
 
 			context.HasInput        = true;
 			context.IsVisible       = true;
+			context.HasUICrosshairViewportX = false;
+			context.UICrosshairViewportX = 0.5f;
+			context.HasUICrosshairViewport = false;
+			context.UICrosshairViewport = new Vector2(0.5f, 0.5f);
+			context.HasAutoLeanSide = false;
+			context.AutoLeanSide = 0.5f;
 
 			ContextReady = true;
 		}

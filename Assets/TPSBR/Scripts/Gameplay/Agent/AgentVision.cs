@@ -196,27 +196,33 @@ namespace TPSBR
 				return;
 
 			TransformData fireTransform = _character.GetFireTransform(false);
-			TransformData cameraTransform = _character.GetCameraTransform(false);
-			Vector3 cameraForward = cameraTransform.Rotation * Vector3.forward;
-			Vector3 targetPoint = cameraTransform.Position + cameraForward * TPSBR_TARGET_RAY_DISTANCE;
-
-			bool isScopedSniper = _character.CharacterController != null
-				&& _character.CharacterController.Data.Aim == true
-				&& _agent != null
-				&& _agent.Weapons != null
-				&& _agent.Weapons.CurrentWeapon != null
-				&& _agent.Weapons.CurrentWeapon.HitType == EHitType.Sniper;
-
-			if (isScopedSniper == true && _agent.Interactions != null)
+			Vector3 cameraPosition;
+			Quaternion cameraRotation;
+			if (TryGetObservedCameraPose(out cameraPosition, out cameraRotation) == false)
 			{
-				targetPoint = _agent.Interactions.GetTargetPoint(false, false);
+				TransformData cameraTransform = _character.GetCameraTransform(false);
+				cameraPosition = cameraTransform.Position;
+				cameraRotation = cameraTransform.Rotation;
+			}
+
+			Vector3 targetPoint = fireTransform.Position + transform.forward * TPSBR_TARGET_RAY_DISTANCE;
+			if (_agent != null && _agent.Interactions != null)
+			{
+				if (_agent.Interactions.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+				{
+					targetPoint = targetPosition;
+				}
+				else
+				{
+					_agent.Interactions.GetAimPose(false, out _, out targetPoint);
+				}
 			}
 
 			Vector3 direction = targetPoint - fireTransform.Position;
 			if (direction.sqrMagnitude <= 0.0001f)
 				return;
 
-			Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, cameraTransform.Rotation * Vector3.up);
+			Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, cameraRotation * Vector3.up);
 			if (Vector3.Distance(_spotLight.transform.position, fireTransform.Position) > 0.0001f)
 			{
 				_spotLight.transform.position = fireTransform.Position;
@@ -225,6 +231,37 @@ namespace TPSBR
 			{
 				_spotLight.transform.rotation = targetRotation;
 			}
+		}
+
+		private bool TryGetObservedCameraPose(out Vector3 position, out Quaternion rotation)
+		{
+			position = default;
+			rotation = default;
+
+			if (_agent == null || _agent.HasInputAuthority == false || _agent.Context == null || _agent.Context.Camera == null)
+				return false;
+
+			TransformData fallbackCamera = _character.GetCameraTransform(false);
+			Camera projectionCamera = _agent.Context.Camera.Camera;
+			if (projectionCamera == null)
+			{
+				position = fallbackCamera.Position;
+				rotation = fallbackCamera.Rotation;
+				return rotation != default;
+			}
+
+			Transform cameraTransform = projectionCamera.transform;
+			position = cameraTransform.position;
+			rotation = cameraTransform.rotation;
+
+			bool invalidPosition = float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z);
+			if (invalidPosition == true || rotation == default)
+			{
+				position = fallbackCamera.Position;
+				rotation = fallbackCamera.Rotation;
+			}
+
+			return rotation != default;
 		}
 	}
 }

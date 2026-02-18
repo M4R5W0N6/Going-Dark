@@ -114,8 +114,9 @@ namespace TPSBR
 
 			UpdateRotation(_lookRotation, _lookRotationDelta);
 
-			Context.Camera.transform.position = _cameraTransform.position;
-			Context.Camera.transform.rotation = _cameraTransform.rotation;
+			Transform cameraTransform = Context.Camera.CameraTransform;
+			cameraTransform.position = _cameraTransform.position;
+			cameraTransform.rotation = _cameraTransform.rotation;
 		}
 
 		// MONOBEHAVIOUR

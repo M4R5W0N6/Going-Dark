@@ -53,6 +53,7 @@ namespace TPSBR
 		public float                        DesiredFOV          => GetDesiredFOV();
 		public float                        CurrentFOV          => GetCurrentFOV();
 		public float                        BaseFOV             => _defaultFOV;
+		public float                        FOVChangeSpeed      => _fovChangeSpeed;
 
 		public float DispersionMultiplier { get; private set; }
 
@@ -60,8 +61,6 @@ namespace TPSBR
 
 		[SerializeField]
 		private CharacterView _thirdPersonView;
-		[SerializeField]
-		private float _cameraChangeDuration = 0.3f;
 
 		[Header("Aim")]
 		[SerializeField]
@@ -89,7 +88,6 @@ namespace TPSBR
 
 		private float                        _targetFOV;
 
-		private float                        _cameraChangeTime;
 		private float                        _cameraDistance;
 
 		private Vector3                      _defaultFireTransformPosition;
@@ -239,74 +237,9 @@ namespace TPSBR
 			}
 
 			_targetFOV = _characterController.Data.Aim == true ? aimFOV : _defaultFOV;
-			_camera.Camera.fieldOfView = Mathf.Lerp(_camera.Camera.fieldOfView, _targetFOV, _fovChangeSpeed * Time.deltaTime);
-
-			if (_previousCameraState != _currentCameraState || _previousLeftSide != _currentLeftSide)
-			{
-				_cameraChangeTime += Time.deltaTime;
-
-				if (_cameraChangeTime >= _cameraChangeDuration)
-				{
-					_previousCameraState = _currentCameraState;
-					_previousLeftSide = _currentLeftSide;
-				}
-			}
-
-			if (_previousCameraState != _currentCameraState || _previousLeftSide != _currentLeftSide)
-			{
-				var previousCameraTransform = GetCameraTransform(_previousCameraState, _previousLeftSide);
-				var currentCameraTransform = GetCameraTransform(_currentCameraState, _currentLeftSide);
-
-				float progress = _cameraChangeTime / _cameraChangeDuration;
-
-				float maxCameraDistance = currentCameraTransform.LocalPosition.magnitude;
-				_cameraDistance = Mathf.Clamp(_cameraDistance + maxCameraDistance * 8.0f * Time.deltaTime, 0.0f, maxCameraDistance);
-
-				Vector3 raycastDirection = Vector3.Normalize(currentCameraTransform.LocalPosition);
-				Vector3 raycastStart     = Vector3.Lerp(previousCameraTransform.Position, currentCameraTransform.Position, progress) - raycastDirection * maxCameraDistance;
-				if (_agent.Runner.GetPhysicsScene().Raycast(raycastStart, raycastDirection, out RaycastHit hitInfo, maxCameraDistance + 0.25f, -5, QueryTriggerInteraction.Ignore) == true)
-				{
-					Agent agent = hitInfo.transform.GetComponentInParent<Agent>();
-					if (agent == null || agent != _agent)
-					{
-						hitInfo.distance = Mathf.Clamp(hitInfo.distance - 0.25f, 0.0f, maxCameraDistance);
-
-						if (hitInfo.distance < _cameraDistance)
-						{
-							_cameraDistance = hitInfo.distance;
-						}
-					}
-				}
-
-				_camera.transform.position = raycastStart + raycastDirection * _cameraDistance;
-				_camera.transform.rotation = Quaternion.Slerp(previousCameraTransform.Rotation, currentCameraTransform.Rotation, progress);
-			}
-			else
-			{
-				var cameraTransform = GetCameraTransform(_currentCameraState, _currentLeftSide);
-
-				float maxCameraDistance = cameraTransform.LocalPosition.magnitude;
-				_cameraDistance = Mathf.Clamp(_cameraDistance + maxCameraDistance * 8.0f * Time.deltaTime, 0.0f, maxCameraDistance);
-
-				Vector3 raycastDirection = Vector3.Normalize(cameraTransform.LocalPosition);
-				Vector3 raycastStart     = cameraTransform.Position - raycastDirection * maxCameraDistance;
-				if (_agent.Runner.GetPhysicsScene().Raycast(raycastStart, raycastDirection, out RaycastHit hitInfo, maxCameraDistance + 0.25f, -5, QueryTriggerInteraction.Ignore) == true)
-				{
-					Agent agent = hitInfo.transform.GetComponentInParent<Agent>();
-					if (agent == null || agent != _agent)
-					{
-						hitInfo.distance = Mathf.Clamp(hitInfo.distance - 0.25f, 0.0f, maxCameraDistance);
-
-						if (hitInfo.distance < _cameraDistance)
-						{
-							_cameraDistance = hitInfo.distance;
-						}
-					}
-				}
-
-				_camera.transform.position = raycastStart + raycastDirection * _cameraDistance;
-				_camera.transform.rotation = cameraTransform.Rotation;
-			}
+			float currentFOV = CurrentFOV;
+			float newFOV = Mathf.Lerp(currentFOV, _targetFOV, _fovChangeSpeed * Time.deltaTime);
+			_camera.SetFieldOfView(newFOV);
 
 			if (_agent.HasInputAuthority == true)
 			{
@@ -388,8 +321,8 @@ namespace TPSBR
 
 		private float GetCurrentFOV()
 		{
-			if (_camera != null && _camera.Camera != null)
-				return _camera.Camera.fieldOfView;
+			if (_camera != null)
+				return _camera.GetFieldOfView();
 
 			return GetDesiredFOV();
 		}
@@ -433,7 +366,6 @@ namespace TPSBR
 			_previousLeftSide = _currentLeftSide;
 			_currentCameraState = state;
 			_currentLeftSide = leftSide;
-			_cameraChangeTime = 0f;
 			_cameraDistance = Mathf.Max(_cameraDistance, GetCameraTransform(_currentCameraState, _currentLeftSide).LocalPosition.magnitude);
 		}
 

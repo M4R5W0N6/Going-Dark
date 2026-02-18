@@ -88,7 +88,11 @@ namespace TPSBR.UI
 			if (_infoActive == false)
 				return;
 
-			var screenPosition = context.Camera.Camera.WorldToScreenPoint(_interactionTarget.HUDPosition);
+			Camera projectionCamera = context != null && context.Camera != null ? context.Camera.Camera : null;
+			if (projectionCamera == null)
+				return;
+
+			var screenPosition = projectionCamera.WorldToScreenPoint(_interactionTarget.HUDPosition);
 			_interactionInfoGroup.transform.position = screenPosition;
 		}
 	}

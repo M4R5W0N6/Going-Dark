@@ -235,7 +235,29 @@ namespace TPSBR
 				weaponHandle.localRotation = _weapons.CurrentWeaponBaseRotation;
 
 				Quaternion handleRotation = weaponHandle.rotation;
-				Quaternion targetRotation = Quaternion.LookRotation(_agent.Context.Camera.transform.position + _agent.Context.Camera.transform.forward * 100.0f - weaponHandle.position);
+				Vector3 targetPoint = weaponHandle.position + transform.forward * 100.0f;
+				if (_agent.Interactions != null)
+				{
+					if (_agent.Interactions.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+					{
+						targetPoint = targetPosition;
+					}
+					else
+					{
+						_agent.Interactions.GetAimPose(false, out _, out targetPoint);
+					}
+				}
+				else
+				{
+					Vector2 lookRotation = _kcc.Data.GetLookRotation(true, true);
+					Vector3 lookDirection = Quaternion.Euler(lookRotation.x, lookRotation.y, 0.0f) * Vector3.forward;
+					if (lookDirection.sqrMagnitude > 0.0001f)
+					{
+						targetPoint = weaponHandle.position + lookDirection.normalized * 100.0f;
+					}
+				}
+
+				Quaternion targetRotation = Quaternion.LookRotation(targetPoint - weaponHandle.position);
 
 				float   snapPower    = Mathf.Clamp(Mathf.Abs(_kcc.FixedData.LookPitch) / 60.0f, _aimSnapPower, 1.0f);
 				Vector3 snapRotation = Quaternion.Slerp(handleRotation, targetRotation, snapPower).eulerAngles;
@@ -246,7 +268,14 @@ namespace TPSBR
 			}
 			else
 			{
-				weaponHandle.rotation = Quaternion.LookRotation(_kcc.FixedData.LookDirection);
+				Vector2 lookRotation = _kcc.FixedData.GetLookRotation(true, true);
+				Vector3 lookDirection = Quaternion.Euler(lookRotation.x, lookRotation.y, 0.0f) * Vector3.forward;
+				if (lookDirection.sqrMagnitude <= 0.0001f)
+				{
+					lookDirection = transform.forward;
+				}
+
+				weaponHandle.rotation = Quaternion.LookRotation(lookDirection);
 			}
 
 			Transform leftHandTarget = _weapons.CurrentWeapon.LeftHandTarget;

@@ -18,10 +18,12 @@ namespace TPSBR
 			{
 				moveDirection = _moveAction.ReadValue<Vector2>();
 			}
+			_renderMoveInputRaw = moveDirection;
 
 			if (_lookAction != null)
 			{
-				Vector2 lookDelta = _lookAction.ReadValue<Vector2>() * 0.075f;
+				_renderLookInputRaw = _lookAction.ReadValue<Vector2>();
+				Vector2 lookDelta = _renderLookInputRaw * 0.075f;
 				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), Global.RuntimeSettings.Sensitivity, _lookResponsivity);
 			}
 
@@ -45,8 +47,6 @@ namespace TPSBR
 			_renderInput.Weapon            = GetWeaponInput();
 			_renderInput.ToggleJetpack     = _abilityAction != null && _abilityAction.IsPressed();
 			_renderInput.Thrust            = _jumpAction != null && _jumpAction.IsPressed();
-			_renderInput.LeanLeft          = _leanLeftAction != null && _leanLeftAction.IsPressed();
-			_renderInput.LeanRight         = _leanRightAction != null && _leanRightAction.IsPressed();
 		}
 	}
 }

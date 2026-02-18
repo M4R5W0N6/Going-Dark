@@ -1,7 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 namespace TPSBR.UI
 {
@@ -10,7 +10,7 @@ namespace TPSBR.UI
 		// PRIVATE MEMBERS
 
 		[SerializeField]
-		private CinemachineVirtualCamera _camera;
+		private CinemachineCamera _camera;
 		[SerializeField]
 		private UIList _agentList;
 		[SerializeField]
