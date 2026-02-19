@@ -285,7 +285,7 @@
                     "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "ScaleVector2(x=15,y=15)",
+                    "processors": "ScaleVector2(x=5,y=5)",
                     "groups": ";Gamepad",
                     "action": "Look",
                     "isComposite": false,
@@ -296,7 +296,7 @@
                     "id": "8c8e490b-c610-4785-884f-f04217b23ca4",
                     "path": "<Pointer>/delta",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "MouseLookNormalization(OutputScale=20)",
                     "groups": ";Keyboard&Mouse;Touch",
                     "action": "Look",
                     "isComposite": false,
@@ -785,6 +785,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Delta",
+                    "type": "PassThrough",
+                    "id": "f8e1f5fc-9e9a-4f47-a6f6-2aa6e9f4d5f7",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Click",
                     "type": "PassThrough",
                     "id": "4b450eb7-75de-413e-a5c2-1f472678ccaf",
@@ -1156,6 +1165,50 @@
                     "processors": "",
                     "groups": "Touch",
                     "action": "Point",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "95e5f6e6-7e7c-4d5f-9f9a-9fd2d5c6f4f7",
+                    "path": "<Pointer>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c2a8ca2d-6cbe-48f7-a57d-8f4c1f1fb5bb",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f8a5f73-4f4d-43b9-94f6-5ff7d4c7a1a3",
+                    "path": "<Pen>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e7f0f6f6-4a2c-4a35-8a6a-1f8fca2f6c8f",
+                    "path": "<Touchscreen>/touch*/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Delta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

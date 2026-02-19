@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem.UI;
 using Fusion;
 using Fusion.Plugin;
 using Fusion.Sockets;
@@ -860,32 +859,9 @@ namespace TPSBR
 
 		private void ResolveInputActions()
 		{
-			if (_actionsAsset == null && Global.Settings != null && Global.Settings.PlayerInputActions != null)
-			{
-				_actionsAsset = Global.Settings.PlayerInputActions;
-			}
-
-			if (_actionsAsset == null && _persistentPlayerInput != null)
-			{
-				_actionsAsset = _persistentPlayerInput.actions;
-			}
-
 			if (_actionsAsset == null)
 			{
-				PlayerInput playerInput = FindFirstObjectByType<PlayerInput>(FindObjectsInactive.Include);
-				if (playerInput != null)
-				{
-					_actionsAsset = playerInput.actions;
-				}
-			}
-
-			if (_actionsAsset == null)
-			{
-				InputSystemUIInputModule inputModule = FindFirstObjectByType<InputSystemUIInputModule>(FindObjectsInactive.Include);
-				if (inputModule != null)
-				{
-					_actionsAsset = inputModule.actionsAsset;
-				}
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
 			}
 
 			if (_actionsAsset == null)
@@ -947,7 +923,7 @@ namespace TPSBR
 
 		private void TryInitializePersistentPlayerInput()
 		{
-			InputActionAsset configuredActions = Global.Settings != null ? Global.Settings.PlayerInputActions : null;
+			InputActionAsset configuredActions = InputActionsResolver.ResolveActionAsset();
 			if (_persistentPlayerInput != null)
 			{
 				ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, configuredActions);
@@ -974,16 +950,14 @@ namespace TPSBR
 				return;
 			}
 
-			InputActionAsset actions = configuredActions != null ? configuredActions : InputActionsResolver.ResolveActionAsset();
-
-			if (actions == null)
+			if (configuredActions == null)
 				return;
 
 			GameObject inputHost = new GameObject("Persistent Player Input");
 			DontDestroyOnLoad(inputHost);
 
 			_persistentPlayerInput = inputHost.AddComponent<PlayerInput>();
-			ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, actions);
+			ApplyPersistentPlayerInputConfiguration(_persistentPlayerInput, configuredActions);
 		}
 
 		private void ApplyPersistentPlayerInputConfiguration(PlayerInput playerInput, InputActionAsset configuredActions)

@@ -1,15 +1,13 @@
 namespace TPSBR.UI
 {
+	using System;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEngine.EventSystems;
 	using UnityEngine.InputSystem;
 	using UnityEngine.InputSystem.Controls;
-	using UnityEngine.InputSystem.Utilities;
 
-	using TouchPhase = UnityEngine.InputSystem.TouchPhase;
-
-	public sealed class UIMobileInputView : UIView, IPointerDownHandler
+	public sealed class UIMobileInputView : UIView
 	{
 		// PUBLIC MEMBERS
 
@@ -46,13 +44,17 @@ namespace TPSBR.UI
 		[SerializeField]
 		private UIBehaviour   _joystickOrigin;
 
-		private int     _movePointerID;
+		private const int NoPointer = -1;
+
+		private int     _movePointerID = NoPointer;
 		private Vector2 _movePosition;
 		private Vector2 _moveOrigin;
 
-		private int     _lookPointerID;
-		private Vector2 _lookPosition;
-		private Vector2 _lookDelta;
+		private int     _lookPointerID = NoPointer;
+
+		private int     _firePointerID     = NoPointer;
+		private int     _jumpPointerID     = NoPointer;
+		private int     _interactPointerID = NoPointer;
 		private bool    _isFiring;
 		private bool    _isJumping;
 		private bool    _isInteracting;
@@ -61,11 +63,21 @@ namespace TPSBR.UI
 
 		private Rect    _moveRect;
 		private Rect    _lookRect;
+		private Rect    _fireRect;
+		private Rect    _jumpRect;
+		private Rect    _interactRect;
 
-		private List<int>           _activeTouches   = new List<int>();
-		private List<int>           _inactiveTouches = new List<int>();
 		private List<RectTransform> _ignoredAreas    = new List<RectTransform>();
 		private List<Rect>          _ignoredRects    = new List<Rect>();
+
+		private Dictionary<int, Vector2> _touchPositionsByPointer = new Dictionary<int, Vector2>();
+		private Dictionary<int, Vector2> _touchDeltasByPointer = new Dictionary<int, Vector2>();
+
+		private InputActionAsset _actionsAsset;
+		private InputAction _pointAction;
+		private InputAction _deltaAction;
+		private InputAction _clickAction;
+		private bool _isSubscribed;
 
 		// PUBLIC METHODS
 
@@ -96,19 +108,45 @@ namespace TPSBR.UI
 			_joystickOrigin.CanvasGroup.alpha = 0.0f;
 
 			ToggleState(false);
+			ResetRuntimeState();
+
+			ResolveInputActions();
+			SubscribeToInputActions();
 		}
 
 		protected override void OnVisible()
 		{
-			_activeTouches.Clear();
-			_inactiveTouches.Clear();
+			_moveRect     = GetScreenSpaceRect(_move);
+			_lookRect     = GetScreenSpaceRect(_look);
+			_fireRect     = GetScreenSpaceRect(_fire);
+			_jumpRect     = GetScreenSpaceRect(_jump);
+			_interactRect = GetScreenSpaceRect(_interact);
 
-			_lookRect = GetScreenSpaceRect(_look);
-			_moveRect = GetScreenSpaceRect(_move);
+			_movePointerID = NoPointer;
+			_lookPointerID = NoPointer;
+
+			_firePointerID     = NoPointer;
+			_jumpPointerID     = NoPointer;
+			_interactPointerID = NoPointer;
 
 			_isFiring      = false;
 			_isJumping     = false;
 			_isInteracting = false;
+
+			Fire     = false;
+			Jump     = false;
+			Interact = false;
+		}
+
+		protected override void OnHidden()
+		{
+			ResetRuntimeState();
+		}
+
+		protected override void OnDeinitialize()
+		{
+			UnsubscribeFromInputActions();
+			ResetRuntimeState();
 		}
 
 		protected override void OnTick()
@@ -119,9 +157,6 @@ namespace TPSBR.UI
 				return;
 			}
 
-			ProcessTouches();
-			ProcessMouse();
-
 			if (_root.CanvasGroup.IsActive() == false && Context.LocalPlayerRef == Context.ObservedPlayerRef && Context.LocalPlayerRef.IsRealPlayer == true)
 			{
 				ToggleState(true);
@@ -131,211 +166,456 @@ namespace TPSBR.UI
 				ToggleState(false);
 			}
 
-			Move = _movePointerID >= 0 ? InputUtility.PixelsToCentimeters(_movePosition - _moveOrigin) : default;
+			_moveRect     = GetScreenSpaceRect(_move);
+			_lookRect     = GetScreenSpaceRect(_look);
+			_fireRect     = GetScreenSpaceRect(_fire);
+			_jumpRect     = GetScreenSpaceRect(_jump);
+			_interactRect = GetScreenSpaceRect(_interact);
+
+			ResolveInputActions();
+			SubscribeToInputActions();
+
+			Move = default;
+			Look = default;
+
+			if (_movePointerID >= 0)
+			{
+				if (_touchPositionsByPointer.TryGetValue(_movePointerID, out Vector2 movePointerPosition) == true)
+				{
+					_movePosition = movePointerPosition;
+
+					Vector2 direction = _movePosition - _moveOrigin;
+					float   scaledRadius = _joystickRadius * transform.lossyScale.x;
+
+					if (scaledRadius > 0.0f && direction.sqrMagnitude > scaledRadius * scaledRadius)
+					{
+						if (_moveJoystickOrigin == true)
+						{
+							_joystick.position = _movePosition;
+							_moveOrigin       = _movePosition - scaledRadius * direction.normalized;
+							_joystickOrigin.transform.position = _moveOrigin;
+						}
+						else
+						{
+							_joystick.position = _moveOrigin + direction.normalized * scaledRadius;
+						}
+					}
+					else
+					{
+						_joystick.position = _movePosition;
+					}
+
+					Move = InputUtility.PixelsToCentimeters(_movePosition - _moveOrigin);
+				}
+			}
 
 			if (_lookPointerID >= 0)
 			{
-				Look += InputUtility.PixelsToCentimeters(_lookDelta);
+				if (_touchDeltasByPointer.TryGetValue(_lookPointerID, out Vector2 lookDelta) == true)
+				{
+					Look += InputUtility.PixelsToCentimeters(lookDelta);
+					_touchDeltasByPointer[_lookPointerID] = default;
+				}
 
 				if (_isFiring      == true) { Fire     = true; }
 				if (_isJumping     == true) { Jump     = true; }
 				if (_isInteracting == true) { Interact = true; }
-
-				_lookDelta = default;
 			}
 			else
 			{
-				Fire     = false; _isFiring      = false;
-				Jump     = false; _isJumping     = false;
-				Interact = false; _isInteracting = false;
+				Fire          = false; _isFiring      = false;
+				Jump          = false; _isJumping     = false;
+				Interact      = false; _isInteracting = false;
 			}
-		}
-
-		// IPointerDownHandler INTERFACE
-
-		void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
-		{
-			if (eventData.pointerEnter == _fire.gameObject)     { Fire     = true; _isFiring      = true; }
-			if (eventData.pointerEnter == _jump.gameObject)     { Jump     = true; _isJumping     = true; }
-			if (eventData.pointerEnter == _interact.gameObject) { Interact = true; _isInteracting = true; }
 		}
 
 		// PRIVATE METHODS
 
-		private void ProcessTouches()
+		private void ResolveInputActions()
 		{
-			Touchscreen touchscreen = Touchscreen.current;
-			if (touchscreen == null)
+			if (_actionsAsset == null)
+			{
+				_actionsAsset = InputActionsResolver.ResolveActionAsset();
+			}
+
+			if (_actionsAsset == null)
 				return;
 
-			_inactiveTouches.Clear();
-			_inactiveTouches.AddRange(_activeTouches);
-
-			ReadOnlyArray<TouchControl> touches = touchscreen.touches;
-			for (int i = 0, count = touches.Count; i < count; i++)
-			{
-				TouchControl touch   = touches[i];
-				TouchPhase   phase   = touch.phase.ReadValue();
-				int          touchID = touch.touchId.ReadValue();
-
-				_inactiveTouches.Remove(touchID);
-
-				if (phase == TouchPhase.None)
-				{
-					// Nothing
-				}
-				else if (phase == TouchPhase.Ended || phase == TouchPhase.Canceled)
-				{
-					ProcessTouchEnded(touchID);
-				}
-				else
-				{
-					if (_activeTouches.Contains(touchID) == false)
-					{
-						_activeTouches.Add(touchID);
-
-						ProcessTouchBegan(touchID, touch.position.ReadValue());
-					}
-					else
-					{
-						ProcessTouchMoved(touchID, touch.position.ReadValue());
-					}
-				}
-			}
-
-			for (int i = 0; i < _inactiveTouches.Count; ++i)
-			{
-				ProcessTouchEnded(_inactiveTouches[i]);
-			}
-			_inactiveTouches.Clear();
+			_pointAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "UI/Point");
+			_deltaAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "UI/Delta");
+			_clickAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "UI/Click");
 		}
 
-		private void ProcessMouse()
+		private void SubscribeToInputActions()
 		{
-#if UNITY_EDITOR
-			Mouse mouse = Mouse.current;
-			if (mouse == null)
+			if (_isSubscribed == true)
 				return;
 
-			if (mouse.leftButton.wasPressedThisFrame == true)
-			{
-				ProcessTouchBegan(int.MaxValue, mouse.position.ReadValue());
-			}
-			else if (mouse.leftButton.isPressed == true)
-			{
-				ProcessTouchMoved(int.MaxValue, mouse.position.ReadValue());
-			}
-			else if (mouse.leftButton.wasReleasedThisFrame == true)
-			{
-				ProcessTouchEnded(int.MaxValue);
-			}
-#endif
+			if (_pointAction == null || _deltaAction == null || _clickAction == null)
+				return;
+
+			_pointAction.performed += OnPointAction;
+			_pointAction.canceled  += OnPointEnded;
+
+			_deltaAction.performed += OnDeltaAction;
+
+			_clickAction.performed += OnClickAction;
+			_clickAction.canceled  += OnClickAction;
+
+			_isSubscribed = true;
 		}
 
-		private void ProcessTouchBegan(int touchID, Vector2 touchPosition)
+		private void UnsubscribeFromInputActions()
 		{
-			for (int i = 0, count = _ignoredRects.Count; i < count; i++)
+			if (_isSubscribed == false)
+				return;
+
+			if (_pointAction != null)
 			{
-				Rect ignoredRect = _ignoredRects[i];
-				if (ignoredRect.Contains(touchPosition) == true)
-					return;
+				_pointAction.performed -= OnPointAction;
+				_pointAction.canceled  -= OnPointEnded;
 			}
 
-			if (_moveRect.Contains(touchPosition) == true)
+			if (_deltaAction != null)
 			{
-				_movePointerID = touchID;
-				_movePosition  = touchPosition;
+				_deltaAction.performed -= OnDeltaAction;
+			}
+
+			if (_clickAction != null)
+			{
+				_clickAction.performed -= OnClickAction;
+				_clickAction.canceled  -= OnClickAction;
+			}
+
+			_isSubscribed = false;
+		}
+
+		private void OnPointAction(InputAction.CallbackContext context)
+		{
+			int    pointerId = GetPointerIdFromControl(context.control);
+			Vector2 point    = context.ReadValue<Vector2>();
+
+			if (pointerId < 0)
+				return;
+
+			_touchPositionsByPointer[pointerId] = point;
+		}
+
+		private void OnPointEnded(InputAction.CallbackContext context)
+		{
+			int pointerId = GetPointerIdFromControl(context.control);
+
+			if (pointerId < 0)
+				return;
+
+			_touchPositionsByPointer.Remove(pointerId);
+			_touchDeltasByPointer.Remove(pointerId);
+
+			if (pointerId == _movePointerID)
+			{
+				ClearMovePointer();
+			}
+			else if (pointerId == _lookPointerID)
+			{
+				ClearLookPointer();
+			}
+
+			OnTouchReleased(pointerId);
+		}
+
+		private void OnDeltaAction(InputAction.CallbackContext context)
+		{
+			int    pointerId = GetPointerIdFromControl(context.control);
+			Vector2 delta    = context.ReadValue<Vector2>();
+
+			if (pointerId < 0)
+				return;
+
+			if (_touchDeltasByPointer.ContainsKey(pointerId) == false)
+			{
+				_touchDeltasByPointer.Add(pointerId, delta);
+			}
+			else
+			{
+				_touchDeltasByPointer[pointerId] += delta;
+			}
+		}
+
+		private void OnClickAction(InputAction.CallbackContext context)
+		{
+			int pointerId = GetPointerIdFromControl(context.control);
+
+			if (pointerId < 0)
+				return;
+
+			float value = context.ReadValue<float>();
+
+			if (value > 0.5f)
+			{
+				OnTouchPressed(pointerId, GetPointerPosition(pointerId, context));
+			}
+			else
+			{
+				OnTouchReleased(pointerId);
+			}
+		}
+
+		private void OnTouchPressed(int pointerId, Vector2 pointerPosition)
+		{
+			if (_ignoredAreas.Count > 0)
+			{
+				for (int i = 0; i < _ignoredRects.Count; i++)
+				{
+					Rect ignoredRect = _ignoredRects[i];
+					if (ignoredRect.Contains(pointerPosition) == true)
+					{
+						return;
+					}
+				}
+			}
+
+			if (pointerId == _movePointerID || pointerId == _lookPointerID || pointerId == _firePointerID || pointerId == _jumpPointerID || pointerId == _interactPointerID)
+				return;
+
+			if (_fireRect.Contains(pointerPosition) == true)
+			{
+				_firePointerID = pointerId;
+				_isFiring      = true;
+				Fire          = true;
+			}
+			else if (_jumpRect.Contains(pointerPosition) == true)
+			{
+				_jumpPointerID = pointerId;
+				_isJumping    = true;
+				Jump          = true;
+			}
+			else if (_interactRect.Contains(pointerPosition) == true)
+			{
+				_interactPointerID = pointerId;
+				_isInteracting     = true;
+				Interact           = true;
+			}
+			else if (_moveRect.Contains(pointerPosition) == true && _movePointerID < 0)
+			{
+				_movePointerID = pointerId;
+				_movePosition  = pointerPosition;
 				_moveOrigin    = _movePosition;
-
 				_joystick.position = _movePosition;
-
 				_joystickOrigin.RectTransform.position = _movePosition;
 				_joystickOrigin.CanvasGroup.alpha = 1.0f;
 			}
-			else if (_lookRect.Contains(touchPosition) == true)
+			else if (_lookRect.Contains(pointerPosition) == true && _lookPointerID < 0)
 			{
-				_lookPointerID = touchID;
-				_lookPosition  = touchPosition;
-				_lookDelta     = default;
+				_lookPointerID = pointerId;
+				_touchDeltasByPointer[_lookPointerID] = default;
 			}
 		}
 
-		private void ProcessTouchMoved(int touchID, Vector2 touchPosition)
+		private void OnTouchReleased(int pointerId)
 		{
-			if (touchID == _movePointerID)
+			if (pointerId == _movePointerID)
 			{
-				_movePosition = touchPosition;
-
-				Vector2 direction    = _movePosition - _moveOrigin;
-				float   scaledRadius = _joystickRadius * transform.lossyScale.x;
-
-				if (scaledRadius > 0.0f && direction.sqrMagnitude > scaledRadius * scaledRadius)
-				{
-					if (_moveJoystickOrigin == true)
-					{
-						_joystick.position                 = _movePosition;
-						_moveOrigin                        = _movePosition - scaledRadius * direction.normalized;
-						_joystickOrigin.transform.position = _moveOrigin;
-					}
-					else
-					{
-						_joystick.position = _moveOrigin + direction.normalized * scaledRadius;;
-					}
-				}
-				else
-				{
-					_joystick.position = _movePosition;
-				}
+				ClearMovePointer();
 			}
-			else if (touchID == _lookPointerID)
+			else if (pointerId == _lookPointerID)
 			{
-				Vector2 position = touchPosition;
-
-				_lookDelta    = position - _lookPosition;
-				_lookPosition = position;
+				ClearLookPointer();
+			}
+			else if (pointerId == _firePointerID)
+			{
+				_firePointerID = NoPointer;
+				_isFiring     = false;
+				Fire         = false;
+			}
+			else if (pointerId == _jumpPointerID)
+			{
+				_jumpPointerID = NoPointer;
+				_isJumping    = false;
+				Jump          = false;
+			}
+			else if (pointerId == _interactPointerID)
+			{
+				_interactPointerID = NoPointer;
+				_isInteracting    = false;
+				Interact          = false;
 			}
 		}
 
-		private void ProcessTouchEnded(int touchID)
+		private void ClearMovePointer()
 		{
-			if (touchID == _movePointerID)
+			_movePointerID = NoPointer;
+			if (_resetMoveJoystickAfterMove == true)
 			{
-				_movePointerID = -1;
-
-				if (_resetMoveJoystickAfterMove == true)
-				{
-					_joystick.position = _joystickInitialPosition;
-				}
-				else
-				{
-					_joystick.position = _moveOrigin;
-				}
-
-				_joystickOrigin.CanvasGroup.alpha = 0.0f;
-
-				Move = default;
+				_joystick.position = _joystickInitialPosition;
 			}
-			else if (touchID == _lookPointerID)
+			else
 			{
-				_lookPointerID = -1;
-				Look = default;
+				_joystick.position = _moveOrigin;
 			}
+
+			_joystickOrigin.CanvasGroup.alpha = 0.0f;
+			Move = default;
+		}
+
+		private void ClearLookPointer()
+		{
+			int pointerId = _lookPointerID;
+			_lookPointerID = NoPointer;
+			Look = default;
+
+			_touchDeltasByPointer.Remove(pointerId);
+		}
+
+		private void ResetRuntimeState()
+		{
+			Move     = default;
+			Look     = default;
+			Fire     = false;
+			Jump     = false;
+			Interact = false;
+
+			_movePointerID = NoPointer;
+			_lookPointerID = NoPointer;
+			_firePointerID = NoPointer;
+			_jumpPointerID = NoPointer;
+			_interactPointerID = NoPointer;
+
+			_isFiring      = false;
+			_isJumping     = false;
+			_isInteracting = false;
+
+			_movePosition = default;
+			_moveOrigin   = default;
+
+			_joystick.position = _joystickInitialPosition;
+			_joystickOrigin.CanvasGroup.alpha = 0.0f;
+
+			_touchPositionsByPointer.Clear();
+			_touchDeltasByPointer.Clear();
+		}
+
+		private Vector2 GetPointerPosition(int pointerId, InputAction.CallbackContext context)
+		{
+			if (pointerId >= 0 && _touchPositionsByPointer.TryGetValue(pointerId, out Vector2 position) == true)
+			{
+				return position;
+			}
+
+			var pressedControl = context.control;
+			if (pressedControl != null)
+			{
+				var device = pressedControl.device;
+				if (device != null)
+				{
+					var positionControl = device["position"];
+					if (positionControl != null && positionControl.valueType == typeof(Vector2))
+					{
+						return ((InputControl<Vector2>)positionControl).ReadValue();
+					}
+				}
+			}
+
+			if (_pointAction != null)
+			{
+				for (int i = 0, count = _pointAction.controls.Count; i < count; ++i)
+				{
+					InputControl control = _pointAction.controls[i];
+					if (GetPointerIdFromControl(control) != pointerId)
+					{
+						continue;
+					}
+
+					if (control.valueType == typeof(Vector2))
+					{
+						return ((InputControl<Vector2>)control).ReadValue();
+					}
+				}
+			}
+
+			return default;
+		}
+
+		private int GetPointerIdFromControl(InputControl control)
+		{
+			if (control == null || string.IsNullOrEmpty(control.path) == true)
+				return NoPointer;
+
+			if (control is TouchControl touchControl)
+			{
+				return touchControl.touchId.ReadValue();
+			}
+
+			string path = control.path;
+			const string touchPrefix = "touch";
+			int touchPrefixIndex = path.IndexOf(touchPrefix, StringComparison.OrdinalIgnoreCase);
+			if (touchPrefixIndex >= 0)
+			{
+				int startIndex = touchPrefixIndex + touchPrefix.Length;
+				int endIndex = startIndex;
+				while (endIndex < path.Length)
+				{
+					char character = path[endIndex];
+					if (character < '0' || character > '9')
+						break;
+
+					++endIndex;
+				}
+
+				if (endIndex > startIndex && int.TryParse(path.Substring(startIndex, endIndex - startIndex), out int touchId) == true)
+				{
+					return touchId;
+				}
+			}
+
+			if (path.IndexOf("/Mouse/", StringComparison.OrdinalIgnoreCase) >= 0 || path.IndexOf("<Mouse>", StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				return 0;
+			}
+
+			if (path.IndexOf("/Pointer/", StringComparison.OrdinalIgnoreCase) >= 0 || path.IndexOf("<Pointer>", StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				return 0;
+			}
+
+			if (path.IndexOf("/Pen/", StringComparison.OrdinalIgnoreCase) >= 0 || path.IndexOf("<Pen>", StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				return 0;
+			}
+
+			return NoPointer;
 		}
 
 		private void ToggleState(bool isActive)
 		{
-			_joystick.position  = _joystickInitialPosition;
+			_joystick.position = _joystickInitialPosition;
 
-			_movePointerID  = -1;
-			_movePosition   = default;
-			_moveOrigin     = default;
+			_movePointerID = NoPointer;
+			_movePosition  = default;
+			_moveOrigin    = default;
 
-			_lookPointerID  = -1;
-			_lookPosition   = default;
-			_lookDelta      = default;
+			_lookPointerID = NoPointer;
+			_firePointerID = NoPointer;
+			_jumpPointerID = NoPointer;
+			_interactPointerID = NoPointer;
 
-			_movePointerID  = -1;
-			_lookPointerID  = -1;
+			_isFiring      = false;
+			_isJumping     = false;
+			_isInteracting = false;
+			Fire           = false;
+			Jump           = false;
+			Interact       = false;
+
+			_touchPositionsByPointer.Clear();
+			_touchDeltasByPointer.Clear();
+
+			if (isActive == true)
+			{
+				SubscribeToInputActions();
+			}
+			else
+			{
+				UnsubscribeFromInputActions();
+			}
 
 			_root.CanvasGroup.SetActive(isActive);
 		}

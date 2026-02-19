@@ -1,21 +1,23 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 
 namespace TPSBR
 {
 	public static class InputActionsResolver
 	{
+		private static bool _didLogMissingActionAsset;
+
 		public static InputActionAsset ResolveActionAsset()
 		{
-			PlayerInput playerInput = Object.FindFirstObjectByType<PlayerInput>(FindObjectsInactive.Include);
-			if (playerInput != null && playerInput.actions != null)
-				return playerInput.actions;
+			InputActionAsset configuredActions = Global.Settings != null ? Global.Settings.PlayerInputActions : null;
+			if (configuredActions != null)
+				return configuredActions;
 
-			InputSystemUIInputModule inputModule = Object.FindFirstObjectByType<InputSystemUIInputModule>(FindObjectsInactive.Include);
-			if (inputModule != null)
-				return inputModule.actionsAsset;
-
+			if (_didLogMissingActionAsset == false)
+			{
+				_didLogMissingActionAsset = true;
+				Debug.LogError("Global.Settings.PlayerInputActions is not assigned. Configure it in Global Settings before input is used.");
+			}
 			return null;
 		}
 
