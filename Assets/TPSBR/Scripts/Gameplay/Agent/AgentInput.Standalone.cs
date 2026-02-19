@@ -18,6 +18,10 @@ namespace TPSBR
 			{
 				moveDirection = _moveAction.ReadValue<Vector2>();
 			}
+			else
+			{
+				moveDirection = default;
+			}
 			_renderMoveInputRaw = moveDirection;
 
 			if (_lookAction != null)
@@ -32,7 +36,7 @@ namespace TPSBR
 				lookRotationDelta *= GetAimSensitivity();
 			}
 
-			if (moveDirection.IsZero() == false)
+			if (moveDirection.sqrMagnitude > 1.0f)
 			{
 				moveDirection.Normalize();
 			}

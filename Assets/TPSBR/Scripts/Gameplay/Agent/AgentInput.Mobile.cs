@@ -26,7 +26,11 @@ namespace TPSBR
 
 			_renderMoveInputRaw = _mobileInputView.Move;
 			_renderLookInputRaw = _mobileInputView.Look;
-			moveDirection     = _renderMoveInputRaw.normalized;
+			moveDirection     = _renderMoveInputRaw;
+			if (moveDirection.sqrMagnitude > 1.0f)
+			{
+				moveDirection.Normalize();
+			}
 			lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-_renderLookInputRaw.y, _renderLookInputRaw.x) * mobileSensitivityMultiplier, Global.RuntimeSettings.Sensitivity, _lookResponsivity);
 
 			_mobileInputView.Look = default;
