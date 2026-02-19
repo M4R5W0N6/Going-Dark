@@ -57,19 +57,6 @@ namespace TPSBR
 		private float _maxRepeatTime = 0.25f;
 		[SerializeField][Tooltip("Outputs missing inputs to console.")]
 		private bool  _logMissingInputs;
-		[Header("Automatic Leaning")]
-		[SerializeField][Range(0.0f, 10.0f)][Tooltip("Shoulder side change speed while directional input is active.")]
-		private float _leanSpeed = 5.0f;
-		[SerializeField][Range(0.0f, 10.0f)][Tooltip("Shoulder side reset speed when directional input is inactive.")]
-		private float _resetSpeed = 5.0f;
-		[SerializeField][Tooltip("Move input weighting by current lean. X=|currentLean|, Y=weight.")]
-		private AnimationCurve _moveWeight = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 1.0f);
-		[SerializeField][Tooltip("Look input weighting by current lean. X=|currentLean|, Y=weight.")]
-		private AnimationCurve _lookWeight = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 1.0f);
-		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Minimum curve weight applied to automatic-lean move/look input.")]
-		private float _weightFloor = 0.05f;
-		[SerializeField][Range(0.0f, 5.0f)][Tooltip("Driving input override strength when explicit lean buttons are pressed.")]
-		private float _overrideStrength = 2.0f;
 
 		// We need to store current input to compare against previous input (to track actions activation/deactivation). It is also reused if the input for current tick is not available.
 		// This is not needed on proxies and will be replicated to input authority only.
@@ -100,7 +87,6 @@ namespace TPSBR
 		private int               _missingInputsTotal;
 		private int               _logMissingInputFromTick;
 		private float             _grenadesCyclingStartTime;
-		private float             _currentLean = 1.0f;
 		private UIMobileInputView _mobileInputView;
 		private InputActionAsset  _actionsAsset;
 		private InputAction       _moveAction;
@@ -425,6 +411,8 @@ namespace TPSBR
 			_agent = GetComponent<Agent>();
 		}
 
+		private Leaning LeaningComponent => _agent != null ? _agent.GetComponent<Leaning>() : null;
+
 		// PARTIAL METHODS
 
 		partial void ProcessStandaloneInput(bool isInputPoll);
@@ -740,122 +728,34 @@ namespace TPSBR
 
 		private void UpdateAutomaticLeaning()
 		{
-			// Calculate signed move/look contributions for this frame, then resolve a single driving input.
-			bool hasDrivingInput = TryGetAutomaticLeanInput(out float currentMove, out float currentLook, out float drivingInput);
-			float deltaTime = Time.unscaledDeltaTime;
+			float leanSide = LeaningComponent == null
+				? 1.0f
+				: LeaningComponent.UpdateLeaning(
+					_renderMoveInputRaw,
+					_renderLookInputRaw,
+					_leanLeftAction != null && _leanLeftAction.IsPressed(),
+					_leanRightAction != null && _leanRightAction.IsPressed(),
+					Time.unscaledDeltaTime);
 
-			if (hasDrivingInput == true)
-			{
-				// Apply signed drive input directly to lean value each frame.
-				_currentLean -= drivingInput * Mathf.Max(0.0f, _leanSpeed) * deltaTime;
-				_currentLean = Mathf.Clamp(_currentLean, -1.0f, 1.0f);
-			}
-			else
-			{
-				// No drive input: reset toward nearest side (-1 or 1) using ResetSpeed.
-				float nearestLean = _currentLean < 0.0f ? -1.0f : 1.0f;
-				_currentLean = Mathf.MoveTowards(_currentLean, nearestLean, Mathf.Max(0.0f, _resetSpeed) * deltaTime);
-			}
-
-			float outputSide = Mathf.Clamp01((_currentLean + 1.0f) * 0.5f);
-			UpdateShoulderButtonsFromLean(outputSide);
+			bool isRightSide = leanSide >= 0.5f;
+			_renderInput.LeanRight = isRightSide;
+			_renderInput.LeanLeft = isRightSide == false;
 
 			if (Context != null)
 			{
 				Context.HasAutoLeanSide = true;
-				Context.AutoLeanSide = outputSide;
+				Context.AutoLeanSide = leanSide;
 			}
 		}
 
-		private void UpdateShoulderButtonsFromLean(float outputSide)
+		private float GetLookSensitivity()
 		{
-			bool isRightSide = outputSide >= 0.5f;
-			_renderInput.LeanRight = isRightSide;
-			_renderInput.LeanLeft = isRightSide == false;
+			return Global.RuntimeSettings.Sensitivity;
 		}
 
-		private bool TryGetAutomaticLeanInput(out float currentMove, out float currentLook, out float drivingInput)
+		private float GetAimSensitivity()
 		{
-			// Read normalized signed inputs and weight them by the current lean-side curve response.
-			currentMove = GetWeightedSignedInput(GetNormalizedHorizontalMoveInput(), _moveWeight);
-			currentLook = GetWeightedSignedInput(GetNormalizedHorizontalLookInput(), _lookWeight);
-			drivingInput = 0.0f;
-			if (TryGetLeanButtonOverride(out float overrideInput) == true)
-			{
-				drivingInput = overrideInput;
-				return true;
-			}
-
-			bool hasMove = Mathf.Abs(currentMove) > 0.0001f;
-			bool hasLook = Mathf.Abs(currentLook) > 0.0001f;
-			if (hasMove == false && hasLook == false)
-				return false;
-
-			// Move input is authoritative whenever present. Look drives only when move is absent.
-			if (hasMove == true)
-			{
-				drivingInput = -currentMove;
-				return true;
-			}
-
-			drivingInput = -currentLook;
-			return true;
-		}
-
-		private bool TryGetLeanButtonOverride(out float drivingInputOverride)
-		{
-			drivingInputOverride = 0.0f;
-
-			bool leanLeftPressed = _leanLeftAction != null && _leanLeftAction.IsPressed();
-			bool leanRightPressed = _leanRightAction != null && _leanRightAction.IsPressed();
-			if (leanLeftPressed == leanRightPressed)
-				return false;
-
-			float overrideStrength = Mathf.Clamp(_overrideStrength, 0.0f, 5.0f);
-			if (overrideStrength <= 0.0001f)
-				return false;
-
-			// Positive driving input moves lean toward left side, negative toward right side.
-			drivingInputOverride = leanLeftPressed == true ? overrideStrength : -overrideStrength;
-			return true;
-		}
-
-		private float GetWeightedSignedInput(float signedInput, AnimationCurve weightCurve)
-		{
-			float magnitude = Mathf.Abs(signedInput);
-			if (magnitude <= 0.0001f)
-				return 0.0f;
-
-			float inputSign = Mathf.Sign(signedInput);
-			// Sample in input-relative space:
-			// 0 = current lean is on the opposite side of this input sign, 1 = same side as input sign.
-			float leanPosition = Mathf.Clamp01((_currentLean * inputSign + 1.0f) * 0.5f);
-
-			float weight = weightCurve != null ? weightCurve.Evaluate(leanPosition) : 1.0f;
-			weight = Mathf.Clamp(weight, Mathf.Clamp01(_weightFloor), 1.0f);
-			return inputSign * magnitude * weight;
-		}
-
-		private float GetNormalizedHorizontalMoveInput()
-		{
-			Vector2 move = _renderMoveInputRaw;
-			if (move.sqrMagnitude > 1.0f)
-			{
-				move.Normalize();
-			}
-
-			return Mathf.Clamp(move.x, -1.0f, 1.0f);
-		}
-
-		private float GetNormalizedHorizontalLookInput()
-		{
-			Vector2 look = _renderLookInputRaw;
-			if (look.sqrMagnitude > 1.0f)
-			{
-				look.Normalize();
-			}
-
-			return Mathf.Clamp(look.x, -1.0f, 1.0f);
+			return Global.RuntimeSettings.AimSensitivity;
 		}
 
 		private void ResolveInputActions()
@@ -901,7 +801,11 @@ namespace TPSBR
 			_processInputFrame       = default;
 			_missingInputsTotal      = default;
 			_missingInputsInRow      = default;
-			_currentLean             = 1.0f;
+
+			if (LeaningComponent != null)
+			{
+				LeaningComponent.ResetLean();
+			}
 
 			if (Context != null)
 			{
@@ -911,7 +815,6 @@ namespace TPSBR
 
 			_smoothLookRotationDelta.ClearValues();
 		}
-
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		private void CheckFixedAccess(bool checkStage)
 		{

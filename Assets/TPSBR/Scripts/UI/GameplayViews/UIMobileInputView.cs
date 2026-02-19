@@ -78,6 +78,7 @@ namespace TPSBR.UI
 		private InputAction _deltaAction;
 		private InputAction _clickAction;
 		private bool _isSubscribed;
+		private bool _isMobileInputEnabled;
 
 		// PUBLIC METHODS
 
@@ -110,8 +111,12 @@ namespace TPSBR.UI
 			ToggleState(false);
 			ResetRuntimeState();
 
-			ResolveInputActions();
-			SubscribeToInputActions();
+			_isMobileInputEnabled = ShouldProcessMobileInput();
+			if (_isMobileInputEnabled == true)
+			{
+				ResolveInputActions();
+				SubscribeToInputActions();
+			}
 		}
 
 		protected override void OnVisible()
@@ -151,7 +156,21 @@ namespace TPSBR.UI
 
 		protected override void OnTick()
 		{
-			if ((Application.isMobilePlatform == false || Application.isEditor == true) && Context.Settings.SimulateMobileInput == false)
+			bool shouldProcessMobileInput = ShouldProcessMobileInput();
+			if (_isMobileInputEnabled != shouldProcessMobileInput)
+			{
+				_isMobileInputEnabled = shouldProcessMobileInput;
+				if (_isMobileInputEnabled == true)
+				{
+					ResolveInputActions();
+				}
+				else
+				{
+					UnsubscribeFromInputActions();
+				}
+			}
+
+			if (_isMobileInputEnabled == false)
 			{
 				ToggleState(false);
 				return;
@@ -233,6 +252,9 @@ namespace TPSBR.UI
 
 		private void ResolveInputActions()
 		{
+			if (_isMobileInputEnabled == false)
+				return;
+
 			if (_actionsAsset == null)
 			{
 				_actionsAsset = InputActionsResolver.ResolveActionAsset();
@@ -248,6 +270,9 @@ namespace TPSBR.UI
 
 		private void SubscribeToInputActions()
 		{
+			if (_isMobileInputEnabled == false)
+				return;
+
 			if (_isSubscribed == true)
 				return;
 
@@ -641,6 +666,11 @@ namespace TPSBR.UI
 			}
 
 			return rect;
+		}
+
+		private bool ShouldProcessMobileInput()
+		{
+			return Application.isMobilePlatform || (Context.Settings != null && Context.Settings.SimulateMobileInput);
 		}
 	}
 }

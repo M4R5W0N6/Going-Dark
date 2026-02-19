@@ -24,12 +24,12 @@ namespace TPSBR
 			{
 				_renderLookInputRaw = _lookAction.ReadValue<Vector2>();
 				Vector2 lookDelta = _renderLookInputRaw * 0.075f;
-				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), Global.RuntimeSettings.Sensitivity, _lookResponsivity);
+				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), GetLookSensitivity(), _lookResponsivity, _lookAction.activeControl);
 			}
 
 			if (_agent.Character.CharacterController.FixedData.Aim == true)
 			{
-				lookRotationDelta *= Global.RuntimeSettings.AimSensitivity;
+				lookRotationDelta *= GetAimSensitivity();
 			}
 
 			if (moveDirection.IsZero() == false)

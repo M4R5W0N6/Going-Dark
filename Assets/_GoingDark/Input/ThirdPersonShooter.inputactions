@@ -285,7 +285,7 @@
                     "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "ScaleVector2(x=5,y=5)",
+                    "processors": "",
                     "groups": ";Gamepad",
                     "action": "Look",
                     "isComposite": false,
@@ -294,10 +294,10 @@
                 {
                     "name": "",
                     "id": "8c8e490b-c610-4785-884f-f04217b23ca4",
-                    "path": "<Pointer>/delta",
+                    "path": "<Mouse>/delta",
                     "interactions": "",
-                    "processors": "MouseLookNormalization(OutputScale=20)",
-                    "groups": ";Keyboard&Mouse;Touch",
+                    "processors": "AbsoluteToNormalized(InvertY=false)",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1147,6 +1147,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "Right Stick",
+                    "id": "2f7e1cc3-ec5f-4c1d-9ea8-7a1eb0e8f0f8",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "NormalizedToAbsolute",
+                    "groups": ";Gamepad",
+                    "action": "Point",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "",
                     "id": "e1394cbc-336e-44ce-9ea8-6007ed6193f7",
                     "path": "<Pen>/position",
@@ -1165,17 +1176,6 @@
                     "processors": "",
                     "groups": "Touch",
                     "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "95e5f6e6-7e7c-4d5f-9f9a-9fd2d5c6f4f7",
-                    "path": "<Pointer>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Delta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

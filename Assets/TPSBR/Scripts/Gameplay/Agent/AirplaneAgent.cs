@@ -134,7 +134,7 @@ namespace TPSBR
 			Vector2 lookDelta = _lookAction != null ? _lookAction.ReadValue<Vector2>() * 0.075f : default;
 			_jump |= _jumpAction != null && _jumpAction.WasPressedThisFrame();
 
-			_lookRotationDelta += InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), Global.RuntimeSettings.Sensitivity, 0.025f);
+			_lookRotationDelta += InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), Global.RuntimeSettings.Sensitivity, 0.025f, _lookAction != null ? _lookAction.activeControl : null);
 		}
 
 		// PRIVATE METHODS

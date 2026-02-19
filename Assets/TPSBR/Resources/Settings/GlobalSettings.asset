@@ -110,9 +110,9 @@ MonoBehaviour:
       Type: 2
       BoolValue: 0
       FloatValue:
-        Value: 1
-        MinValue: 0.05
-        MaxValue: 5
+        Value: 25
+        MinValue: 1
+        MaxValue: 100
       IntValue:
         Value: 0
         MinValue: 0

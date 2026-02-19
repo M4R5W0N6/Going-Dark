@@ -5279,6 +5279,7 @@ GameObject:
   - component: {fileID: 3227591614157517285}
   - component: {fileID: 42101657442118405}
   - component: {fileID: 8058901565933001508}
+  - component: {fileID: 947654321098765432}
   m_Layer: 8
   m_Name: AgentBase
   m_TagString: Untagged
@@ -5340,6 +5341,7 @@ MonoBehaviour:
   - {fileID: 4264704789929423561}
   - {fileID: 2084853432409141758}
   - {fileID: 8058901565933001508}
+  - {fileID: 947654321098765432}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8106659039670942066
 MonoBehaviour:
@@ -5357,6 +5359,7 @@ MonoBehaviour:
   _lookResponsivity: 0.02
   _maxRepeatTime: 0.25
   _logMissingInputs: 0
+  _leaning: {fileID: 0}
   _leanSpeed: 5
   _resetSpeed: 0.85
   _moveWeight:
@@ -5809,6 +5812,71 @@ MonoBehaviour:
     m_Bits: 16777481
   _spawnDebugHitPointProxies: 0
   _debugHitPointProxyScale: 0.2
+--- !u!114 &947654321098765432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3de4f72eecd9463bb3f9c5f2c4cf1d6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _leanSpeed: 5
+  _resetSpeed: 0.85
+  _moveWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _lookWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _weightFloor: 0.1
+  _overrideStrength: 1
+  _currentLean: 1
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0

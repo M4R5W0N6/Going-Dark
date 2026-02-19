@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace TPSBR
 {
@@ -29,6 +30,10 @@ namespace TPSBR
 		private InputActionAsset _actionsAsset;
 		private InputAction _escapeAction;
 		private InputAction _middleClickAction;
+		private InputActionMap _uiActionMap;
+		private InputSystemUIInputModule[] _uiInputModules;
+		private bool _isUISystemInputEnabled;
+		private bool _isUISystemInputInitialized;
 
 		// PUBLIC METHODS
 
@@ -67,10 +72,17 @@ namespace TPSBR
 
 		// SceneService INTERFACE
 
+		protected override void OnActivate()
+		{
+			ResolveInputActions();
+			UpdateUISystemInput();
+		}
+
 		protected override void OnTick()
 		{
 			base.OnTick();
 			ResolveInputActions();
+			UpdateUISystemInput();
 
 			if (Context.Runner != null)
 			{
@@ -94,7 +106,6 @@ namespace TPSBR
 
 			if (Context.HasInput == true)
 			{
-				ResolveInputActions();
 				bool toggleCursor = _middleClickAction != null && _middleClickAction.WasPressedThisFrame();
 				if (toggleCursor == true)
 				{
@@ -123,6 +134,52 @@ namespace TPSBR
 
 			_escapeAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "Escape");
 			_middleClickAction ??= InputActionsResolver.FindAndEnable(_actionsAsset, "MiddleClick");
+			_uiActionMap ??= _actionsAsset.FindActionMap("UI", false);
+			if (_uiActionMap != null && IsCursorVisible == false && _uiActionMap.enabled == true)
+			{
+				_uiActionMap.Disable();
+			}
+		}
+
+		private void UpdateUISystemInput()
+		{
+			if (_uiInputModules == null || _uiInputModules.Length == 0)
+			{
+				_uiInputModules = FindObjectsByType<InputSystemUIInputModule>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+			}
+
+			if (_uiActionMap != null)
+			{
+				if (IsCursorVisible == true && _uiActionMap.enabled == false)
+				{
+					_uiActionMap.Enable();
+				}
+				else if (IsCursorVisible == false && _uiActionMap.enabled == true)
+				{
+					_uiActionMap.Disable();
+				}
+			}
+
+			// Keep UI input module active only when the cursor is visible so gameplay mouse aiming
+			// doesn't pay extra per-frame pointer action processing.
+			if (_uiInputModules != null && _uiInputModules.Length > 0)
+			{
+				bool shouldEnable = IsCursorVisible;
+				if (_isUISystemInputInitialized == false || _isUISystemInputEnabled != shouldEnable)
+				{
+					for (int i = 0, count = _uiInputModules.Length; i < count; i++)
+					{
+						InputSystemUIInputModule uiInputModule = _uiInputModules[i];
+						if (uiInputModule != null && uiInputModule.enabled != shouldEnable)
+						{
+							uiInputModule.enabled = shouldEnable;
+						}
+					}
+
+					_isUISystemInputEnabled = shouldEnable;
+					_isUISystemInputInitialized = true;
+				}
+			}
 		}
 
 		// PRIVATE METHODS
@@ -166,3 +223,4 @@ namespace TPSBR
 		}
 	}
 }
+
