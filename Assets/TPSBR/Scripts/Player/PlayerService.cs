@@ -37,6 +37,8 @@ namespace TPSBR
 
 		void IGlobalService.Tick()
 		{
+			EnsureValidPlayerAgent(PlayerData);
+
 			if (PlayerData.IsDirty == true)
 			{
 				SavePlayer();
@@ -80,10 +82,47 @@ namespace TPSBR
 			if (playerData == null)
 			{
 				playerData = new PlayerData(userID);
-				playerData.AgentID = Global.Settings.Agent.GetRandomAgentSetup().ID;
+				AgentSetup setup = Global.Settings.Agent.GetRandomSpawnableAgentSetup();
+				if (setup == null)
+				{
+					setup = Global.Settings.Agent.GetFirstSelectableAgentSetup();
+				}
+
+				if (setup != null)
+				{
+					playerData.AgentID = setup.ID;
+				}
 			};
 
+			EnsureValidPlayerAgent(playerData);
 			return playerData;
+		}
+
+		private bool EnsureValidPlayerAgent(PlayerData playerData)
+		{
+			if (playerData == null || Global.Settings == null || Global.Settings.Agent == null)
+				return false;
+
+			AgentSettings settings = Global.Settings.Agent;
+			AgentSetup selectedSetup = settings.GetAgentSetup(playerData.AgentID);
+			if (settings.IsSelectableAgentSetup(selectedSetup) == true)
+				return false;
+
+			AgentSetup fallbackSetup = settings.GetFirstSelectableAgentSetup();
+			if (fallbackSetup == null)
+			{
+				Debug.LogError("[PlayerService] No selectable agent setup exists. Agent selection cannot be repaired.");
+				return false;
+			}
+
+			if (playerData.AgentID != fallbackSetup.ID)
+			{
+				Debug.LogWarning($"[PlayerService] Repaired invalid AgentID '{playerData.AgentID}' -> '{fallbackSetup.ID}'.");
+				playerData.AgentID = fallbackSetup.ID;
+				return true;
+			}
+
+			return false;
 		}
 
 		private void SavePlayer()

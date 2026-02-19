@@ -42,7 +42,16 @@ namespace TPSBR
 			mouse.MakeCurrent();
 
 			PlayerData playerData = Global.PlayerService.PlayerData;
-			playerData.AgentID  = Global.Settings.Agent.Agents.GetRandom().ID;
+			AgentSetup randomSetup = Global.Settings.Agent.GetRandomSpawnableAgentSetup();
+			if (randomSetup == null)
+			{
+				randomSetup = Global.Settings.Agent.GetFirstSelectableAgentSetup();
+			}
+
+			if (randomSetup != null)
+			{
+				playerData.AgentID = randomSetup.ID;
+			}
 			playerData.Nickname = "Batch" + UnityEngine.Random.Range(1000, 10000);
 
 			if (ApplicationSettings.IsQuickPlay == true)

@@ -47,16 +47,21 @@ namespace TPSBR
 
 		private void InstantiateAgent(string agentID)
 		{
-			if (agentID.HasValue() == false)
-				return;
+			AgentSetup agentSetup = null;
+			if (agentID.HasValue() == true)
+			{
+				agentSetup = Global.Settings.Agent.GetAgentSetup(agentID);
+			}
+			if (Global.Settings.Agent.IsSelectableAgentSetup(agentSetup) == false)
+			{
+				agentSetup = Global.Settings.Agent.GetFirstSelectableAgentSetup();
+			}
 
-			var agentSetup = Global.Settings.Agent.GetAgentSetup(agentID);
-
-			if (agentSetup == null)
+			if (agentSetup == null || agentSetup.MenuAgentPrefab == null)
 				return;
 
 			_agentInstance = Instantiate(agentSetup.MenuAgentPrefab, _agentParent);
-			_agentID = agentID;
+			_agentID = agentSetup.ID;
 		}
 
 		private void ClearAgent()

@@ -24,7 +24,10 @@ namespace TPSBR
 			if (agentID.HasValue() == false)
 				return null;
 
-			return _agents.Find(t => t.ID == agentID);
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			return _agents.Find(t => t != null && t.ID == agentID);
 		}
 
 		public AgentSetup GetAgentSetup(NetworkPrefabRef prefabId)
@@ -32,12 +35,118 @@ namespace TPSBR
 			if (prefabId.IsValid == false)
 				return null;
 
-			return _agents.Find(t => t.AgentPrefab == prefabId);
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			return _agents.Find(t => t != null && t.AgentPrefab == prefabId);
 		}
 
 		public AgentSetup GetRandomAgentSetup()
 		{
-			return _agents[UnityEngine.Random.Range(0, _agents.Length)];
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			int validCount = 0;
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				if (IsSelectableAgentSetup(_agents[i]) == true)
+				{
+					++validCount;
+				}
+			}
+
+			if (validCount <= 0)
+				return null;
+
+			int randomIndex = UnityEngine.Random.Range(0, validCount);
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				AgentSetup setup = _agents[i];
+				if (IsSelectableAgentSetup(setup) == false)
+					continue;
+
+				if (randomIndex == 0)
+					return setup;
+
+				--randomIndex;
+			}
+
+			return null;
+		}
+
+		public AgentSetup GetRandomSpawnableAgentSetup()
+		{
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			int validCount = 0;
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				if (IsSpawnableAgentSetup(_agents[i]) == true)
+				{
+					++validCount;
+				}
+			}
+
+			if (validCount <= 0)
+				return null;
+
+			int randomIndex = UnityEngine.Random.Range(0, validCount);
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				AgentSetup setup = _agents[i];
+				if (IsSpawnableAgentSetup(setup) == false)
+					continue;
+
+				if (randomIndex == 0)
+					return setup;
+
+				--randomIndex;
+			}
+
+			return null;
+		}
+
+		public AgentSetup GetFirstSelectableAgentSetup()
+		{
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				AgentSetup setup = _agents[i];
+				if (IsSelectableAgentSetup(setup) == true)
+					return setup;
+			}
+
+			return null;
+		}
+
+		public AgentSetup GetFirstSpawnableAgentSetup()
+		{
+			if (_agents == null || _agents.Length == 0)
+				return null;
+
+			for (int i = 0; i < _agents.Length; ++i)
+			{
+				AgentSetup setup = _agents[i];
+				if (IsSpawnableAgentSetup(setup) == true)
+					return setup;
+			}
+
+			return null;
+		}
+
+		public bool IsSelectableAgentSetup(AgentSetup setup)
+		{
+			return setup != null &&
+				setup.ID.HasValue() == true;
+		}
+
+		public bool IsSpawnableAgentSetup(AgentSetup setup)
+		{
+			return IsSelectableAgentSetup(setup) == true &&
+				setup.AgentPrefab.IsValid == true;
 		}
 	}
 
