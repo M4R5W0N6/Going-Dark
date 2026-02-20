@@ -259,10 +259,11 @@ namespace TPSBR
 				return;
 			}
 
+			OptionsValue defaultValue = value;
+			string key = _persistencyPrefix + value.Key;
+
 			if (_enablePersistency == true)
 			{
-				string key = _persistencyPrefix + value.Key;
-
 				switch (value.Type)
 				{
 					case EOptionsValueType.Bool:
@@ -280,7 +281,52 @@ namespace TPSBR
 				}
 			}
 
+			if (IsOutOfConfiguredRange(value) == true)
+			{
+				value = defaultValue;
+
+				if (_enablePersistency == true)
+				{
+					PersistentStorage.Delete(key, false);
+				}
+			}
+
 			AddValue(value);
+		}
+
+		private static bool IsOutOfConfiguredRange(OptionsValue value)
+		{
+			switch (value.Type)
+			{
+				case EOptionsValueType.Float:
+				{
+					float currentValue = value.FloatValue.Value;
+					if (float.IsNaN(currentValue) == true || float.IsInfinity(currentValue) == true)
+						return true;
+
+					float minValue = value.FloatValue.MinValue;
+					float maxValue = value.FloatValue.MaxValue;
+					if (maxValue > minValue)
+					{
+						return currentValue < minValue || currentValue > maxValue;
+					}
+
+					return false;
+				}
+				case EOptionsValueType.Int:
+				{
+					int minValue = value.IntValue.MinValue;
+					int maxValue = value.IntValue.MaxValue;
+					if (maxValue > minValue)
+					{
+						return value.IntValue.Value < minValue || value.IntValue.Value > maxValue;
+					}
+
+					return false;
+				}
+			}
+
+			return false;
 		}
 	}
 }

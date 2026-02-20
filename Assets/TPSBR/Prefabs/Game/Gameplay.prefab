@@ -1756,6 +1756,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7759548161034443842}
     - target: {fileID: 5718438956936379577, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
+      propertyPath: _leanAxis
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5718438956936379577, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
       propertyPath: _aimOrigin
       value: 
       objectReference: {fileID: 6676786661328551308}

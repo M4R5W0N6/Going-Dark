@@ -11255,6 +11255,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gameplay
       objectReference: {fileID: 0}
+    - target: {fileID: 7759548161034443842, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: Targets.Array.data[0].Weight
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

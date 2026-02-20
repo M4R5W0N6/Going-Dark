@@ -5771,19 +5771,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de4f72eecd9463bb3f9c5f2c4cf1d6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manualLean: 1
-  _opposingOnly: 0
-  _leanDuration: 0.1
-  _resetSpeed: 0.2
+  _manualLean: 0
+  _opposingOnly: 1
+  _leanDuration: 0.5
+  _resetSpeed: 1
   _moveCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -5792,7 +5792,7 @@ MonoBehaviour:
       value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -5805,10 +5805,10 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -5817,15 +5817,15 @@ MonoBehaviour:
       value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _lookWeight: 1
-  _currentLean: 0.786622
+  _lookWeight: 2
+  _currentLean: 0.9950368
   _lastLeanSign: 1
 --- !u!1 &8107021845495828554
 GameObject:

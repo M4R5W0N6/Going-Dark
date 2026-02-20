@@ -10,6 +10,9 @@ namespace TPSBR
 		// CONSTANTS
 
 		private const float INCH_TO_CM = 2.54f;
+		private const float LOOK_DELTA_SCALE = 0.075f;
+		private const float CONTROLLER_LOOK_REFERENCE_HZ = 125.0f;
+		private const float MOUSE_AUTO_LEAN_REFERENCE_DELTA = 8.0f;
 
 		// PUBLIC METHODS
 
@@ -26,7 +29,7 @@ namespace TPSBR
 			InputControl lookInputControl)
 		{
 			lookRotationDelta *= sensitivity;
-			lookRotationDelta *= GetLookInputSensitivityScale();
+			lookRotationDelta *= GetLookInputSensitivityScale(lookInputControl);
 
 			// If the look rotation responsivity is enabled, calculate average delta instead.
 			if (responsivity > 0.0f)
@@ -47,6 +50,49 @@ namespace TPSBR
 		public static float GetLookInputSensitivityScale()
 		{
 			return 1.0f;
+		}
+
+		public static float GetLookInputSensitivityScale(InputControl lookInputControl)
+		{
+			return 1.0f;
+		}
+
+		public static float GetControllerLookDeltaScale()
+		{
+			return Time.unscaledDeltaTime * CONTROLLER_LOOK_REFERENCE_HZ;
+		}
+
+		public static float GetLookDeltaScale()
+		{
+			return LOOK_DELTA_SCALE;
+		}
+
+		public static float GetGameplayLookSensitivity(float sensitivity)
+		{
+			return Mathf.Max(0.0f, sensitivity);
+		}
+
+		public static float GetLookDeviceNormalizationScale(InputControl lookInputControl)
+		{
+			if (lookInputControl != null && lookInputControl.device is Gamepad)
+				return GetControllerLookDeltaScale();
+
+			return 1.0f;
+		}
+
+		public static Vector2 GetAutoLeanLookInput(Vector2 rawLookInput, InputControl lookInputControl)
+		{
+			if (lookInputControl != null && lookInputControl.device is Gamepad)
+			{
+				return new Vector2(
+					Mathf.Clamp(rawLookInput.x, -1.0f, 1.0f),
+					Mathf.Clamp(rawLookInput.y, -1.0f, 1.0f));
+			}
+
+			float referenceDelta = Mathf.Max(0.0001f, MOUSE_AUTO_LEAN_REFERENCE_DELTA);
+			return new Vector2(
+				Mathf.Clamp(rawLookInput.x / referenceDelta, -1.0f, 1.0f),
+				Mathf.Clamp(rawLookInput.y / referenceDelta, -1.0f, 1.0f));
 		}
 
 		public static float PixelsToCentimeters(float pixels)

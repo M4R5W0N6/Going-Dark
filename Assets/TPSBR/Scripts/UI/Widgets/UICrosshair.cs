@@ -128,6 +128,18 @@ namespace TPSBR.UI
 				}
 			}
 
+			UpdateContextCrosshairViewport(
+				canUseLocalAimData,
+				hasProjectionData,
+				projectionPixelRect,
+				projectionAspect,
+				hasPostBlendCameraPose,
+				postBlendCameraPosition,
+				postBlendCameraRotation,
+				postBlendFieldOfView,
+				hasScreenHitPoint,
+				screenHitPoint);
+
 			if (_crosshairWorldRoot != null && hasProjectionData == true && hasPostBlendCameraPose == true && hasScreenHitPoint == true)
 			{
 				// Main crosshair is always projected from the local peer ScreenHitPoint.
@@ -397,6 +409,44 @@ namespace TPSBR.UI
 
 			Vector3 center = new Vector3(projectionPixelRect.x + projectionPixelRect.width * 0.5f, projectionPixelRect.y + projectionPixelRect.height * 0.5f, 0.0f);
 			SetUIElementScreenPosition(_crosshairWorldRoot, center, 0.0f);
+		}
+
+		private void UpdateContextCrosshairViewport(
+			bool canUseLocalAimData,
+			bool hasProjectionData,
+			Rect projectionPixelRect,
+			float projectionAspect,
+			bool hasPostBlendCameraPose,
+			Vector3 cameraPosition,
+			Quaternion cameraRotation,
+			float cameraFieldOfView,
+			bool hasScreenHitPoint,
+			Vector3 screenHitPoint)
+		{
+			if (Context == null)
+				return;
+
+			Context.HasUICrosshairViewportX = false;
+			Context.UICrosshairViewportX = 0.5f;
+			Context.HasUICrosshairViewport = false;
+			Context.UICrosshairViewport = new Vector2(0.5f, 0.5f);
+
+			if (canUseLocalAimData == false || hasProjectionData == false || hasPostBlendCameraPose == false || hasScreenHitPoint == false)
+				return;
+
+			if (TryProjectWorldToScreen(cameraPosition, cameraRotation, cameraFieldOfView, projectionPixelRect, projectionAspect, screenHitPoint, out Vector3 screenPosition) == false)
+				return;
+
+			if (projectionPixelRect.width <= 0.01f || projectionPixelRect.height <= 0.01f)
+				return;
+
+			float viewportX = Mathf.Clamp01((screenPosition.x - projectionPixelRect.x) / projectionPixelRect.width);
+			float viewportY = Mathf.Clamp01((screenPosition.y - projectionPixelRect.y) / projectionPixelRect.height);
+
+			Context.HasUICrosshairViewportX = true;
+			Context.UICrosshairViewportX = viewportX;
+			Context.HasUICrosshairViewport = true;
+			Context.UICrosshairViewport = new Vector2(viewportX, viewportY);
 		}
 	}
 }

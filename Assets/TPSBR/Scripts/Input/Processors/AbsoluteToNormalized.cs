@@ -12,7 +12,7 @@ namespace TPSBR
 	public sealed class AbsoluteToNormalized : InputProcessor<Vector2>
 	{
 		public float OutputScale = 1.0f;
-		public float Deadzone = 0.08f;
+		public float Deadzone = 0.0f;
 		public bool InvertY = true;
 
 		private const float MIN_VALUE = 0.0001f;
@@ -45,10 +45,10 @@ namespace TPSBR
 				return value;
 
 			float deadzoneSqr = Deadzone * Deadzone;
-			if (value.sqrMagnitude <= deadzoneSqr)
+			if (deadzoneSqr > 0.0f && value.sqrMagnitude <= deadzoneSqr)
 				return Vector2.zero;
 
-			UpdateScaleCache(GetSensitivityScale(), screenWidth, screenHeight);
+			UpdateScaleCache(screenWidth, screenHeight);
 
 			float y = value.y * _scaleY;
 			if (InvertY == true)
@@ -59,31 +59,23 @@ namespace TPSBR
 			return new Vector2(value.x * _scaleX, y);
 		}
 
-		private float GetSensitivityScale()
+		private void UpdateScaleCache(int screenWidth, int screenHeight)
 		{
-			if (Global.RuntimeSettings == null)
-				return 1.0f;
+			float outputScale = Mathf.Max(MIN_VALUE, OutputScale);
 
-			return Mathf.Max(MIN_VALUE, Global.RuntimeSettings.Sensitivity);
-		}
-
-		private void UpdateScaleCache(float sensitivityScale, int screenWidth, int screenHeight)
-		{
-			sensitivityScale = Mathf.Max(MIN_VALUE, sensitivityScale);
-			float outputScale = Mathf.Max(MIN_VALUE, OutputScale * sensitivityScale);
-
-			if (_cachedFrame == Time.frameCount && _cachedScreenWidth == screenWidth && _cachedScreenHeight == screenHeight && _cachedScale == outputScale)
+			if (_cachedFrame == Time.frameCount &&
+				_cachedScreenWidth == screenWidth &&
+				_cachedScreenHeight == screenHeight &&
+				_cachedScale == outputScale)
 			{
 				return;
 			}
 
-			float width = (float)screenWidth;
-			float height = (float)screenHeight;
-			float inverseWidth = 1.0f / Mathf.Max(width, 1.0f);
-			float inverseHeight = 1.0f / Mathf.Max(height, 1.0f);
+			float width = Mathf.Max(1.0f, (float)screenWidth);
+			float height = Mathf.Max(1.0f, (float)screenHeight);
 
-			_scaleX = outputScale * inverseWidth;
-			_scaleY = outputScale * inverseHeight;
+			_scaleX = outputScale / width;
+			_scaleY = outputScale / height;
 
 			_cachedScale = outputScale;
 			_cachedScreenWidth = screenWidth;

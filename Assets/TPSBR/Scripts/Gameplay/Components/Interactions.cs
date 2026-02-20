@@ -35,7 +35,6 @@ namespace TPSBR
 			if (hold == false)
 			{
 				DropItemTimer = default;
-				return;
 			}
 
 			if (_weapons.IsSwitchingWeapon() == true)
@@ -57,6 +56,9 @@ namespace TPSBR
 
 			if (InteractionTarget == null)
 			{
+				if (hold == false)
+					return;
+
 				if (DropItemTimer.IsRunning == false && _weapons.CurrentWeaponSlot > 0 && interact == true)
 				{
 					DropItemTimer = TickTimer.CreateFromSeconds(Runner, _itemDropTime);
@@ -135,45 +137,8 @@ namespace TPSBR
 
 			InteractionTarget = null;
 
-			Vector3 cameraPosition;
-			Vector3 cameraDirection;
-			if (_aiming != null && _aiming.TryGetObservedCameraPose(false, out cameraPosition, out cameraDirection) == true)
-			{
-				_aiming.GetAimPose(false, out _, out Vector3 aimPoint);
-				Vector3 directionToAimPoint = aimPoint - cameraPosition;
-				if (directionToAimPoint.sqrMagnitude > 0.0001f)
-				{
-					cameraDirection = directionToAimPoint.normalized;
-				}
-			}
-			else
-			{
-				var cameraTransform = _character.GetCameraTransform(false);
-				cameraPosition = cameraTransform.Position;
-
-				if (_aiming != null)
-				{
-					_aiming.GetAimPose(false, out _, out Vector3 aimPoint);
-					Vector3 directionToAimPoint = aimPoint - cameraPosition;
-					if (directionToAimPoint.sqrMagnitude > 0.0001f)
-					{
-						cameraDirection = directionToAimPoint.normalized;
-					}
-					else
-					{
-						cameraDirection = _character.GetCameraHandle().forward;
-					}
-				}
-				else
-				{
-					cameraDirection = _character.GetCameraHandle().forward;
-				}
-			}
-
-			if (cameraDirection.sqrMagnitude <= 0.0001f)
-			{
-				cameraDirection = transform.forward;
-			}
+			if (TryGetInteractionRay(out Vector3 cameraPosition, out Vector3 cameraDirection) == false)
+				return;
 
 			var physicsScene = Runner.GetPhysicsScene();
 			int hitCount = physicsScene.SphereCast(cameraPosition, _interactionPrecisionRadius, cameraDirection, _interactionHits, _interactionDistance, _interactionMask, QueryTriggerInteraction.Ignore);
@@ -220,6 +185,57 @@ namespace TPSBR
 			{
 				InteractionTarget = interaction;
 			}
+		}
+
+		private bool TryGetInteractionRay(out Vector3 cameraPosition, out Vector3 cameraDirection)
+		{
+			cameraPosition = default;
+			cameraDirection = default;
+
+			bool useAuthoritativeInputRay = Runner != null && Runner.Stage != default && HasStateAuthority == true &&
+				_character != null && _character.Agent != null && _character.Agent.AgentInput != null;
+
+			if (useAuthoritativeInputRay == true)
+			{
+				GameplayInput fixedInput = _character.Agent.AgentInput.FixedInput;
+				if (fixedInput.HasAimRay == true)
+				{
+					cameraPosition = fixedInput.AimRayOrigin;
+					cameraDirection = fixedInput.AimRayDirection;
+
+					bool invalidInputPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
+					if (invalidInputPosition == false && cameraDirection.sqrMagnitude > 0.0001f)
+					{
+						cameraDirection.Normalize();
+						return true;
+					}
+				}
+			}
+
+			if (_aiming != null && _aiming.TryGetObservedCameraPose(false, out cameraPosition, out cameraDirection) == true)
+				return true;
+
+			if (_character == null)
+				return false;
+
+			var cameraTransform = _character.GetCameraTransform(false);
+			cameraPosition = cameraTransform.Position;
+
+			Transform cameraHandle = _character.GetCameraHandle();
+			cameraDirection = cameraHandle != null ? cameraHandle.forward : transform.forward;
+
+			bool invalidFallbackPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
+			if (invalidFallbackPosition == true || cameraDirection.sqrMagnitude <= 0.0001f)
+			{
+				cameraPosition = transform.position;
+				cameraDirection = transform.forward;
+			}
+
+			if (cameraDirection.sqrMagnitude <= 0.0001f)
+				return false;
+
+			cameraDirection.Normalize();
+			return true;
 		}
 
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]

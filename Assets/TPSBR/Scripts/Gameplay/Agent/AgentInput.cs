@@ -643,9 +643,63 @@ namespace TPSBR
 				return;
 
 			Context.Camera.SyncForGameplayRender();
-			Context.Camera.GetPostBlendCameraPose(out Vector3 cameraPosition, out Quaternion cameraRotation, out _);
+			Context.Camera.GetPostBlendCameraPose(out Vector3 cameraPosition, out Quaternion cameraRotation, out float fieldOfView);
 
 			Vector3 cameraForward = cameraRotation * Vector3.forward;
+
+			Vector2 crosshairViewport = new Vector2(0.5f, 0.5f);
+			if (Context.HasUICrosshairViewport == true)
+			{
+				crosshairViewport = Context.UICrosshairViewport;
+			}
+			else if (Context.HasUICrosshairViewportX == true)
+			{
+				crosshairViewport = new Vector2(Context.UICrosshairViewportX, 0.5f);
+			}
+
+			crosshairViewport.x = Mathf.Clamp01(crosshairViewport.x);
+			crosshairViewport.y = Mathf.Clamp01(crosshairViewport.y);
+
+			float aspect = 0.0f;
+			Camera outputCamera = Context.Camera.Camera;
+			if (outputCamera != null)
+			{
+				Rect pixelRect = outputCamera.pixelRect;
+				if (pixelRect.width > 0.01f && pixelRect.height > 0.01f)
+				{
+					aspect = pixelRect.width / pixelRect.height;
+				}
+				else if (outputCamera.aspect > 0.0001f)
+				{
+					aspect = outputCamera.aspect;
+				}
+			}
+
+			if (aspect <= 0.0001f && Screen.height > 0)
+			{
+				aspect = (float)Screen.width / (float)Screen.height;
+			}
+
+			if (aspect > 0.0001f && fieldOfView > 0.0f && float.IsNaN(fieldOfView) == false)
+			{
+				float tanHalfVerticalFov = Mathf.Tan(fieldOfView * Mathf.Deg2Rad * 0.5f);
+				if (tanHalfVerticalFov > 0.0001f && float.IsNaN(tanHalfVerticalFov) == false)
+				{
+					float normalizedX = crosshairViewport.x * 2.0f - 1.0f;
+					float normalizedY = crosshairViewport.y * 2.0f - 1.0f;
+
+					Vector3 localDirection = new Vector3(
+						normalizedX * tanHalfVerticalFov * aspect,
+						normalizedY * tanHalfVerticalFov,
+						1.0f);
+
+					if (localDirection.sqrMagnitude > 0.0001f)
+					{
+						cameraForward = cameraRotation * localDirection.normalized;
+					}
+				}
+			}
+
 			bool invalidPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
 			if (invalidPosition == true || cameraForward.sqrMagnitude <= 0.0001f)
 				return;

@@ -72,6 +72,10 @@ namespace TPSBR
 		private Transform _aimOrigin;
 		[SerializeField]
 		private Transform _aimTarget;
+		[SerializeField]
+		[Range(0.0f, 1.0f)]
+		[Tooltip("Blends lean offset axis: 0 = VerticalArmLength only, 1 = CameraDistance only.")]
+		private float _leanAxis = 0.5f;
 
 		private int _cameraCullingMask;
 		private CinemachineThirdPersonFollow _thirdPersonFollow;
@@ -324,8 +328,10 @@ namespace TPSBR
 				inverseLeanContribution = Mathf.Clamp01(1.0f - (2.0f * centeredCameraSide));
 			}
 
-			float splitInverseLeanContribution = inverseLeanContribution * 0.5f;
-			float targetVerticalArmLength = _targetVerticalArmLength + splitInverseLeanContribution;
+			float leanAxis = Mathf.Clamp01(_leanAxis);
+			float verticalLeanContribution = inverseLeanContribution * (1.0f - leanAxis);
+			float depthLeanContribution = inverseLeanContribution * leanAxis;
+			float targetVerticalArmLength = _targetVerticalArmLength + verticalLeanContribution;
 			float verticalArmLength = Mathf.Lerp(_thirdPersonFollow.VerticalArmLength, targetVerticalArmLength, t);
 			if (Mathf.Abs(verticalArmLength - targetVerticalArmLength) <= 0.0001f)
 			{
@@ -336,7 +342,7 @@ namespace TPSBR
 				_thirdPersonFollow.VerticalArmLength = verticalArmLength;
 			}
 
-			float targetCameraDistance = _targetCameraDistance + splitInverseLeanContribution;
+			float targetCameraDistance = _targetCameraDistance + depthLeanContribution;
 			float cameraDistance = Mathf.Lerp(_thirdPersonFollow.CameraDistance, targetCameraDistance, t);
 			if (Mathf.Abs(cameraDistance - targetCameraDistance) <= 0.0001f)
 			{

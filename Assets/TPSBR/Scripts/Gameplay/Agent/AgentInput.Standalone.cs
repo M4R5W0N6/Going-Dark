@@ -3,6 +3,7 @@ using Fusion.Addons.KCC;
 namespace TPSBR
 {
 	using UnityEngine;
+	using UnityEngine.InputSystem;
 
 	public sealed partial class AgentInput
 	{
@@ -26,9 +27,15 @@ namespace TPSBR
 
 			if (_lookAction != null)
 			{
-				_renderLookInputRaw = _lookAction.ReadValue<Vector2>();
-				Vector2 lookDelta = _renderLookInputRaw * 0.075f;
-				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), GetLookSensitivity(), _lookResponsivity, _lookAction.activeControl);
+				Vector2 rawLookInput = _lookAction.ReadValue<Vector2>();
+				InputControl activeLookControl = _lookAction.activeControl;
+
+				Vector2 lookInputForRotation = rawLookInput * InputUtility.GetLookDeviceNormalizationScale(activeLookControl);
+
+				Vector2 lookDelta = lookInputForRotation * InputUtility.GetLookDeltaScale();
+				float lookSensitivity = InputUtility.GetGameplayLookSensitivity(GetLookSensitivity());
+				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), lookSensitivity, _lookResponsivity, activeLookControl);
+				_renderLookInputRaw = InputUtility.GetAutoLeanLookInput(rawLookInput, activeLookControl);
 			}
 
 			if (_agent.Character.CharacterController.FixedData.Aim == true)

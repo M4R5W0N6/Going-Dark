@@ -50,7 +50,7 @@ namespace TPSBR
 
 		public float UpdateLeaning(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, float deltaTime)
 		{
-			bool hasDrivingInput = TryGetAutomaticLeanInput(moveInput, lookInput, leanLeftPressed, leanRightPressed, deltaTime, out float currentMove, out float currentLook, out float drivingInput);
+			bool hasDrivingInput = TryGetAutomaticLeanInput(moveInput, lookInput, leanLeftPressed, leanRightPressed, out float currentMove, out float currentLook, out float drivingInput);
 			float leanDelta = 0.0f;
 
 			if (hasDrivingInput == true)
@@ -77,15 +77,15 @@ namespace TPSBR
 			return LeanSide;
 		}
 
-		private bool TryGetAutomaticLeanInput(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, float deltaTime, out float currentMove, out float currentLook, out float drivingInput)
+		private bool TryGetAutomaticLeanInput(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, out float currentMove, out float currentLook, out float drivingInput)
 		{
 			float moveAxis = GetNormalizedHorizontalInput(moveInput);
 			float lookAxis = GetNormalizedHorizontalInput(lookInput);
 			bool hasRawMoveAxis = Mathf.Abs(moveAxis) > 0.0001f;
 			bool hasRawLookAxis = Mathf.Abs(lookAxis) > 0.0001f;
 
-			currentMove = GetWeightedSignedInput(moveAxis, _moveCurve, _moveWeight, false, 0.0f);
-			currentLook = GetWeightedSignedInput(lookAxis, _lookCurve, _lookWeight, true, deltaTime);
+			currentMove = GetWeightedSignedInput(moveAxis, _moveCurve, _moveWeight);
+			currentLook = GetWeightedSignedInput(lookAxis, _lookCurve, _lookWeight);
 			drivingInput = 0.0f;
 			if (TryGetLeanButtonOverride(leanLeftPressed, leanRightPressed, out float overrideInput) == true)
 			{
@@ -103,7 +103,6 @@ namespace TPSBR
 			float moveLeanInput = -currentMove;
 			float lookLeanInput = -currentLook;
 
-			float summedLeanInput = moveLeanInput + lookLeanInput;
 			bool hasOpposingInputs = hasRawMoveAxis == true && hasRawLookAxis == true && Mathf.Sign(moveAxis) != Mathf.Sign(lookAxis);
 
 			if (_opposingOnly == true)
@@ -113,14 +112,17 @@ namespace TPSBR
 					return false;
 				}
 			}
-			else if (hasOpposingInputs == true)
-			{
-				summedLeanInput = Mathf.Abs(summedLeanInput) * Mathf.Sign(moveLeanInput);
-			}
 
-			if (hasMove == true && hasLook == true)
+			float summedLeanInput;
+			if (hasOpposingInputs == true)
 			{
-				summedLeanInput *= 0.5f;
+				float opposingMagnitude = Mathf.Abs(moveLeanInput) + Mathf.Abs(lookLeanInput);
+				float moveSign = Mathf.Sign(moveLeanInput);
+				summedLeanInput = opposingMagnitude * (moveSign == 0.0f ? 1.0f : moveSign);
+			}
+			else
+			{
+				summedLeanInput = moveLeanInput + lookLeanInput;
 			}
 
 			drivingInput = Mathf.Clamp(summedLeanInput, -1.0f, 1.0f);
@@ -147,12 +149,9 @@ namespace TPSBR
 			return completionTime > 0.0f ? (2.0f / completionTime) : 0.0f;
 		}
 
-		private float GetWeightedSignedInput(float signedInput, AnimationCurve weightCurve, float weight, bool useLookFloor, float minimumMagnitude)
+		private float GetWeightedSignedInput(float signedInput, AnimationCurve weightCurve, float weight)
 		{
-			// For look-driven automatic lean, enforce a minimum magnitude based on frame time.
-			// This is equivalent to Mathf.Max(abs(input), deltaTime) for the raw look axis.
-			float floorMagnitude = useLookFloor == true ? minimumMagnitude : 0.0f;
-			float magnitude = Mathf.Max(Mathf.Abs(signedInput), floorMagnitude);
+			float magnitude = Mathf.Abs(signedInput);
 
 			if (magnitude <= 0.0001f)
 				return 0.0f;
@@ -168,11 +167,6 @@ namespace TPSBR
 
 		private float GetNormalizedHorizontalInput(Vector2 input)
 		{
-			if (input.sqrMagnitude > 1.0f)
-			{
-				input.Normalize();
-			}
-
 			return Mathf.Clamp(input.x, -1.0f, 1.0f);
 		}
 	}
