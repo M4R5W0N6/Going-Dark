@@ -54,6 +54,9 @@ namespace TPSBR
 			if (enabled == false)
 				return;
 
+			_hasAppliedState = false;
+			_lastLightEnabled = false;
+
 			if (Application.isPlaying == true && _spotLight != null)
 			{
 				// Keep it off until authority/state is resolved for this instance.
@@ -176,8 +179,7 @@ namespace TPSBR
 			if (Application.isPlaying == false || _agent == null || _spotLight == null)
 				return;
 
-			SceneContext context = _agent.Context;
-			bool isLocalControlled = context != null ? (_agent.HasInputAuthority && context.HasInput) : _agent.HasInputAuthority;
+			bool isLocalControlled = IsLocalVisionOwner();
 			bool lightEnabled = isLocalControlled;
 
 			SyncSpotLightPose(isLocalControlled);
@@ -188,6 +190,33 @@ namespace TPSBR
 			_hasAppliedState = true;
 			_lastLightEnabled = lightEnabled;
 			_spotLight.enabled = lightEnabled;
+		}
+
+		private bool IsLocalVisionOwner()
+		{
+			if (_agent == null || _agent.HasInputAuthority == false)
+				return false;
+
+			SceneContext context = _agent.Context;
+			if (context == null || context.HasInput == false)
+				return false;
+
+			Agent observedAgent = context.ObservedAgent;
+			if (observedAgent != null)
+				return observedAgent == _agent;
+
+			// Observed agent may be briefly unset during handoff/respawn.
+			// Use local active agent as a strict fallback, still scoped to this local context.
+			if (context.NetworkGame != null && context.LocalPlayerRef.IsRealPlayer == true)
+			{
+				Player localPlayer = context.NetworkGame.GetPlayer(context.LocalPlayerRef);
+				if (localPlayer != null && localPlayer.ActiveAgent != null)
+				{
+					return localPlayer.ActiveAgent == _agent;
+				}
+			}
+
+			return false;
 		}
 
 		private void SyncSpotLightPose(bool isLocalControlled)
@@ -238,30 +267,43 @@ namespace TPSBR
 			position = default;
 			rotation = default;
 
-			if (_agent == null || _agent.HasInputAuthority == false || _agent.Context == null || _agent.Context.Camera == null)
+			if (_character == null)
 				return false;
 
 			TransformData fallbackCamera = _character.GetCameraTransform(false);
-			Camera projectionCamera = _agent.Context.Camera.Camera;
-			if (projectionCamera == null)
+			SceneContext sceneContext = _agent != null ? _agent.Context : null;
+			bool hasLocalInputAuthority = _character.HasInputAuthority == true &&
+				sceneContext != null &&
+				sceneContext.HasInput == true &&
+				sceneContext.Camera != null &&
+				IsLocalVisionOwner() == true;
+
+			if (hasLocalInputAuthority == true)
 			{
-				position = fallbackCamera.Position;
-				rotation = fallbackCamera.Rotation;
-				return rotation != default;
+				sceneContext.Camera.SyncForGameplayRender();
+				sceneContext.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out Quaternion postBlendRotation, out _);
+				position = postBlendPosition;
+				rotation = postBlendRotation;
+
+				bool invalidLocalPosition =
+					float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z);
+				bool invalidLocalRotation =
+					float.IsNaN(rotation.x) || float.IsNaN(rotation.y) || float.IsNaN(rotation.z) || float.IsNaN(rotation.w);
+				if (invalidLocalPosition == false && invalidLocalRotation == false && rotation != default)
+					return true;
+
+				return false;
 			}
 
-			Transform cameraTransform = projectionCamera.transform;
-			position = cameraTransform.position;
-			rotation = cameraTransform.rotation;
+			position = fallbackCamera.Position;
+			rotation = fallbackCamera.Rotation;
 
 			bool invalidPosition = float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z);
-			if (invalidPosition == true || rotation == default)
-			{
-				position = fallbackCamera.Position;
-				rotation = fallbackCamera.Rotation;
-			}
+			bool invalidRotation = float.IsNaN(rotation.x) || float.IsNaN(rotation.y) || float.IsNaN(rotation.z) || float.IsNaN(rotation.w);
+			if (invalidPosition == true || invalidRotation == true || rotation == default)
+				return false;
 
-			return rotation != default;
+			return true;
 		}
 	}
 }
