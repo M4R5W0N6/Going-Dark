@@ -321,12 +321,8 @@ namespace TPSBR
 				_thirdPersonFollow.ShoulderOffset = shoulderOffset;
 			}
 
-			float inverseLeanContribution = 0.0f;
-			if (IsSniperAds(observedAgent) == false)
-			{
-				float centeredCameraSide = Mathf.Abs(_thirdPersonFollow.CameraSide - 0.5f);
-				inverseLeanContribution = Mathf.Clamp01(1.0f - (2.0f * centeredCameraSide));
-			}
+			float centeredCameraSide = Mathf.Abs(_thirdPersonFollow.CameraSide - 0.5f);
+			float inverseLeanContribution = Mathf.Clamp01(1.0f - (2.0f * centeredCameraSide));
 
 			float leanAxis = Mathf.Clamp01(_leanAxis);
 			float verticalLeanContribution = inverseLeanContribution * (1.0f - leanAxis);
@@ -437,18 +433,6 @@ namespace TPSBR
 			return null;
 		}
 
-		private static bool IsSniperAds(Agent observedAgent)
-		{
-			if (observedAgent == null || observedAgent.Character == null || observedAgent.Weapons == null)
-				return false;
-			if (observedAgent.Character.CharacterController == null || observedAgent.Character.CharacterController.Data.Aim == false)
-				return false;
-			if (observedAgent.Weapons.CurrentWeapon == null)
-				return false;
-
-			return observedAgent.Weapons.CurrentWeapon.HitType == EHitType.Sniper;
-		}
-
 		private void UpdateScopedLocalVisuals(Agent observedAgent)
 		{
 			if (observedAgent != _scopedVisualsAgent)
@@ -479,12 +463,7 @@ namespace TPSBR
 
 		private bool ShouldHideLocalVisualsForScopedSniper(Agent observedAgent)
 		{
-			if (Context == null || Context.HasInput == false)
-				return false;
-			if (observedAgent == null || observedAgent.HasInputAuthority == false)
-				return false;
-
-			return IsSniperAds(observedAgent);
+			return false;
 		}
 
 		private void RestoreScopedLocalVisuals()

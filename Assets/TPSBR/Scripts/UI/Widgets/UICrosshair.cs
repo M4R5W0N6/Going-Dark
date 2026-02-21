@@ -165,12 +165,13 @@ namespace TPSBR.UI
 			_targetSize = new Vector2(size, size);
 			_resizingGroup.sizeDelta = Vector2.Lerp(_resizingGroup.sizeDelta, _targetSize, Time.deltaTime * _changeSpeed);
 
-			bool showScope = weaponValid == true && weapon.HitType == EHitType.Sniper && agent.Character.CharacterController.Data.Aim == true;
-
-			_armedGroup.SetVisibility(showScope == false && weaponValid);
+			_armedGroup.SetVisibility(weaponValid);
 			_unarmedGroup.SetVisibility(weaponValid == false);
 
-			_sniperScope.SetActive(showScope);
+			if (_sniperScope != null)
+			{
+				_sniperScope.SetActive(false);
+			}
 
 			bool showUndesiredFirePosition = weaponValid == true && isUndesiredTargetPoint == true;
 			bool showFireHitMarker = weaponValid == true && hasProjectionData == true && hasPostBlendCameraPose == true && hasFireHitPoint == true;
