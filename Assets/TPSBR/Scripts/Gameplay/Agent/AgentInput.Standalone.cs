@@ -35,7 +35,12 @@ namespace TPSBR
 				Vector2 lookDelta = lookInputForRotation * InputUtility.GetLookDeltaScale();
 				float lookSensitivity = InputUtility.GetGameplayLookSensitivity(GetLookSensitivity());
 				lookRotationDelta = InputUtility.GetSmoothLookRotationDelta(_smoothLookRotationDelta, new Vector2(-lookDelta.y, lookDelta.x), lookSensitivity, _lookResponsivity, activeLookControl);
-				_renderLookInputRaw = InputUtility.GetAutoLeanLookInput(rawLookInput, activeLookControl);
+
+				float deltaTime = Mathf.Max(Time.unscaledDeltaTime, 0.0001f);
+				float safeLookSensitivity = Mathf.Max(lookSensitivity, 0.0001f);
+				float yawPerSecond = (lookRotationDelta.y / deltaTime) / safeLookSensitivity;
+				float leanLookX = Mathf.Clamp(yawPerSecond, -1.0f, 1.0f);
+				_renderLookInputRaw = new Vector2(leanLookX, 0.0f);
 			}
 
 			if (_agent.Character.CharacterController.FixedData.Aim == true)

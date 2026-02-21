@@ -82,17 +82,7 @@ namespace TPSBR
 
 		public static Vector2 GetAutoLeanLookInput(Vector2 rawLookInput, InputControl lookInputControl)
 		{
-			if (lookInputControl != null && lookInputControl.device is Gamepad)
-			{
-				return new Vector2(
-					Mathf.Clamp(rawLookInput.x, -1.0f, 1.0f),
-					Mathf.Clamp(rawLookInput.y, -1.0f, 1.0f));
-			}
-
-			float referenceDelta = Mathf.Max(0.0001f, MOUSE_AUTO_LEAN_REFERENCE_DELTA);
-			return new Vector2(
-				Mathf.Clamp(rawLookInput.x / referenceDelta, -1.0f, 1.0f),
-				Mathf.Clamp(rawLookInput.y / referenceDelta, -1.0f, 1.0f));
+			return rawLookInput;
 		}
 
 		public static float PixelsToCentimeters(float pixels)

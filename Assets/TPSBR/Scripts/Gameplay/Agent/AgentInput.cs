@@ -789,6 +789,7 @@ namespace TPSBR
 					_renderLookInputRaw,
 					_leanLeftAction != null && _leanLeftAction.IsPressed(),
 					_leanRightAction != null && _leanRightAction.IsPressed(),
+					_renderInput.Aim,
 					Time.unscaledDeltaTime);
 
 			bool isRightSide = leanSide >= 0.5f;

@@ -5,10 +5,9 @@ namespace TPSBR
 	[DefaultExecutionOrder(-10)]
 	public sealed class Leaning : ContextBehaviour
 	{
-		private const float LeanWeightFloor = 0.1f;
 		private const float MinLeanDuration = 0.05f;
 		private const float MaxLeanDuration = 2.0f;
-		private const float ManualLeanOverrideStrength = 2.0f;
+		private const float Epsilon = 0.0001f;
 
 		private enum ELeanDirection
 		{
@@ -16,23 +15,23 @@ namespace TPSBR
 			Right = 1,
 		}
 
-		[SerializeField][Tooltip("Enable lean from manual lean input.")]
-		private bool _manualLean = true;
-		[SerializeField][Tooltip("When true, lean from auto-input is only applied when move and look oppose.")]
-		private bool _opposingOnly = false;
-		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Normalized lean duration from 0 (fastest) to 1 (slowest).")]
-		private float _leanDuration = 0.5f;
-		[SerializeField][Range(0.0f, 2.0f)][Tooltip("Flat lean return speed toward the nearest side, applied every frame.")]
-		private float _resetSpeed = 1.0f;
+		[Header("Input Influence")]
+		[SerializeField][Range(0.0f, 2.0f)][Tooltip("Strength of manual lean buttons. 0 disables manual lean, 2 doubles manual lean strength.")]
+		private float _manualInfluence = 1.0f;
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Strength of move input contribution to automatic lean.")]
+		private float _moveInfluence = 1.0f;
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Strength of look input contribution to automatic lean.")]
+		private float _lookInfluence = 1.0f;
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Additional opposing-input lean strength. 0 keeps base move+look behavior. 1 enforces full opposing support even if move/look influence are zero.")]
+		private float _opposingInfluence = 0.0f;
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Automatic anti-lean while aiming/ADS. 0 keeps full auto lean, 1 fully suppresses auto lean.")]
+		private float _aimingAntiLean = 1.0f;
 
-		[SerializeField]
-		private AnimationCurve _moveCurve = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 1.0f);
-		[SerializeField][Range(0.0f, 2.0f)][Tooltip("Multiplier applied to move auto-lean curve output.")]
-		private float _moveWeight = 1.0f;
-		[SerializeField]
-		private AnimationCurve _lookCurve = AnimationCurve.Linear(0.0f, 1.0f, 1.0f, 1.0f);
-		[SerializeField][Range(0.0f, 2.0f)][Tooltip("Multiplier applied to look auto-lean curve output.")]
-		private float _lookWeight = 1.0f;
+		[Header("Lean Motion")]
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("Overall lean speed scale. 0 is slowest, 1 is fastest.")]
+		private float _leanSpeed = 0.5f;
+		[SerializeField][Range(0.0f, 1.0f)][Tooltip("How strongly lean resets toward nearest side (-1 or 1).")]
+		private float _resetInfluence = 1.0f;
 
 		[SerializeField, HideInInspector]
 		private float _currentLean = 1.0f;
@@ -48,9 +47,20 @@ namespace TPSBR
 			_lastLeanSign = 1.0f;
 		}
 
-		public float UpdateLeaning(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, float deltaTime)
+		public float UpdateLeaning(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, bool isAiming, float deltaTime)
 		{
-			bool hasDrivingInput = TryGetAutomaticLeanInput(moveInput, lookInput, leanLeftPressed, leanRightPressed, out float currentMove, out float currentLook, out float drivingInput);
+			Debug.Log(lookInput);
+			float manualInput = GetManualInput(leanLeftPressed, leanRightPressed);
+			bool hasManualInput = Mathf.Abs(manualInput) > Epsilon;
+
+			bool hasAutomaticInput = TryGetAutomaticLeanInput(moveInput, lookInput, out float currentMove, out float currentLook, out float automaticInput);
+			float aimingAutoScale = isAiming == true ? 1.0f - Mathf.Clamp01(_aimingAntiLean) : 1.0f;
+			automaticInput *= aimingAutoScale;
+			currentMove *= aimingAutoScale;
+			currentLook *= aimingAutoScale;
+
+			float drivingInput = hasManualInput == true ? manualInput : automaticInput;
+			bool hasDrivingInput = Mathf.Abs(drivingInput) > Epsilon || hasAutomaticInput == true;
 			float leanDelta = 0.0f;
 
 			if (hasDrivingInput == true)
@@ -59,17 +69,20 @@ namespace TPSBR
 				leanDelta -= drivingInput * leanSpeed * deltaTime;
 			}
 
-			float currentLeanSign = Mathf.Abs(_currentLean) > 0.0001f ? Mathf.Sign(_currentLean) : _lastLeanSign;
+			float currentLeanSign = Mathf.Abs(_currentLean) > Epsilon ? Mathf.Sign(_currentLean) : _lastLeanSign;
 			float nearestLean = currentLeanSign < 0.0f ? -1.0f : 1.0f;
 			float resetDistance = Mathf.Abs(nearestLean - _currentLean);
 			float resetDirection = Mathf.Sign(nearestLean - _currentLean);
-			float maxInputMagnitude = Mathf.Max(Mathf.Abs(currentMove), Mathf.Abs(currentLook));
+			float maxInputMagnitude = Mathf.Max(
+				Mathf.Abs(manualInput),
+				Mathf.Max(Mathf.Abs(drivingInput), Mathf.Max(Mathf.Abs(currentMove), Mathf.Abs(currentLook))));
 			float inverseInputMagnitude = 1.0f - Mathf.Clamp01(maxInputMagnitude);
-			leanDelta += resetDirection * _resetSpeed * inverseInputMagnitude * resetDistance * deltaTime;
+			float resetStrength = Mathf.Clamp01(_resetInfluence) * inverseInputMagnitude;
+			leanDelta += resetDirection * resetStrength * resetDistance * GetLeanSpeedAtMaxInput() * deltaTime;
 
 			_currentLean += leanDelta;
 			_currentLean = Mathf.Clamp(_currentLean, -1.0f, 1.0f);
-			if (Mathf.Abs(_currentLean) > 0.0001f)
+			if (Mathf.Abs(_currentLean) > Epsilon)
 			{
 				_lastLeanSign = Mathf.Sign(_currentLean);
 			}
@@ -77,97 +90,91 @@ namespace TPSBR
 			return LeanSide;
 		}
 
-		private bool TryGetAutomaticLeanInput(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, out float currentMove, out float currentLook, out float drivingInput)
+		private bool TryGetAutomaticLeanInput(Vector2 moveInput, Vector2 lookInput, out float currentMove, out float currentLook, out float drivingInput)
 		{
-			float moveAxis = GetNormalizedHorizontalInput(moveInput);
-			float lookAxis = GetNormalizedHorizontalInput(lookInput);
-			bool hasRawMoveAxis = Mathf.Abs(moveAxis) > 0.0001f;
-			bool hasRawLookAxis = Mathf.Abs(lookAxis) > 0.0001f;
-
-			currentMove = GetWeightedSignedInput(moveAxis, _moveCurve, _moveWeight);
-			currentLook = GetWeightedSignedInput(lookAxis, _lookCurve, _lookWeight);
 			drivingInput = 0.0f;
-			if (TryGetLeanButtonOverride(leanLeftPressed, leanRightPressed, out float overrideInput) == true)
-			{
-				drivingInput = overrideInput;
-				return true;
-			}
 
-			bool hasMove = Mathf.Abs(currentMove) > 0.0001f;
-			bool hasLook = Mathf.Abs(currentLook) > 0.0001f;
-			if (hasMove == false && hasLook == false)
-			{
+			float moveAxis = GetMoveHorizontalInput(moveInput);
+			float lookAxis = GetLookHorizontalInput(lookInput);
+			bool hasRawMoveAxis = Mathf.Abs(moveAxis) > Epsilon;
+			bool hasRawLookAxis = Mathf.Abs(lookAxis) > Epsilon;
+			bool hasOpposingInputs = hasRawMoveAxis == true && hasRawLookAxis == true && Mathf.Sign(moveAxis) != Mathf.Sign(lookAxis);
+
+			currentMove = GetWeightedSignedInput(moveAxis, _moveInfluence);
+			currentLook = GetWeightedSignedInput(lookAxis, _lookInfluence);
+
+			bool hasMove = Mathf.Abs(currentMove) > Epsilon;
+			bool hasLook = Mathf.Abs(currentLook) > Epsilon;
+
+			if (hasMove == false && hasLook == false && (hasOpposingInputs == false || _opposingInfluence <= Epsilon))
 				return false;
-			}
 
 			float moveLeanInput = -currentMove;
 			float lookLeanInput = -currentLook;
+			float combinedLeanInput = moveLeanInput + lookLeanInput;
 
-			bool hasOpposingInputs = hasRawMoveAxis == true && hasRawLookAxis == true && Mathf.Sign(moveAxis) != Mathf.Sign(lookAxis);
-
-			if (_opposingOnly == true)
+			if (hasOpposingInputs == true && _opposingInfluence > Epsilon)
 			{
-				if (hasOpposingInputs == false)
+				float opposingDirection = -Mathf.Sign(moveAxis);
+				if (opposingDirection == 0.0f)
 				{
-					return false;
+					opposingDirection = -Mathf.Sign(lookAxis);
+				}
+
+				if (opposingDirection != 0.0f)
+				{
+					float opposingMagnitude = Mathf.Min(Mathf.Abs(moveAxis), Mathf.Abs(lookAxis));
+					if (opposingMagnitude > Epsilon)
+					{
+						float targetMagnitude = Mathf.Abs(combinedLeanInput) + opposingMagnitude;
+						float targetLeanInput = opposingDirection * targetMagnitude;
+						combinedLeanInput = Mathf.Lerp(combinedLeanInput, targetLeanInput, Mathf.Clamp01(_opposingInfluence));
+					}
 				}
 			}
 
-			float summedLeanInput;
-			if (hasOpposingInputs == true)
-			{
-				float opposingMagnitude = Mathf.Abs(moveLeanInput) + Mathf.Abs(lookLeanInput);
-				float moveSign = Mathf.Sign(moveLeanInput);
-				summedLeanInput = opposingMagnitude * (moveSign == 0.0f ? 1.0f : moveSign);
-			}
-			else
-			{
-				summedLeanInput = moveLeanInput + lookLeanInput;
-			}
-
-			drivingInput = Mathf.Clamp(summedLeanInput, -1.0f, 1.0f);
-			return true;
+			drivingInput = combinedLeanInput;
+			return Mathf.Abs(drivingInput) > Epsilon;
 		}
 
-		private bool TryGetLeanButtonOverride(bool leanLeftPressed, bool leanRightPressed, out float drivingInputOverride)
+		private float GetManualInput(bool leanLeftPressed, bool leanRightPressed)
 		{
-			drivingInputOverride = 0.0f;
-			if (_manualLean == false)
-				return false;
-
 			if (leanLeftPressed == leanRightPressed)
-				return false;
+				return 0.0f;
 
 			ELeanDirection direction = leanLeftPressed == true ? ELeanDirection.Left : ELeanDirection.Right;
-			drivingInputOverride = direction == ELeanDirection.Left ? ManualLeanOverrideStrength : -ManualLeanOverrideStrength;
-			return true;
+			float clampedManualInfluence = Mathf.Clamp(_manualInfluence, 0.0f, 2.0f);
+			return direction == ELeanDirection.Left ? clampedManualInfluence : -clampedManualInfluence;
 		}
 
 		private float GetLeanSpeedAtMaxInput()
 		{
-			float completionTime = Mathf.Lerp(MinLeanDuration, MaxLeanDuration, Mathf.Clamp01(_leanDuration));
+			float completionTime = Mathf.Lerp(MaxLeanDuration, MinLeanDuration, Mathf.Clamp01(_leanSpeed));
 			return completionTime > 0.0f ? (2.0f / completionTime) : 0.0f;
 		}
 
-		private float GetWeightedSignedInput(float signedInput, AnimationCurve weightCurve, float weight)
+		private float GetWeightedSignedInput(float signedInput, float influence)
 		{
 			float magnitude = Mathf.Abs(signedInput);
+			if (magnitude <= Epsilon)
+				return 0.0f;
 
-			if (magnitude <= 0.0001f)
+			float scaledInfluence = Mathf.Clamp01(influence);
+			if (scaledInfluence <= Epsilon)
 				return 0.0f;
 
 			float inputSign = Mathf.Sign(signedInput);
-			float leanPosition = Mathf.Clamp01(Mathf.Abs(_currentLean));
-
-			float curveValue = weightCurve != null ? weightCurve.Evaluate(leanPosition) : 1.0f;
-			curveValue = Mathf.Max(curveValue, LeanWeightFloor);
-			float scaledWeight = Mathf.Max(0.0f, weight);
-			return inputSign * magnitude * curveValue * scaledWeight;
+			return inputSign * magnitude * scaledInfluence;
 		}
 
-		private float GetNormalizedHorizontalInput(Vector2 input)
+		private float GetMoveHorizontalInput(Vector2 input)
 		{
 			return Mathf.Clamp(input.x, -1.0f, 1.0f);
+		}
+
+		private float GetLookHorizontalInput(Vector2 input)
+		{
+			return input.x;
 		}
 	}
 }
