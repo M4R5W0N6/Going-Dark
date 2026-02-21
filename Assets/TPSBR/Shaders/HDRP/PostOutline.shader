@@ -4,6 +4,8 @@ Shader "Hidden/TPSBR/HDRP/PostOutline"
 	{
 		[HideInInspector] _SceneColorTex("Scene Color", 2D) = "white" {}
 		[HideInInspector] _MaskTex("Mask", 2D) = "white" {}
+		[HideInInspector] _LayerMaskTex("Layer Mask", 2D) = "black" {}
+		[HideInInspector] _LayerMaskEnabled("Layer Mask Enabled", Range(0,1)) = 0
 		[HideInInspector] _Strength("Strength", Range(0,1)) = 1
 		[HideInInspector] _ModeWeights("Mode Weights", Vector) = (0,0,0,0)
 		_OutlineColor("Outline Color", Color) = (0,0,0,1)
@@ -23,33 +25,18 @@ Shader "Hidden/TPSBR/HDRP/PostOutline"
 	TEXTURE2D_X(_VisionMaskTex);
 	TEXTURE2D_X(_HiddenColorTex);
 	TEXTURE2D_X(_HiddenMaskTex);
+	TEXTURE2D_X(_LayerMaskTex);
+	float _LayerMaskEnabled;
 	float _Strength;
 	float4 _ModeWeights;
 	float4 _OutlineColor;
 	float _OutlineThickness;
 
-	float ComputeVisionMask(float mask, float visionControl)
+	float ComputeSideMask(float mask, float2 visionControls)
 	{
-		visionControl = clamp(visionControl, -1.0, 1.0);
-
-		float modeMask = 1.0;
-		if (visionControl > 0.0)
-		{
-			modeMask = lerp(1.0, mask, visionControl);
-		}
-		else if (visionControl < 0.0)
-		{
-			modeMask = lerp(1.0, 1.0 - mask, -visionControl);
-		}
-
-		return saturate(modeMask);
-	}
-
-	float ComputeBlendMask(float mask, float hiddenSignal, float2 controls)
-	{
-		float visionMask = ComputeVisionMask(mask, controls.x);
-		float hiddenControl = saturate(controls.y);
-		return saturate(lerp(visionMask, hiddenControl, saturate(hiddenSignal)));
+		float insideControl = saturate(visionControls.x);
+		float outsideControl = saturate(visionControls.y);
+		return saturate((mask * insideControl) + ((1.0 - mask) * outsideControl));
 	}
 
 	float SampleMask(int2 p)
@@ -67,6 +54,12 @@ Shader "Hidden/TPSBR/HDRP/PostOutline"
 		return saturate(LOAD_TEXTURE2D_X(_HiddenMaskTex, p).r);
 	}
 
+	float SampleLayer(int2 p)
+	{
+		float layerDepth = LOAD_TEXTURE2D_X(_LayerMaskTex, p).r;
+		return step(1e-5, layerDepth) * saturate(_LayerMaskEnabled);
+	}
+
 	float4 FullScreenPass(Varyings varyings) : SV_Target
 	{
 		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(varyings);
@@ -77,27 +70,38 @@ Shader "Hidden/TPSBR/HDRP/PostOutline"
 		float centerRawMask = SampleMask(pixelCoord);
 		float centerHidden = SampleHidden(pixelCoord);
 		float centerHiddenInVision = SampleHiddenInVision(pixelCoord);
-		float centerVisionMask = ComputeVisionMask(centerRawMask, _ModeWeights.x);
-		float hiddenControl = saturate(_ModeWeights.y);
+		float centerLayerMask = SampleLayer(pixelCoord);
+		float centerVisionMask = ComputeSideMask(centerRawMask, _ModeWeights.xy);
+		float hiddenControl = saturate(_ModeWeights.z);
+		float hiddenVisibility = saturate(centerHidden * centerHiddenInVision * centerRawMask);
+		float sceneVisibility = 1.0 - hiddenVisibility;
 
 		float depth = LoadCameraDepth(positionSS);
 		if (depth == UNITY_RAW_FAR_CLIP_VALUE)
 			return sceneColor;
 
 		int t = max(1, (int)round(_OutlineThickness));
-		float mL = ComputeVisionMask(SampleMask(pixelCoord + int2(-t, 0)), _ModeWeights.x);
-		float mR = ComputeVisionMask(SampleMask(pixelCoord + int2( t, 0)), _ModeWeights.x);
-		float mU = ComputeVisionMask(SampleMask(pixelCoord + int2(0, -t)), _ModeWeights.x);
-		float mD = ComputeVisionMask(SampleMask(pixelCoord + int2(0,  t)), _ModeWeights.x);
+		float mL = SampleMask(pixelCoord + int2(-t, 0));
+		float mR = SampleMask(pixelCoord + int2( t, 0));
+		float mU = SampleMask(pixelCoord + int2(0, -t));
+		float mD = SampleMask(pixelCoord + int2(0,  t));
 		float hL = SampleHidden(pixelCoord + int2(-t, 0));
 		float hR = SampleHidden(pixelCoord + int2( t, 0));
 		float hU = SampleHidden(pixelCoord + int2(0, -t));
 		float hD = SampleHidden(pixelCoord + int2(0,  t));
+		float lL = SampleLayer(pixelCoord + int2(-t, 0));
+		float lR = SampleLayer(pixelCoord + int2( t, 0));
+		float lU = SampleLayer(pixelCoord + int2(0, -t));
+		float lD = SampleLayer(pixelCoord + int2(0,  t));
 
-		float edgeVision = max(max(abs(centerVisionMask - mL), abs(centerVisionMask - mR)), max(abs(centerVisionMask - mU), abs(centerVisionMask - mD)));
+		float edgeVisionRaw = max(max(abs(centerRawMask - mL), abs(centerRawMask - mR)), max(abs(centerRawMask - mU), abs(centerRawMask - mD)));
+		float edgeVision = edgeVisionRaw * centerVisionMask * sceneVisibility;
 		float edgeHidden = max(max(abs(centerHidden - hL), abs(centerHidden - hR)), max(abs(centerHidden - hU), abs(centerHidden - hD)));
-		float hiddenGate = centerHidden * centerHiddenInVision;
-		float edge = lerp(edgeVision * centerVisionMask, edgeHidden * hiddenControl * centerHiddenInVision, hiddenGate);
+		float hiddenGate = hiddenVisibility * hiddenControl;
+		float edgeLayerRaw = max(max(abs(centerLayerMask - lL), abs(centerLayerMask - lR)), max(abs(centerLayerMask - lU), abs(centerLayerMask - lD)));
+		float layerGate = centerLayerMask * centerVisionMask * sceneVisibility;
+		float edgeLayer = edgeLayerRaw * layerGate;
+		float edge = max(edgeVision, max(edgeHidden * hiddenGate, edgeLayer));
 		float tBlend = saturate(edge * _Strength * _OutlineColor.a);
 		float3 composed = lerp(sceneColor.rgb, _OutlineColor.rgb, tBlend);
 		return float4(composed, sceneColor.a);

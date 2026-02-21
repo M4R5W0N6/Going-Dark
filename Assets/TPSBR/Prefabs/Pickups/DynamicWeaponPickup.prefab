@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4293421684965784907}
   - component: {fileID: 5266773143233988680}
   - component: {fileID: 4134556668991104137}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: DynamicWeaponPickup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,6 +54,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4293421684965784907}
   - {fileID: 4134556668991104137}
+  ForceRemoteRenderTimeframe: 0
 --- !u!114 &4293421684965784907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,8 +68,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _despawnTime: 60
-  _fullOutlineDistance: 5
-  _noOutlineDistance: 10
 --- !u!54 &5266773143233988680
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -76,10 +75,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4520707987917204161}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 12
+  m_LinearDamping: 0
+  m_AngularDamping: 12
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -108,6 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0.15
   SyncScale: 0
   SyncParent: 0
   _interpolationTarget: {fileID: 0}

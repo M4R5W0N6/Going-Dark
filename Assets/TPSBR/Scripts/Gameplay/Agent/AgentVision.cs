@@ -10,7 +10,8 @@ namespace TPSBR
 	public sealed class AgentVision : MonoBehaviour
 	{
 		private const float TPSBR_TARGET_RAY_DISTANCE = 500.0f;
-		private const string LOCAL_OBJECT_LAYER_NAME = "Local";
+		private const string DEFAULT_OBJECT_LAYER_NAME = "Default";
+		private const string HIDDEN_OBJECT_LAYER_NAME = "Hidden";
 
 		public uint VisionLightLayerMask
 		{
@@ -41,7 +42,7 @@ namespace TPSBR
 		private float _initialInnerOuterDelta;
 		private bool _hasCachedInitialAngles;
 		private bool _didLogMissingAgent;
-		private bool _didLogMissingLocalLayer;
+		private bool _didLogMissingCullingLayers;
 
 		private void Awake()
 		{
@@ -107,17 +108,36 @@ namespace TPSBR
 			if (_spotLight == null)
 				return;
 
-			int localLayer = LayerMask.NameToLayer(LOCAL_OBJECT_LAYER_NAME);
-			if (localLayer >= 0)
+			int defaultLayer = LayerMask.NameToLayer(DEFAULT_OBJECT_LAYER_NAME);
+			int hiddenLayer = LayerMask.NameToLayer(HIDDEN_OBJECT_LAYER_NAME);
+
+			int cullingMask = 0;
+			if (defaultLayer >= 0)
 			{
-				_spotLight.cullingMask &= ~(1 << localLayer);
+				cullingMask |= 1 << defaultLayer;
+			}
+			if (hiddenLayer >= 0)
+			{
+				cullingMask |= 1 << hiddenLayer;
+			}
+
+			if (cullingMask != 0)
+			{
+				int constrainedMask = _spotLight.cullingMask & cullingMask;
+				if (constrainedMask == 0)
+				{
+					// Safety fallback if current mask doesn't overlap allowed layers.
+					constrainedMask = cullingMask;
+				}
+
+				_spotLight.cullingMask = constrainedMask;
 				return;
 			}
 
-			if (_didLogMissingLocalLayer == false)
+			if (_didLogMissingCullingLayers == false)
 			{
-				Debug.LogWarning($"[AgentVision] Object layer '{LOCAL_OBJECT_LAYER_NAME}' not found. Vision light will not exclude local visuals by culling mask.", this);
-				_didLogMissingLocalLayer = true;
+				Debug.LogWarning($"[AgentVision] Could not resolve object layers '{DEFAULT_OBJECT_LAYER_NAME}'/'{HIDDEN_OBJECT_LAYER_NAME}'. Vision light culling mask was not constrained.", this);
+				_didLogMissingCullingLayers = true;
 			}
 		}
 

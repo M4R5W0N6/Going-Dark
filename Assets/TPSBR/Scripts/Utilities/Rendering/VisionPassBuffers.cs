@@ -17,6 +17,7 @@ namespace TPSBR
 		public static RTHandle LocalDepth { get; private set; }
 		public static RTHandle HiddenColor { get; private set; }
 		public static RTHandle SceneColorCopy { get; private set; }
+		public static RTHandle PostLayerMask { get; private set; }
 
 		public static void Ensure()
 		{
@@ -96,6 +97,18 @@ namespace TPSBR
 					useDynamicScale: true,
 					name: "VisionSceneColorCopy");
 			}
+
+			if (PostLayerMask == null)
+			{
+				PostLayerMask = RTHandles.Alloc(
+					Vector2.one,
+					TextureXR.slices,
+					dimension: TextureXR.dimension,
+					colorFormat: GraphicsFormat.R32_SFloat,
+					useDynamicScale: true,
+					name: "VisionPostLayerMask");
+			}
+
 		}
 
 		public static void MarkCompositeExecuted(int cameraId)
@@ -118,6 +131,7 @@ namespace TPSBR
 			RTHandles.Release(LocalDepth);
 			RTHandles.Release(HiddenColor);
 			RTHandles.Release(SceneColorCopy);
+			RTHandles.Release(PostLayerMask);
 
 			VisionMask = null;
 			HiddenMask = null;
@@ -126,6 +140,7 @@ namespace TPSBR
 			LocalDepth = null;
 			HiddenColor = null;
 			SceneColorCopy = null;
+			PostLayerMask = null;
 			LastCompositeFrame = -1;
 			LastCompositeCameraId = -1;
 		}

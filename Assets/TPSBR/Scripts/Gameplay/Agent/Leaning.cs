@@ -49,7 +49,6 @@ namespace TPSBR
 
 		public float UpdateLeaning(Vector2 moveInput, Vector2 lookInput, bool leanLeftPressed, bool leanRightPressed, bool isAiming, float deltaTime)
 		{
-			Debug.Log(lookInput);
 			float manualInput = GetManualInput(leanLeftPressed, leanRightPressed);
 			bool hasManualInput = Mathf.Abs(manualInput) > Epsilon;
 

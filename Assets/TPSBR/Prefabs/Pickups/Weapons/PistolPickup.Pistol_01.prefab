@@ -8,9 +8,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7320660508273703153}
     m_Modifications:
+    - target: {fileID: 1039771782396844, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173718274897694, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1247909356318324, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 1710767275942618, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
       propertyPath: m_Name
       value: Gun
+      objectReference: {fileID: 0}
+    - target: {fileID: 1710767275942618, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1965659501398006, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 4250219561922860, guid: 4a468707c86c0894b87ae2408982ca9f, type: 3}
       propertyPath: m_RootOrder
@@ -147,11 +167,11 @@ PrefabInstance:
       value: 3546145489
       objectReference: {fileID: 0}
     - target: {fileID: 6727132063299379605, guid: 3a8bda49c86a2ba479189c50e7fb0b37, type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 7250423493530358375
       objectReference: {fileID: 0}
     - target: {fileID: 6727132063299379605, guid: 3a8bda49c86a2ba479189c50e7fb0b37, type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 295635235069046186
       objectReference: {fileID: 0}
     - target: {fileID: 8017275584695234895, guid: 3a8bda49c86a2ba479189c50e7fb0b37, type: 3}

@@ -628,12 +628,12 @@ MonoBehaviour:
     - rid: 2616474014005854289
       type: {class: VisionMaskPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Vision Mask Pass
+        m_Name: Create Vision Mask
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _lightLayerMask: 128
         _localLayerMask:
@@ -642,12 +642,12 @@ MonoBehaviour:
     - rid: 2616474014005854293
       type: {class: VisionHiddenPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Vision Hidden Pass
+        m_Name: Create Hidden Mask
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _hiddenLayerMask:
           serializedVersion: 2
@@ -655,18 +655,18 @@ MonoBehaviour:
     - rid: 2616474014005854297
       type: {class: VisionCompositePass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Vision Composite Pass
+        m_Name: Composite Vision & Hidden
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _renderMode: 0
     - rid: 2616474032983507286
       type: {class: FullscreenPostPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Depth Pass
+        m_Name: Apply Depth
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
@@ -674,8 +674,9 @@ MonoBehaviour:
         passFoldout: 0
         m_Version: 0
         _shader: {fileID: 4800000, guid: 29d49475aee4422c93cab029390691d0, type: 3}
-        _vision: -0.25
-        _hidden: 0.425
+        _visionInside: 0.95
+        _visionOutside: 1
+        _hidden: 0.5
         _strength: 1
         _tintColor: {r: 0.32520467, g: 0.33688918, b: 0.33962262, a: 1}
         _saturationStrength: 0
@@ -687,10 +688,13 @@ MonoBehaviour:
         _outlineThickness: 1
         _depthDistance: 500
         _depthAttenuationPower: 0.95
+        _renderLayerMask:
+          serializedVersion: 2
+          m_Bits: 0
     - rid: 2616474032983507289
       type: {class: FullscreenPostPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Blur Pass
+        m_Name: Apply Blur
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
@@ -698,7 +702,8 @@ MonoBehaviour:
         passFoldout: 0
         m_Version: 0
         _shader: {fileID: 4800000, guid: 20d86bb5f9234435a21ddd0880c1d074, type: 3}
-        _vision: -0.75
+        _visionInside: 0.05
+        _visionOutside: 1
         _hidden: 0
         _strength: 0.75
         _tintColor: {r: 0.7, g: 0.9, b: 1, a: 1}
@@ -711,10 +716,13 @@ MonoBehaviour:
         _outlineThickness: 1
         _depthDistance: 100
         _depthAttenuationPower: 1
+        _renderLayerMask:
+          serializedVersion: 2
+          m_Bits: 0
     - rid: 2616474032983507292
       type: {class: FullscreenPostPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Outline Pass
+        m_Name: Apply Outline
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
@@ -722,23 +730,27 @@ MonoBehaviour:
         passFoldout: 0
         m_Version: 0
         _shader: {fileID: 4800000, guid: 9063794a00fa4271abce43da37221ab7, type: 3}
-        _vision: -0.1
-        _hidden: 0.333
-        _strength: 1
+        _visionInside: 0.25
+        _visionOutside: 0.005
+        _hidden: 0.5
+        _strength: 0.5
         _tintColor: {r: 0.7, g: 0.9, b: 1, a: 1}
         _saturationStrength: 0
         _overlayTexture: {fileID: 0}
         _textureTiling: {x: 1, y: 1}
         _textureScrollSpeed: {x: 0, y: 0}
         _triplanarSharpness: 8
-        _outlineColor: {r: 1, g: 0.64581203, b: 0, a: 1}
-        _outlineThickness: 1.25
+        _outlineColor: {r: 0.759434, g: 0.961168, b: 1, a: 1}
+        _outlineThickness: 0.5
         _depthDistance: 100
         _depthAttenuationPower: 1
+        _renderLayerMask:
+          serializedVersion: 2
+          m_Bits: 4096
     - rid: 2616474039566467158
       type: {class: FullscreenPostPass, ns: TPSBR, asm: Assembly-CSharp}
       data:
-        m_Name: Color Pass
+        m_Name: Apply Color
         enabled: 1
         targetColorBuffer: 0
         targetDepthBuffer: 0
@@ -746,7 +758,8 @@ MonoBehaviour:
         passFoldout: 0
         m_Version: 0
         _shader: {fileID: 4800000, guid: 82e5a1236de64ac8b1d5c3a0a2a058c4, type: 3}
-        _vision: 0
+        _visionInside: 0
+        _visionOutside: 0.8
         _hidden: 0.25
         _strength: 1
         _tintColor: {r: 0.7, g: 0.9, b: 1, a: 1}
@@ -759,6 +772,9 @@ MonoBehaviour:
         _outlineThickness: 1
         _depthDistance: 100
         _depthAttenuationPower: 1
+        _renderLayerMask:
+          serializedVersion: 2
+          m_Bits: 0
 --- !u!1 &2608271525644362106
 GameObject:
   m_ObjectHideFlags: 0

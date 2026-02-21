@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace TPSBR
 {
@@ -55,6 +56,8 @@ namespace TPSBR
 		private Camera _camera;
 		[SerializeField]
 		private AudioListener _audioListener;
+		[SerializeField]
+		private CustomPassVolume _customPassVolume;
 		[SerializeField]
 		private ShakeEffect _shakeEffect;
 		private CinemachineCamera _cinemachineCamera => _cinemachineBrain != null ? _cinemachineBrain.ActiveVirtualCamera as CinemachineCamera : null;
@@ -151,6 +154,11 @@ namespace TPSBR
 				if (runtimeCamera != null)
 				{
 					runtimeCamera.enabled = cameraEnabled;
+				}
+				CustomPassVolume runtimeCustomPassVolume = ResolveCustomPassVolume();
+				if (runtimeCustomPassVolume != null)
+				{
+					runtimeCustomPassVolume.enabled = cameraEnabled;
 				}
 
 				// We are just switching culling mask as disabling would mean more complex camera setup to not stop UI rendering
@@ -814,6 +822,29 @@ namespace TPSBR
 
 			Transform searchRoot = transform.parent != null ? transform.parent : transform;
 			return searchRoot.GetComponentInChildren<CinemachineBrain>(true);
+		}
+
+		private CustomPassVolume ResolveCustomPassVolume()
+		{
+			if (_customPassVolume != null)
+				return _customPassVolume;
+
+			Camera outputCamera = ResolveRenderCamera();
+			if (outputCamera != null && outputCamera.TryGetComponent(out CustomPassVolume outputCameraVolume))
+			{
+				_customPassVolume = outputCameraVolume;
+				return _customPassVolume;
+			}
+
+			if (_camera != null && _camera.TryGetComponent(out CustomPassVolume cameraVolume))
+			{
+				_customPassVolume = cameraVolume;
+				return _customPassVolume;
+			}
+
+			Transform searchRoot = transform.parent != null ? transform.parent : transform;
+			_customPassVolume = searchRoot.GetComponentInChildren<CustomPassVolume>(true);
+			return _customPassVolume;
 		}
 
 		private void CachePostBlendCameraPose()

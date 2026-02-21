@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6352151470713455112}
   - component: {fileID: 7085287599532876375}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SideCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 547310556397903740}
   - component: {fileID: 5049686685103501534}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SideCollider (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1708100450523124968}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -182,7 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1708100450671474993}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: HUDPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 1708100450679120186}
   - component: {fileID: 1708100450679120184}
   - component: {fileID: 1708100450679120185}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: LidLocked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,6 +262,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -283,9 +288,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1708100450708126175
 GameObject:
@@ -296,7 +303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1708100450708126174}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,7 +341,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1708100450735829040}
   - component: {fileID: 1708100450735829047}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: KCCObstacle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +395,7 @@ GameObject:
   - component: {fileID: 1708100450755852143}
   - component: {fileID: 1708100450755852141}
   - component: {fileID: 1708100450755852142}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: LidUnlocked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -435,6 +442,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -456,9 +468,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1708100450960633998
 GameObject:
@@ -514,6 +528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25689a0a2c93b2a4b8bbf4420b12d6c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
   _autoCloseTime: 25
   _unlockTime: 40
   _startState: 1
@@ -602,6 +617,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1708100450960633986}
+  ForceRemoteRenderTimeframe: 0
 --- !u!111 &1708100450960633996
 Animation:
   m_ObjectHideFlags: 0
@@ -610,7 +626,7 @@ Animation:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708100450960633998}
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 4
   m_Animation: {fileID: 7400000, guid: d33e238ef847604449df19bfcc23ce3c, type: 2}
   m_Animations:
   - {fileID: 7400000, guid: 38dfd97675fad834291a91d2a564f655, type: 2}
@@ -618,6 +634,7 @@ Animation:
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
+  m_UpdateMode: 0
   m_CullingType: 0
 --- !u!65 &1708100450960633985
 BoxCollider:
@@ -649,7 +666,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1902573880166076804}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: PickupTransform1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -683,7 +700,7 @@ GameObject:
   - component: {fileID: 3587972941648643198}
   - component: {fileID: 9051639076483246905}
   - component: {fileID: 2676748689349838254}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -730,6 +747,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -751,9 +773,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &2676748689349838254
 BoxCollider:
@@ -786,7 +810,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1635201792236871238}
   - component: {fileID: 5839550203938036869}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SideCollider (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -838,7 +862,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5384783977642912115}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: WeaponTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -870,7 +894,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1453681165795510309}
   - component: {fileID: 4148034653968610438}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SideCollider (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -924,7 +948,7 @@ GameObject:
   - component: {fileID: 6352428161742281633}
   - component: {fileID: 6257035811917401114}
   - component: {fileID: 7445570749907807910}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: crate 02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -971,6 +995,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -992,9 +1021,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &5344287574071720621
 GameObject:
@@ -1005,7 +1036,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1786731465062042743}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: PickupTransform2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1038,7 +1069,7 @@ GameObject:
   - component: {fileID: 3260633528194389451}
   - component: {fileID: 5474883811483405347}
   - component: {fileID: 8046687650521345275}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: AudioEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1071,6 +1102,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 243265986909122044, guid: 5fe66330c489e4544ba809ba6cc86e2b, type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -1238,7 +1270,7 @@ GameObject:
   - component: {fileID: 149160494648677763}
   - component: {fileID: 8060187677330909202}
   - component: {fileID: 7399581704422206107}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: crate 02_cap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1285,6 +1317,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1306,9 +1343,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &7399581704422206107
 BoxCollider:

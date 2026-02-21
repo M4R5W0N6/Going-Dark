@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1573407973551653719}
   - component: {fileID: 8512152418355915017}
   - component: {fileID: 5262848806163570071}
-  m_Layer: 9
+  m_Layer: 12
   m_Name: Grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,6 +58,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -79,9 +84,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1001 &2769364576212169075
 PrefabInstance:
@@ -144,11 +151,11 @@ PrefabInstance:
       value: 1472304780
       objectReference: {fileID: 0}
     - target: {fileID: 6727132063299379605, guid: 17580a6c632e05f409085fc2dd33f57c, type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 8430137235229266119
       objectReference: {fileID: 0}
     - target: {fileID: 6727132063299379605, guid: 17580a6c632e05f409085fc2dd33f57c, type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -6138091791125057144
       objectReference: {fileID: 0}
     - target: {fileID: 8017275584695234895, guid: 17580a6c632e05f409085fc2dd33f57c, type: 3}

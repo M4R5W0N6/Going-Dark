@@ -10,7 +10,8 @@ namespace TPSBR.EditorTools
 		protected override PassUIFlag commonPassUIFlags => PassUIFlag.Name;
 
 		private SerializedProperty _shader;
-		private SerializedProperty _vision;
+		private SerializedProperty _visionInside;
+		private SerializedProperty _visionOutside;
 		private SerializedProperty _hidden;
 		private SerializedProperty _strength;
 		private SerializedProperty _tintColor;
@@ -23,12 +24,14 @@ namespace TPSBR.EditorTools
 		private SerializedProperty _outlineThickness;
 		private SerializedProperty _depthDistance;
 		private SerializedProperty _depthAttenuationPower;
+		private SerializedProperty _renderLayerMask;
 		private const string DEFAULT_SHADER_NAME = "Hidden/TPSBR/HDRP/PostGreyscale";
 
 		protected override void Initialize(SerializedProperty customPass)
 		{
 			_shader = customPass.FindPropertyRelative("_shader");
-			_vision = customPass.FindPropertyRelative("_vision");
+			_visionInside = customPass.FindPropertyRelative("_visionInside");
+			_visionOutside = customPass.FindPropertyRelative("_visionOutside");
 			_hidden = customPass.FindPropertyRelative("_hidden");
 			_strength = customPass.FindPropertyRelative("_strength");
 			_tintColor = customPass.FindPropertyRelative("_tintColor");
@@ -41,6 +44,7 @@ namespace TPSBR.EditorTools
 			_outlineThickness = customPass.FindPropertyRelative("_outlineThickness");
 			_depthDistance = customPass.FindPropertyRelative("_depthDistance");
 			_depthAttenuationPower = customPass.FindPropertyRelative("_depthAttenuationPower");
+			_renderLayerMask = customPass.FindPropertyRelative("_renderLayerMask");
 		}
 
 		protected override void DoPassGUI(SerializedProperty customPass, Rect rect)
@@ -53,9 +57,21 @@ namespace TPSBR.EditorTools
 				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 			}
 
-			if (_vision != null)
+			if (_renderLayerMask != null)
 			{
-				_vision.floatValue = EditorGUI.Slider(rect, new GUIContent("Vision"), _vision.floatValue, -1.0f, 1.0f);
+				EditorGUI.PropertyField(rect, _renderLayerMask, new GUIContent("Render Layers"));
+				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+			}
+
+			if (_visionInside != null)
+			{
+				_visionInside.floatValue = EditorGUI.Slider(rect, new GUIContent("Vision Inside"), _visionInside.floatValue, 0.0f, 1.0f);
+				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+			}
+
+			if (_visionOutside != null)
+			{
+				_visionOutside.floatValue = EditorGUI.Slider(rect, new GUIContent("Vision Outside"), _visionOutside.floatValue, 0.0f, 1.0f);
 				rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 			}
 
@@ -135,7 +151,7 @@ namespace TPSBR.EditorTools
 		protected override float GetPassHeight(SerializedProperty customPass)
 		{
 			Shader activeShader = GetActiveShader();
-			int lineCount = 4; // Shader + Vision + Hidden + Strength are always shown.
+			int lineCount = 6; // Shader + Render Layers + Vision Inside + Vision Outside + Hidden + Strength.
 			if (ShaderHasProperty(activeShader, "_TintColor")) lineCount++;
 			if (ShaderHasProperty(activeShader, "_SaturationStrength")) lineCount++;
 			if (ShaderHasProperty(activeShader, "_OverlayTex")) lineCount++;

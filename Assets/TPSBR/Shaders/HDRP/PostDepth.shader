@@ -7,6 +7,8 @@ Shader "Hidden/TPSBR/HDRP/PostDepth"
 		[HideInInspector] _HiddenColorTex("Hidden Color", 2D) = "black" {}
 		[HideInInspector] _HiddenMaskTex("Hidden Mask", 2D) = "black" {}
 		[HideInInspector] _HiddenDepthTex("Hidden Depth", 2D) = "black" {}
+		[HideInInspector] _LayerMaskTex("Layer Mask", 2D) = "black" {}
+		[HideInInspector] _LayerMaskEnabled("Layer Mask Enabled", Range(0,1)) = 0
 		[HideInInspector] _Strength("Strength", Range(-1,1)) = 1
 		[HideInInspector] _ModeWeights("Mode Weights", Vector) = (0,0,0,0)
 		_TintColor("Tint Color", Color) = (0.7, 0.9, 1.0, 1.0)
@@ -28,28 +30,30 @@ Shader "Hidden/TPSBR/HDRP/PostDepth"
 	TEXTURE2D_X(_HiddenColorTex);
 	TEXTURE2D_X(_HiddenMaskTex);
 	TEXTURE2D_X(_HiddenDepthTex);
+	TEXTURE2D_X(_LayerMaskTex);
+	float _LayerMaskEnabled;
 	float _Strength;
 	float4 _ModeWeights;
 	float4 _TintColor;
 	float _DepthDistance;
 	float _DepthAttenuationPower;
 
-	float ComputeBlendMask(float mask, float hiddenSignal, float2 controls)
+	float ComputeSideMask(float mask, float2 visionControls)
 	{
-		float visionControl = clamp(controls.x, -1.0, 1.0);
-		float hiddenControl = saturate(controls.y);
+		float insideControl = saturate(visionControls.x);
+		float outsideControl = saturate(visionControls.y);
+		return saturate((mask * insideControl) + ((1.0 - mask) * outsideControl));
+	}
 
-		float modeMask = 1.0;
-		if (visionControl > 0.0)
-		{
-			modeMask = lerp(1.0, mask, visionControl);
-		}
-		else if (visionControl < 0.0)
-		{
-			modeMask = lerp(1.0, 1.0 - mask, -visionControl);
-		}
-
-		return saturate(lerp(modeMask, hiddenControl, saturate(hiddenSignal)));
+	float ComputeBlendMask(float visionMask, float hiddenCoverage, float hiddenInVision, float layerCoverage, float3 controls)
+	{
+		float sideMask = ComputeSideMask(visionMask, controls.xy);
+		float hiddenControl = saturate(controls.z);
+		float hiddenVisibility = saturate(hiddenCoverage * hiddenInVision * visionMask);
+		float hiddenSignal = hiddenVisibility * hiddenControl;
+		float layerSignal = saturate(layerCoverage * sideMask);
+		float sceneSignal = saturate(max(sideMask, layerSignal) * (1.0 - hiddenVisibility));
+		return saturate(sceneSignal + hiddenSignal);
 	}
 
 	float4 FullScreenPass(Varyings varyings) : SV_Target
@@ -64,6 +68,8 @@ Shader "Hidden/TPSBR/HDRP/PostDepth"
 		float hiddenInVision = saturate(LOAD_TEXTURE2D_X(_HiddenMaskTex, pixelCoord).r);
 		float hiddenVisible = hiddenCoverage * hiddenInVision;
 		float finalMask = sceneMask;
+		float layerDepth = LOAD_TEXTURE2D_X(_LayerMaskTex, pixelCoord).r;
+		float layerCoverage = step(1e-5, layerDepth) * saturate(_LayerMaskEnabled);
 
 		float depth = LoadCameraDepth(positionSS);
 		float linearSceneDepth = 0.0;
@@ -86,7 +92,7 @@ Shader "Hidden/TPSBR/HDRP/PostDepth"
 			finalLinearDepth = linearHiddenDepth;
 		}
 
-		float blendMask = ComputeBlendMask(finalMask, hiddenVisible, _ModeWeights.xy);
+		float blendMask = ComputeBlendMask(finalMask, hiddenCoverage, hiddenInVision, layerCoverage, _ModeWeights.xyz);
 
 		float depth01 = saturate(finalLinearDepth / max(_DepthDistance, 0.001));
 		depth01 = pow(depth01, max(_DepthAttenuationPower, 0.0));

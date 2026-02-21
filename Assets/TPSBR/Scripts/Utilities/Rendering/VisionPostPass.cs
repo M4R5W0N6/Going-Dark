@@ -10,8 +10,11 @@ namespace TPSBR
 		[SerializeField]
 		private Shader _shader;
 		[SerializeField]
-		[Range(-1.0f, 1.0f)]
-		private float _vision = 0.0f;
+		[Range(0.0f, 1.0f)]
+		private float _visionInside = 1.0f;
+		[SerializeField]
+		[Range(0.0f, 1.0f)]
+		private float _visionOutside = 1.0f;
 		[SerializeField]
 		[Range(0.0f, 1.0f)]
 		private float _hidden = 0.0f;
@@ -37,6 +40,8 @@ namespace TPSBR
 		private float _depthDistance = 100.0f;
 		[SerializeField, Range(0.0f, 1.0f)]
 		private float _depthAttenuationPower = 1.0f;
+		[SerializeField]
+		private LayerMask _renderLayerMask;
 
 		private const string DEFAULT_SHADER_NAME = "Hidden/TPSBR/HDRP/PostGreyscale";
 		private static readonly int SCENE_COLOR_TEX = Shader.PropertyToID("_SceneColorTex");
@@ -45,6 +50,8 @@ namespace TPSBR
 		private static readonly int HIDDEN_COLOR_TEX = Shader.PropertyToID("_HiddenColorTex");
 		private static readonly int HIDDEN_MASK_TEX = Shader.PropertyToID("_HiddenMaskTex");
 		private static readonly int HIDDEN_DEPTH_TEX = Shader.PropertyToID("_HiddenDepthTex");
+		private static readonly int LAYER_MASK_TEX = Shader.PropertyToID("_LayerMaskTex");
+		private static readonly int LAYER_MASK_ENABLED = Shader.PropertyToID("_LayerMaskEnabled");
 		private static readonly int STRENGTH = Shader.PropertyToID("_Strength");
 		private static readonly int MODE_WEIGHTS = Shader.PropertyToID("_ModeWeights");
 		private static readonly int TINT_COLOR = Shader.PropertyToID("_TintColor");
@@ -71,27 +78,39 @@ namespace TPSBR
 			clearFlags = ClearFlag.None;
 		}
 
+		protected override void AggregateCullingParameters(ref ScriptableCullingParameters cullingParameters, HDCamera hdCamera)
+		{
+			if (_renderLayerMask.value != 0)
+			{
+				cullingParameters.cullingMask |= (uint)_renderLayerMask.value;
+			}
+		}
+
 		protected override void Execute(CustomPassContext ctx)
 		{
-			EnsureMaterial();
-
-			if (_material == null || _propertyBlock == null)
-				return;
 			int cameraId = ctx.hdCamera.camera != null ? ctx.hdCamera.camera.GetInstanceID() : -1;
 			if (!VisionPassBuffers.WasCompositeExecutedThisFrame(cameraId))
 				return;
 
+			EnsureMaterial();
+			if (_material == null || _propertyBlock == null)
+				return;
+
 			VisionPassBuffers.Ensure();
+			bool hasLayerMask = _renderLayerMask.value != 0;
+			RTHandle layerMaskTexture = hasLayerMask ? ResolveLayerMaskTexture(ctx) : VisionPassBuffers.PostLayerMask;
 
 			CustomPassUtils.Copy(ctx, ctx.cameraColorBuffer, VisionPassBuffers.SceneColorCopy);
 
 			_propertyBlock.Clear();
 			_propertyBlock.SetTexture(SCENE_COLOR_TEX, VisionPassBuffers.SceneColorCopy);
-			_propertyBlock.SetTexture(VISION_MASK_TEX, VisionPassBuffers.VisionMask);
+			_propertyBlock.SetTexture(VISION_MASK_TEX, VisionPassBuffers.FinalMask);
 			_propertyBlock.SetTexture(MASK_TEX, VisionPassBuffers.FinalMask);
 			_propertyBlock.SetTexture(HIDDEN_COLOR_TEX, VisionPassBuffers.HiddenColor);
 			_propertyBlock.SetTexture(HIDDEN_MASK_TEX, VisionPassBuffers.HiddenMask);
 			_propertyBlock.SetTexture(HIDDEN_DEPTH_TEX, VisionPassBuffers.HiddenDepth);
+			_propertyBlock.SetTexture(LAYER_MASK_TEX, layerMaskTexture);
+			_propertyBlock.SetFloat(LAYER_MASK_ENABLED, hasLayerMask ? 1.0f : 0.0f);
 			_propertyBlock.SetFloat(STRENGTH, _strength);
 			_propertyBlock.SetVector(MODE_WEIGHTS, GetModeWeights());
 			_propertyBlock.SetColor(TINT_COLOR, _tintColor);
@@ -107,6 +126,23 @@ namespace TPSBR
 
 			CoreUtils.SetRenderTarget(ctx.cmd, ctx.cameraColorBuffer, ClearFlag.None);
 			CoreUtils.DrawFullScreen(ctx.cmd, _material, _propertyBlock, shaderPassId: 0);
+		}
+
+		private RTHandle ResolveLayerMaskTexture(CustomPassContext ctx)
+		{
+			if (_renderLayerMask.value == 0)
+				return null;
+
+			CustomPassUtils.RenderDepthFromCamera(
+				ctx,
+				ctx.hdCamera.camera,
+				VisionPassBuffers.PostLayerMask,
+				ctx.cameraDepthBuffer,
+				ClearFlag.Color,
+				_renderLayerMask,
+				RenderQueueType.All);
+
+			return VisionPassBuffers.PostLayerMask;
 		}
 
 		private void EnsureMaterial()
@@ -128,7 +164,7 @@ namespace TPSBR
 
 		private Vector4 GetModeWeights()
 		{
-			return new Vector4(_vision, _hidden, 0.0f, 0.0f);
+			return new Vector4(_visionInside, _visionOutside, _hidden, 0.0f);
 		}
 
 		protected override void Cleanup()
