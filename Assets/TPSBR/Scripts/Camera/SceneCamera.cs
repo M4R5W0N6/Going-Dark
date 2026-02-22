@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEngine.Rendering.HighDefinition;
@@ -6,6 +7,13 @@ namespace TPSBR
 {
 	public class SceneCamera : SceneService
 	{
+		private struct DirectionalShadowState
+		{
+			public Light Light;
+			public bool OriginalEnabled;
+			public LightShadows OriginalShadows;
+		}
+
 		// PUBLIC MEMBERS
 
 		public Camera      Camera
@@ -101,6 +109,8 @@ namespace TPSBR
 		private Vector3 _postBlendCameraPosition;
 		private Quaternion _postBlendCameraRotation = Quaternion.identity;
 		private float _postBlendFieldOfView = 60.0f;
+		private readonly List<DirectionalShadowState> _directionalShadowStates = new List<DirectionalShadowState>(4);
+		private bool _lastDirectionalShadowOwnership;
 
 		// SceneService INTERFACE
 
@@ -117,6 +127,8 @@ namespace TPSBR
 			}
 
 			_hadInputLastTick = Context != null && Context.HasInput;
+			ApplyDirectionalShadowOwnership(false);
+			ApplyDirectionalShadowOwnership(_hadInputLastTick && EnableCamera);
 		}
 
 		protected override void OnTick()
@@ -126,6 +138,7 @@ namespace TPSBR
 				bool hasInput = Context.HasInput;
 				bool cameraEnabled = hasInput && EnableCamera;
 				Camera outputCamera = ResolveRenderCamera();
+				ApplyDirectionalShadowOwnership(cameraEnabled);
 
 				if (hasInput != _hadInputLastTick)
 				{
@@ -173,6 +186,131 @@ namespace TPSBR
 				}
 
 			}
+		}
+
+		private void ApplyDirectionalShadowOwnership(bool ownsDirectionalShadows)
+		{
+			if (_lastDirectionalShadowOwnership == ownsDirectionalShadows && _directionalShadowStates.Count > 0)
+				return;
+
+			CacheDirectionalShadowLights();
+			Light primaryShadowLight = ownsDirectionalShadows == true ? ResolvePrimaryDirectionalShadowLight() : null;
+
+			for (int i = 0; i < _directionalShadowStates.Count; ++i)
+			{
+				DirectionalShadowState state = _directionalShadowStates[i];
+				if (state.Light == null)
+					continue;
+
+				bool targetEnabled = ownsDirectionalShadows == true && state.Light == primaryShadowLight;
+				LightShadows targetShadows = LightShadows.None;
+				if (targetEnabled == true)
+				{
+					targetShadows = state.OriginalShadows != LightShadows.None ? state.OriginalShadows : LightShadows.Soft;
+				}
+				if (state.Light.enabled != targetEnabled)
+				{
+					state.Light.enabled = targetEnabled;
+				}
+				if (state.Light.shadows != targetShadows)
+				{
+					state.Light.shadows = targetShadows;
+				}
+			}
+
+			_lastDirectionalShadowOwnership = ownsDirectionalShadows;
+		}
+
+		private Light ResolvePrimaryDirectionalShadowLight()
+		{
+			if (_directionalShadowStates.Count <= 0)
+				return null;
+
+			Light renderSun = RenderSettings.sun;
+			if (renderSun != null && renderSun.type == LightType.Directional)
+			{
+				for (int i = 0; i < _directionalShadowStates.Count; ++i)
+				{
+					if (_directionalShadowStates[i].Light == renderSun)
+						return renderSun;
+				}
+			}
+
+			for (int i = 0; i < _directionalShadowStates.Count; ++i)
+			{
+				DirectionalShadowState state = _directionalShadowStates[i];
+				if (state.Light != null && state.OriginalShadows != LightShadows.None)
+					return state.Light;
+			}
+
+			for (int i = 0; i < _directionalShadowStates.Count; ++i)
+			{
+				DirectionalShadowState state = _directionalShadowStates[i];
+				if (state.Light != null)
+					return state.Light;
+			}
+
+			return null;
+		}
+
+		private void CacheDirectionalShadowLights()
+		{
+			if (Context == null || Context.Runner == null)
+				return;
+
+			var simulationScene = Context.Runner.SimulationUnityScene;
+			if (simulationScene.IsValid() == false || simulationScene.isLoaded == false)
+				return;
+
+			var sceneLights = simulationScene.GetComponents<Light>(true);
+			for (int i = 0; i < sceneLights.Count; ++i)
+			{
+				Light light = sceneLights[i];
+				if (light == null || light.type != LightType.Directional)
+					continue;
+
+				bool alreadyTracked = false;
+				for (int j = 0; j < _directionalShadowStates.Count; ++j)
+				{
+					if (_directionalShadowStates[j].Light == light)
+					{
+						alreadyTracked = true;
+						break;
+					}
+				}
+
+				if (alreadyTracked == true)
+					continue;
+
+				_directionalShadowStates.Add(new DirectionalShadowState
+				{
+					Light = light,
+					OriginalEnabled = light.enabled,
+					OriginalShadows = light.shadows
+				});
+			}
+		}
+
+		private void RestoreDirectionalShadowOwnership()
+		{
+			for (int i = 0; i < _directionalShadowStates.Count; ++i)
+			{
+				DirectionalShadowState state = _directionalShadowStates[i];
+				if (state.Light == null)
+					continue;
+
+				if (state.Light.enabled != state.OriginalEnabled)
+				{
+					state.Light.enabled = state.OriginalEnabled;
+				}
+				if (state.Light.shadows != state.OriginalShadows)
+				{
+					state.Light.shadows = state.OriginalShadows;
+				}
+			}
+
+			_directionalShadowStates.Clear();
+			_lastDirectionalShadowOwnership = false;
 		}
 
 		private void OnInputOwnershipChanged(bool hasInput)
@@ -419,23 +557,11 @@ namespace TPSBR
 			if (localPlayer != null)
 			{
 				Agent activeAgent = localPlayer.ActiveAgent;
-				if (activeAgent != null)
+				if (activeAgent != null &&
+					activeAgent.Object != null &&
+					Context.Runner != null &&
+					Context.Runner.Exists(activeAgent.Object) == true)
 					return activeAgent;
-			}
-
-			// Multipeer fallback: resolve the local input-authority agent bound to this scene context.
-			Agent[] agents = FindObjectsByType<Agent>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-			for (int i = 0; i < agents.Length; ++i)
-			{
-				Agent agent = agents[i];
-				if (agent == null)
-					continue;
-				if (agent.Context != Context)
-					continue;
-				if (agent.HasInputAuthority == false)
-					continue;
-
-				return agent;
 			}
 
 			return null;
@@ -1007,6 +1133,7 @@ namespace TPSBR
 
 		protected override void OnDeinitialize()
 		{
+			RestoreDirectionalShadowOwnership();
 			base.OnDeinitialize();
 
 			_aimGroup = null;

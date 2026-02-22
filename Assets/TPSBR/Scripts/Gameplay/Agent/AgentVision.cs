@@ -9,9 +9,28 @@ namespace TPSBR
 	[RequireComponent(typeof(Light))]
 	public sealed class AgentVision : MonoBehaviour
 	{
-		private const float TPSBR_TARGET_RAY_DISTANCE = 500.0f;
+		private const float EPSILON = 0.0001f;
 		private const string DEFAULT_OBJECT_LAYER_NAME = "Default";
 		private const string HIDDEN_OBJECT_LAYER_NAME = "Hidden";
+
+		private enum LookAtMode
+		{
+			Fixed,
+			Dynamic,
+			Hybrid,
+		}
+
+		[Header("Vision FoV Mapping")]
+		[SerializeField]
+		[Tooltip("Maps camera FoV ratio to vision-cone FoV ratio. X = CurrentFoV / BaseFoV, Y = VisionFoV / BaseFoV.")]
+		private AnimationCurve _visionFovRatioCurve = AnimationCurve.Linear(0.0f, 0.0f, 2.0f, 2.0f);
+		[SerializeField]
+		[Tooltip("Fixed uses fire transform forward. Dynamic uses fire-origin to fire-hit look-at. Hybrid blends fixed and dynamic directions.")]
+		private LookAtMode _lookAtMode = LookAtMode.Dynamic;
+		[SerializeField]
+		[Range(0.0f, 10.0f)]
+		[Tooltip("Hybrid blend response speed. 0 = instant, higher = smoother/faster response.")]
+		private float _hybridResponseSpeed = 5.0f;
 
 		public uint VisionLightLayerMask
 		{
@@ -39,10 +58,15 @@ namespace TPSBR
 		private bool _hasAppliedState;
 		private bool _lastLightEnabled;
 		private float _lastAppliedViewAngle = -1.0f;
+		private float _baseMappedViewAngle = 60.0f;
 		private float _initialInnerOuterDelta;
 		private bool _hasCachedInitialAngles;
 		private bool _didLogMissingAgent;
 		private bool _didLogMissingCullingLayers;
+		private bool _didLogMissingAimRay;
+		private bool _hasHybridState;
+		private Quaternion _hybridSmoothedRotation = Quaternion.identity;
+		private float _hybridSmoothedAspect = 1.0f;
 
 		private void Awake()
 		{
@@ -81,6 +105,8 @@ namespace TPSBR
 		{
 			_hasAppliedState = false;
 			_lastLightEnabled = false;
+			_hasHybridState = false;
+			_hybridSmoothedAspect = 1.0f;
 			if (_spotLight != null)
 			{
 				_spotLight.enabled = false;
@@ -181,17 +207,73 @@ namespace TPSBR
 			if (_hasCachedInitialAngles == false)
 				return;
 
-			float viewAngle = _character.CurrentFOV;
+			float defaultFov = Mathf.Max(1.0f, _character.BaseFOV);
+			float currentFov = Mathf.Max(1.0f, _character.CurrentFOV);
+			float inputRatio = currentFov / defaultFov;
+			float mappedRatio = _visionFovRatioCurve != null ? _visionFovRatioCurve.Evaluate(inputRatio) : inputRatio;
+			if (float.IsNaN(mappedRatio) == true || float.IsInfinity(mappedRatio) == true)
+			{
+				mappedRatio = inputRatio;
+			}
+
+			float mappedFov = defaultFov * Mathf.Max(0.01f, mappedRatio);
+			float viewAngle = Mathf.Clamp(mappedFov, 1.0f, 179.0f);
+			_baseMappedViewAngle = viewAngle;
 			if (Mathf.Abs(_lastAppliedViewAngle - viewAngle) <= 0.001f)
 				return;
 
 			_lastAppliedViewAngle = viewAngle;
+			ApplySpotLightAngles(viewAngle);
+		}
 
-			if (Mathf.Abs(_spotLight.spotAngle - viewAngle) > 0.001f)
+		private void ApplySpotLightAngles(float spotAngle)
+		{
+			if (_spotLight == null)
+				return;
+
+			float clampedSpotAngle = Mathf.Clamp(spotAngle, 1.0f, 179.0f);
+			if (Mathf.Abs(_spotLight.spotAngle - clampedSpotAngle) > 0.001f)
 			{
-				_spotLight.spotAngle = viewAngle;
-				_spotLight.innerSpotAngle = Mathf.Max(0.0f, viewAngle - _initialInnerOuterDelta);
+				_spotLight.spotAngle = clampedSpotAngle;
 			}
+
+			float targetInnerAngle = Mathf.Max(0.0f, clampedSpotAngle - _initialInnerOuterDelta);
+			if (Mathf.Abs(_spotLight.innerSpotAngle - targetInnerAngle) > 0.001f)
+			{
+				_spotLight.innerSpotAngle = targetInnerAngle;
+			}
+		}
+
+		private void ApplyHybridSpotlightFovCompensation(float hybridAspect)
+		{
+			float baseViewAngle = _lastAppliedViewAngle > 0.0f ? _lastAppliedViewAngle : _baseMappedViewAngle;
+			baseViewAngle = Mathf.Clamp(baseViewAngle, 1.0f, 179.0f);
+
+			float compensation = 1.0f;
+			if (compensation <= 0.0001f)
+			{
+				ApplySpotLightAngles(baseViewAngle);
+				return;
+			}
+
+			float clampedAspect = Mathf.Max(1.0f, hybridAspect);
+			float tanHalfBase = Mathf.Tan(baseViewAngle * Mathf.Deg2Rad * 0.5f);
+			if (tanHalfBase <= EPSILON || float.IsNaN(tanHalfBase))
+			{
+				ApplySpotLightAngles(baseViewAngle);
+				return;
+			}
+
+			float fullCompensatedScale = 1.0f / Mathf.Sqrt(clampedAspect);
+			float tanHalfScale = Mathf.Lerp(1.0f, fullCompensatedScale, compensation);
+			float compensatedTanHalf = tanHalfBase * tanHalfScale;
+			float compensatedViewAngle = Mathf.Atan(compensatedTanHalf) * Mathf.Rad2Deg * 2.0f;
+			if (float.IsNaN(compensatedViewAngle) || float.IsInfinity(compensatedViewAngle))
+			{
+				compensatedViewAngle = baseViewAngle;
+			}
+
+			ApplySpotLightAngles(compensatedViewAngle);
 		}
 
 		private void ApplyState(bool force)
@@ -214,29 +296,20 @@ namespace TPSBR
 
 		private bool IsLocalVisionOwner()
 		{
-			if (_agent == null || _agent.HasInputAuthority == false)
+			if (_agent == null)
 				return false;
 
 			SceneContext context = _agent.Context;
 			if (context == null || context.HasInput == false)
+				return false;
+			if (_agent.HasInputAuthority == false)
 				return false;
 
 			Agent observedAgent = context.ObservedAgent;
 			if (observedAgent != null)
 				return observedAgent == _agent;
 
-			// Observed agent may be briefly unset during handoff/respawn.
-			// Use local active agent as a strict fallback, still scoped to this local context.
-			if (context.NetworkGame != null && context.LocalPlayerRef.IsRealPlayer == true)
-			{
-				Player localPlayer = context.NetworkGame.GetPlayer(context.LocalPlayerRef);
-				if (localPlayer != null && localPlayer.ActiveAgent != null)
-				{
-					return localPlayer.ActiveAgent == _agent;
-				}
-			}
-
-			return false;
+			return true;
 		}
 
 		private void SyncSpotLightPose(bool isLocalControlled)
@@ -245,41 +318,154 @@ namespace TPSBR
 				return;
 
 			TransformData fireTransform = _character.GetFireTransform(false);
-			Vector3 cameraPosition;
-			Quaternion cameraRotation;
-			if (TryGetObservedCameraPose(out cameraPosition, out cameraRotation) == false)
+			Vector3 firePosition = fireTransform.Position;
+			Quaternion targetRotation = fireTransform.Rotation;
+			Vector3 fixedDirection = fireTransform.Rotation * Vector3.forward;
+			if (fixedDirection.sqrMagnitude <= EPSILON)
 			{
-				TransformData cameraTransform = _character.GetCameraTransform(false);
-				cameraPosition = cameraTransform.Position;
-				cameraRotation = cameraTransform.Rotation;
+				fixedDirection = transform.forward;
 			}
-
-			Vector3 targetPoint = fireTransform.Position + transform.forward * TPSBR_TARGET_RAY_DISTANCE;
-			if (_agent != null && _agent.Aiming != null)
+			if (fixedDirection.sqrMagnitude <= EPSILON)
 			{
-				if (_agent.Aiming.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+				fixedDirection = Vector3.forward;
+			}
+			fixedDirection.Normalize();
+
+			if (_lookAtMode == LookAtMode.Dynamic || _lookAtMode == LookAtMode.Hybrid)
+			{
+				if (_agent == null || _agent.Aiming == null ||
+					_agent.Aiming.TryGetCrosshairAndHitPoints(false, out Vector3 aimFireOrigin, out Vector3 cameraHitPoint, out Vector3 characterHitPoint, out _) == false)
 				{
-					targetPoint = targetPosition;
+					if (_didLogMissingAimRay == false)
+					{
+						Debug.LogWarning("[AgentVision] Failed to resolve local crosshair hit point. Vision cone pose update skipped.", this);
+						_didLogMissingAimRay = true;
+					}
+					return;
+				}
+
+				firePosition = aimFireOrigin;
+				Vector3 cameraPosition;
+				Quaternion cameraRotation;
+				if (TryGetObservedCameraPose(out cameraPosition, out cameraRotation) == false)
+				{
+					TransformData cameraTransform = _character.GetCameraTransform(false);
+					cameraPosition = cameraTransform.Position;
+					cameraRotation = cameraTransform.Rotation;
+				}
+
+				Vector3 cameraUp = cameraRotation * Vector3.up;
+				if (cameraUp.sqrMagnitude <= EPSILON)
+				{
+					cameraUp = Vector3.up;
+				}
+
+				Vector3 dynamicDirection;
+				if (_lookAtMode == LookAtMode.Dynamic)
+				{
+					dynamicDirection = characterHitPoint - firePosition;
+					if (dynamicDirection.sqrMagnitude <= EPSILON)
+						return;
+					dynamicDirection.Normalize();
+
+					targetRotation = Quaternion.LookRotation(dynamicDirection, cameraUp);
+					_hasHybridState = false;
+					_hybridSmoothedAspect = 1.0f;
+					ApplySpotLightAngles(_baseMappedViewAngle);
 				}
 				else
 				{
-					_agent.Aiming.GetAimPose(false, out _, out targetPoint);
+					// Hybrid should blend fixed forward with the same dynamic target used by gameplay/undesired marker.
+					dynamicDirection = characterHitPoint - firePosition;
+					if (dynamicDirection.sqrMagnitude <= EPSILON)
+					{
+						dynamicDirection = cameraHitPoint - cameraPosition;
+					}
+					if (dynamicDirection.sqrMagnitude <= EPSILON)
+					{
+						dynamicDirection = cameraRotation * Vector3.forward;
+					}
+					if (dynamicDirection.sqrMagnitude <= EPSILON)
+						return;
+					dynamicDirection.Normalize();
+
+					Vector3 centerDirection = fixedDirection + dynamicDirection;
+					if (centerDirection.sqrMagnitude <= EPSILON)
+					{
+						centerDirection = fixedDirection;
+					}
+					centerDirection.Normalize();
+
+					Vector3 splitVector = Vector3.ProjectOnPlane(dynamicDirection - fixedDirection, centerDirection);
+					Vector3 majorAxis = splitVector.sqrMagnitude > EPSILON ? splitVector.normalized : Vector3.ProjectOnPlane(dynamicDirection, centerDirection);
+					if (majorAxis.sqrMagnitude <= EPSILON)
+					{
+						majorAxis = Vector3.Cross(cameraUp, centerDirection);
+					}
+					if (majorAxis.sqrMagnitude <= EPSILON)
+					{
+						majorAxis = Vector3.Cross(Vector3.up, centerDirection);
+					}
+					if (majorAxis.sqrMagnitude <= EPSILON)
+					{
+						majorAxis = Vector3.right;
+					}
+					majorAxis.Normalize();
+
+					Vector3 upAxis = Vector3.Cross(centerDirection, majorAxis);
+					if (upAxis.sqrMagnitude <= EPSILON)
+					{
+						upAxis = cameraUp;
+					}
+					if (upAxis.sqrMagnitude <= EPSILON)
+					{
+						upAxis = Vector3.up;
+					}
+					upAxis.Normalize();
+
+					float separationAngle = Vector3.Angle(fixedDirection, dynamicDirection);
+					float maxSeparation = 25.0f;
+					float separation01 = Mathf.Clamp01(separationAngle / maxSeparation);
+					separation01 = separation01 * separation01 * (3.0f - 2.0f * separation01);
+					float targetAspect = Mathf.Lerp(1.0f, 1.75f, separation01);
+
+					Quaternion hybridTargetRotation = Quaternion.LookRotation(centerDirection, upAxis);
+					float dt = Mathf.Max(0.0f, Time.unscaledDeltaTime);
+					float response = Mathf.Max(0.0f, _hybridResponseSpeed);
+					float lerpFactor = response <= EPSILON ? 1.0f : (dt > 0.0f ? 1.0f - Mathf.Exp(-response * dt) : 1.0f);
+
+					if (_hasHybridState == false)
+					{
+						_hybridSmoothedRotation = hybridTargetRotation;
+						_hybridSmoothedAspect = targetAspect;
+						_hasHybridState = true;
+					}
+					else
+					{
+						_hybridSmoothedRotation = Quaternion.Slerp(_hybridSmoothedRotation, hybridTargetRotation, lerpFactor);
+						_hybridSmoothedAspect = Mathf.Lerp(_hybridSmoothedAspect, targetAspect, lerpFactor);
+					}
+
+					targetRotation = _hybridSmoothedRotation;
+					ApplyHybridSpotlightFovCompensation(_hybridSmoothedAspect);
 				}
 			}
-
-			Vector3 direction = targetPoint - fireTransform.Position;
-			if (direction.sqrMagnitude <= 0.0001f)
-				return;
-
-			Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, cameraRotation * Vector3.up);
-			if (Vector3.Distance(_spotLight.transform.position, fireTransform.Position) > 0.0001f)
+			else
 			{
-				_spotLight.transform.position = fireTransform.Position;
+				_hasHybridState = false;
+				_hybridSmoothedAspect = 1.0f;
+				ApplySpotLightAngles(_baseMappedViewAngle);
+			}
+			if (Vector3.Distance(_spotLight.transform.position, firePosition) > 0.0001f)
+			{
+				_spotLight.transform.position = firePosition;
 			}
 			if (Quaternion.Angle(_spotLight.transform.rotation, targetRotation) > 0.01f)
 			{
 				_spotLight.transform.rotation = targetRotation;
 			}
+			
+			_didLogMissingAimRay = false;
 		}
 
 		private bool TryGetObservedCameraPose(out Vector3 position, out Quaternion rotation)
@@ -325,5 +511,6 @@ namespace TPSBR
 
 			return true;
 		}
+
 	}
 }

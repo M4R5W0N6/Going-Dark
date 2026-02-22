@@ -268,7 +268,7 @@ MonoBehaviour:
   _validOnlyWithAmmo: 0
   _leftHandTarget: {fileID: 7131331527089721130}
   _hitType: 8
-  _aimFOV: 10
+  _aimFOV: 45
   _displayName: Sniper
   _nameShortcut: 
   _icon: {fileID: 21300000, guid: 46b7bf5c452958e40bfc1d8c5a401344, type: 3}

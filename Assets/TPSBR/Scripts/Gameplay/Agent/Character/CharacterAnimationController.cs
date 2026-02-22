@@ -238,9 +238,9 @@ namespace TPSBR
 				Vector3 targetPoint = weaponHandle.position + transform.forward * 100.0f;
 				if (_agent.Aiming != null)
 				{
-					if (_agent.Aiming.TryGetTargetPosition(false, out _, out Vector3 targetPosition) == true)
+					if (_agent.Aiming.TryGetCrosshairAndHitPoints(false, out _, out _, out Vector3 characterHitPoint, out _) == true)
 					{
-						targetPoint = targetPosition;
+						targetPoint = characterHitPoint;
 					}
 					else
 					{

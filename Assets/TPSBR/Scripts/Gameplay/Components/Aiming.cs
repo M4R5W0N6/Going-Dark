@@ -12,6 +12,9 @@ namespace TPSBR
 		public Vector3 AimPoint               { get; private set; }
 		public Vector3 AimOrigin              { get; private set; }
 		public bool    IsUndesiredTargetPoint { get; private set; }
+		public bool    IsCrosshairOccluded    { get; private set; }
+		public bool    IsCrosshairOnHiddenLayer { get; private set; }
+		public bool    IsCrosshairOnAgent { get; private set; }
 
 		[SerializeField]
 		private float _aimDistance = 40f;
@@ -24,6 +27,16 @@ namespace TPSBR
 		[SerializeField]
 		[Min(0.01f)]
 		private float _debugHitPointProxyScale = 0.15f;
+		[SerializeField]
+		private bool _surfaceDeflection = true;
+		[SerializeField, Range(1, 16)]
+		private int _surfaceDeflectionIterations = 6;
+		[SerializeField, Min(0.05f)]
+		private float _surfaceDeflectionStepDistance = 0.6f;
+		[SerializeField, Min(0.001f)]
+		private float _surfaceDeflectionSurfaceOffset = 0.02f;
+		[SerializeField, Min(0.05f)]
+		private float _surfaceDeflectionMaxTravelDistance = 8.0f;
 
 		private Health     _health;
 		private Weapons    _weapons;
@@ -44,14 +57,24 @@ namespace TPSBR
 				{
 					IsUndesiredTargetPoint = true;
 				}
+				IsCrosshairOccluded = true;
+				IsCrosshairOnHiddenLayer = false;
+				IsCrosshairOnAgent = false;
 				return fallbackPosition;
 			}
 
-			if (TryGetAimPipeline(resolveRenderHistory, out _, out _, out Vector3 screenHitPoint, out Vector3 fireHitPoint, out bool isUndesiredTargetPoint) == false)
+			if (TryGetAimPipeline(resolveRenderHistory, out _, out _, out _, out Vector3 fireHitPoint, out bool isUndesiredTargetPoint) == false)
+			{
+				IsCrosshairOccluded = true;
+				IsCrosshairOnHiddenLayer = false;
+				IsCrosshairOnAgent = false;
 				return transform.position + transform.forward * Mathf.Max(1.0f, _aimDistance);
+			}
 
 			IsUndesiredTargetPoint = isUndesiredTargetPoint;
-			return checkReachability == true ? fireHitPoint : screenHitPoint;
+			// Gameplay-authoritative targeting always uses the resolved fire point.
+			// (This includes any surface deflection applied in the aim pipeline.)
+			return fireHitPoint;
 		}
 
 		public bool TryGetCrosshairAndHitPoints(bool resolveRenderHistory, out Vector3 fireOrigin, out Vector3 cameraHitPoint, out Vector3 characterHitPoint, out bool isUndesiredTargetPoint)
@@ -169,6 +192,9 @@ namespace TPSBR
 			}
 
 			IsUndesiredTargetPoint = true;
+			IsCrosshairOccluded = true;
+			IsCrosshairOnHiddenLayer = false;
+			IsCrosshairOnAgent = false;
 			SetDebugHitPointProxiesActive(false);
 		}
 
@@ -235,6 +261,8 @@ namespace TPSBR
 		{
 			cameraPosition = default;
 			point = default;
+			IsCrosshairOnHiddenLayer = false;
+			IsCrosshairOnAgent = false;
 			Vector3 cameraRayDirection = default;
 			bool hasExplicitCameraRayDirection = false;
 
@@ -280,6 +308,11 @@ namespace TPSBR
 				return false;
 
 			LayerMask cameraHitMask = ResolveCameraHitMask();
+			LayerMask cameraTargetHitMask = cameraHitMask;
+			if (_weapons != null)
+			{
+				cameraTargetHitMask |= _weapons.HitMask;
+			}
 			if (hasExplicitCameraRayDirection == false)
 			{
 				Vector3 cameraToTarget = targetPosition - cameraPosition;
@@ -291,9 +324,32 @@ namespace TPSBR
 
 			float cameraRayDistance = Mathf.Max(1.0f, _cameraRayDistance);
 			Vector3 cameraRayTarget = cameraPosition + cameraRayDirection * cameraRayDistance;
+			int hiddenLayer = LayerMask.NameToLayer("Hidden");
+			LayerMask crosshairStateMask = cameraTargetHitMask;
+			if (hiddenLayer >= 0)
+			{
+				crosshairStateMask |= (1 << hiddenLayer);
+			}
+
+			if (TryResolvePhysicsRaycastHit(cameraPosition, cameraRayTarget, crosshairStateMask, out RaycastHit crosshairHit) == true &&
+				crosshairHit.collider != null)
+			{
+				if (hiddenLayer >= 0)
+				{
+					IsCrosshairOnHiddenLayer = IsLayerInHierarchy(crosshairHit.collider.transform, hiddenLayer);
+				}
+			}
+
+			if (_weapons != null && _weapons.HitMask.value != 0 &&
+				TryResolveLagCompensatedRaycastHit(cameraPosition, cameraRayTarget, _weapons.HitMask, out LagCompensatedHit agentHit) == true &&
+				agentHit.Hitbox != null &&
+				agentHit.Hitbox.Root != null)
+			{
+				IsCrosshairOnAgent = Object == null || agentHit.Hitbox.Root.gameObject != Object.gameObject;
+			}
 
 			point = cameraRayTarget;
-			if (TryResolveRaycastHitPoint(resolveRenderHistory, cameraPosition, cameraRayTarget, cameraHitMask, out Vector3 targetHitPoint) == true)
+			if (TryResolveRaycastHitPoint(resolveRenderHistory, cameraPosition, cameraRayTarget, cameraTargetHitMask, out Vector3 targetHitPoint) == true)
 			{
 				point = targetHitPoint;
 			}
@@ -374,6 +430,7 @@ namespace TPSBR
 			screenHitPoint = default;
 			fireHitPoint = default;
 			isUndesiredTargetPoint = false;
+			IsCrosshairOccluded = false;
 
 			if (_character == null || _weapons == null || Runner == null)
 				return false;
@@ -393,7 +450,7 @@ namespace TPSBR
 			}
 
 			Vector3 rawScreenHitPoint = default;
-			bool hasCameraHitPoint = TryGetCameraAimHitPoint(resolveRenderHistory, targetPosition, out _, out rawScreenHitPoint);
+			bool hasCameraHitPoint = TryGetCameraAimHitPoint(resolveRenderHistory, targetPosition, out Vector3 cameraPosition, out rawScreenHitPoint);
 			if (hasCameraHitPoint == false)
 				return false;
 
@@ -405,15 +462,31 @@ namespace TPSBR
 
 			screenHitPoint = rawScreenHitPoint;
 
+			LayerMask observableHitMask = ResolveCameraHitMask();
+			LayerMask reachabilityHitMask = observableHitMask | _weapons.HitMask;
+
 			fireHitPoint = screenHitPoint;
 			if (TryResolveRaycastHitPoint(resolveRenderHistory, fireOrigin, screenHitPoint, _weapons.HitMask, out Vector3 raycastFireHitPoint) == true)
 			{
 				fireHitPoint = raycastFireHitPoint;
 			}
+			
+			if (_surfaceDeflection == true &&
+				TryResolvePhysicsRaycastHit(fireOrigin, screenHitPoint, observableHitMask, out RaycastHit surfaceHit) == true)
+			{
+				float desiredDistance = Vector3.Distance(fireOrigin, screenHitPoint);
+				bool hasInterveningOccluder = surfaceHit.distance + 0.01f < desiredDistance;
+				if (hasInterveningOccluder == true &&
+					TryResolveSurfaceDeflectedTargetPoint(resolveRenderHistory, cameraPosition, fireOrigin, screenHitPoint, observableHitMask, reachabilityHitMask, surfaceHit, out Vector3 deflectedTargetPoint) == true)
+				{
+					fireHitPoint = deflectedTargetPoint;
+				}
+			}
 
 			bool isOccludedFromFireOrigin = (screenHitPoint - fireHitPoint).sqrMagnitude > 0.01f;
 			bool cannotReach = _weapons.CurrentWeapon != null && _weapons.CurrentWeapon.CanFireToPosition(fireOrigin, ref fireHitPoint, _weapons.HitMask) == false;
 			isUndesiredTargetPoint = isOccludedFromFireOrigin || cannotReach;
+			IsCrosshairOccluded = isOccludedFromFireOrigin;
 
 			TargetPosition = targetPosition;
 			ScreenHitPoint = screenHitPoint;
@@ -476,6 +549,157 @@ namespace TPSBR
 			return false;
 		}
 
+		private bool TryResolveSurfaceDeflectedTargetPoint(bool resolveRenderHistory, Vector3 cameraPosition, Vector3 fireOrigin, Vector3 desiredTargetPoint, LayerMask observableMask, LayerMask reachabilityMask, RaycastHit firstSurfaceHit, out Vector3 deflectedTargetPoint)
+		{
+			deflectedTargetPoint = default;
+
+			Vector3 crosshairDirection = desiredTargetPoint - cameraPosition;
+			if (crosshairDirection.sqrMagnitude <= 0.0001f)
+				return false;
+			crosshairDirection.Normalize();
+
+			Vector3 fireDirection = fireOrigin - cameraPosition;
+			if (fireDirection.sqrMagnitude <= 0.0001f)
+				return false;
+			fireDirection.Normalize();
+
+			Vector3 fallbackNormal = firstSurfaceHit.normal.sqrMagnitude > 0.0001f
+				? firstSurfaceHit.normal.normalized
+				: -crosshairDirection;
+			if (fallbackNormal.sqrMagnitude <= 0.0001f)
+				fallbackNormal = Vector3.up;
+
+			int sampleCount = Mathf.Max(4, _surfaceDeflectionIterations * 8);
+			float cameraRayDistance = Mathf.Max(1.0f, _cameraRayDistance);
+			float surfaceOffset = Mathf.Max(0.001f, _surfaceDeflectionSurfaceOffset);
+
+			for (int i = 0; i <= sampleCount; ++i)
+			{
+				float t = sampleCount > 0 ? (float)i / sampleCount : 0.0f;
+				Vector3 sampleDirection = Vector3.Slerp(crosshairDirection, fireDirection, t);
+				if (sampleDirection.sqrMagnitude <= 0.0001f)
+					continue;
+				sampleDirection.Normalize();
+
+				Vector3 sampleDestination = cameraPosition + sampleDirection * cameraRayDistance;
+				Vector3 samplePoint = sampleDestination;
+				if (TryResolveRaycastHitPoint(resolveRenderHistory, cameraPosition, sampleDestination, observableMask, out Vector3 cameraHitPoint) == true)
+					samplePoint = cameraHitPoint;
+
+				if (firstSurfaceHit.collider != null)
+				{
+					Vector3 projectedSurfacePoint = firstSurfaceHit.collider.ClosestPoint(samplePoint);
+					Vector3 outward = samplePoint - projectedSurfacePoint;
+					if (outward.sqrMagnitude <= 0.0001f)
+					{
+						outward = fallbackNormal;
+					}
+					else
+					{
+						outward.Normalize();
+					}
+
+					Vector3 surfaceCandidate = projectedSurfacePoint + outward * surfaceOffset;
+					if (IsTargetReachable(resolveRenderHistory, fireOrigin, surfaceCandidate, reachabilityMask) == true)
+					{
+						deflectedTargetPoint = surfaceCandidate;
+						return true;
+					}
+				}
+
+				if (IsTargetReachable(resolveRenderHistory, fireOrigin, samplePoint, reachabilityMask) == true)
+				{
+					deflectedTargetPoint = samplePoint;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private bool IsTargetReachable(bool resolveRenderHistory, Vector3 origin, Vector3 target, LayerMask hitMask)
+		{
+			if (resolveRenderHistory == true)
+			{
+				if (TryResolveRaycastHitPoint(resolveRenderHistory, origin, target, hitMask, out Vector3 hitPoint) == false)
+					return true;
+
+				return (hitPoint - target).sqrMagnitude <= 0.01f;
+			}
+
+			if (TryResolvePhysicsRaycastHitPoint(origin, target, hitMask, out Vector3 physicsHitPoint) == false)
+				return true;
+
+			return (physicsHitPoint - target).sqrMagnitude <= 0.01f;
+		}
+
+		private bool TryResolvePhysicsRaycastHitPoint(Vector3 origin, Vector3 destination, LayerMask hitMask, out Vector3 hitPoint)
+		{
+			hitPoint = default;
+			if (TryResolvePhysicsRaycastHit(origin, destination, hitMask, out RaycastHit hit) == false)
+				return false;
+
+			hitPoint = hit.point;
+			return true;
+		}
+
+		private bool TryResolvePhysicsRaycastHit(Vector3 origin, Vector3 destination, LayerMask hitMask, out RaycastHit hit)
+		{
+			hit = default;
+
+			if (Runner == null)
+				return false;
+
+			Vector3 direction = destination - origin;
+			float distance = direction.magnitude;
+			if (distance <= 0.001f)
+				return false;
+
+			direction /= distance;
+
+			PhysicsScene physicsScene = Runner.GetPhysicsScene();
+			int hitCount = physicsScene.Raycast(origin, direction, _aimHits, distance, hitMask, QueryTriggerInteraction.Ignore);
+			if (hitCount <= 0)
+				return false;
+
+			RaycastUtility.Sort(_aimHits, hitCount);
+			for (int i = 0; i < hitCount; ++i)
+			{
+				RaycastHit candidate = _aimHits[i];
+				if (candidate.collider == null)
+					continue;
+
+				if (IsSelfCollider(candidate.collider) == true)
+					continue;
+
+				hit = candidate;
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool TryResolveLagCompensatedRaycastHit(Vector3 origin, Vector3 destination, LayerMask hitMask, out LagCompensatedHit hit)
+		{
+			hit = default;
+
+			if (Runner == null || Object == null)
+				return false;
+
+			if (Runner.LagCompensation == null || Runner.LagCompensation.enabled == false)
+				return false;
+
+			Vector3 direction = destination - origin;
+			float distance = direction.magnitude;
+			if (distance <= 0.001f)
+				return false;
+
+			direction /= distance;
+
+			return Runner.LagCompensation.Raycast(origin, direction, distance, Object.InputAuthority, out hit, hitMask,
+				HitOptions.IncludePhysX | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority);
+		}
+
 		private bool IsSelfCollider(Collider collider)
 		{
 			if (collider == null)
@@ -486,6 +710,23 @@ namespace TPSBR
 				return false;
 
 			return colliderTransform.IsChildOf(transform);
+		}
+
+		private static bool IsLayerInHierarchy(Transform transform, int layer)
+		{
+			if (transform == null || layer < 0)
+				return false;
+
+			Transform current = transform;
+			while (current != null)
+			{
+				if (current.gameObject.layer == layer)
+					return true;
+
+				current = current.parent;
+			}
+
+			return false;
 		}
 
 		private void UpdateDebugHitPointProxies(Vector3 origin, Quaternion originRotation, Vector3 targetPosition, Vector3 screenHitPoint, Vector3 fireHitPoint)

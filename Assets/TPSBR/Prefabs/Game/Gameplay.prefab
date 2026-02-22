@@ -633,7 +633,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 1
+        passFoldout: 0
         m_Version: 0
         _lightLayerMask: 128
         _localLayerMask:
@@ -647,7 +647,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 1
+        passFoldout: 0
         m_Version: 0
         _hiddenLayerMask:
           serializedVersion: 2
@@ -660,7 +660,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 1
+        passFoldout: 0
         m_Version: 0
         _renderMode: 0
     - rid: 2616474032983507286
@@ -671,7 +671,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _shader: {fileID: 4800000, guid: 29d49475aee4422c93cab029390691d0, type: 3}
         _visionInside: 0.95
@@ -699,7 +699,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _shader: {fileID: 4800000, guid: 20d86bb5f9234435a21ddd0880c1d074, type: 3}
         _visionInside: 0.05
@@ -727,7 +727,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _shader: {fileID: 4800000, guid: 9063794a00fa4271abce43da37221ab7, type: 3}
         _visionInside: 0.25
@@ -755,7 +755,7 @@ MonoBehaviour:
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         _shader: {fileID: 4800000, guid: 82e5a1236de64ac8b1d5c3a0a2a058c4, type: 3}
         _visionInside: 0

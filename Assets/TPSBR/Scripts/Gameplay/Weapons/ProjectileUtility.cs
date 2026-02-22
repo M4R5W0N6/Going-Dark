@@ -76,7 +76,6 @@ namespace TPSBR
 			validHits.Clear();
 
 			var hitRoots = ListPool.Get<int>(16);
-
 			Sort(hits, hitCount);
 
 			for (int i = 0; i < hits.Count; i++)

@@ -15,6 +15,7 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 	#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/PunctualLightCommon.hlsl"
 	#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/HDShadow.hlsl"
 	#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoopDef.hlsl"
+	#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/CookieSampling.hlsl"
 
 	CBUFFER_START(UnityPerMaterial)
 	int _TargetLightLayerMask;
@@ -29,6 +30,46 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 	{
 		float z = max(linearEyeDepth, 1e-5);
 		return (rcp(z) - _ZBufferParams.w) / _ZBufferParams.z;
+	}
+
+	float4 EvaluateCookiePunctualMask(LightData light, float3 lightToSample)
+	{
+		float4 cookie = float4(1.0, 1.0, 1.0, 1.0);
+		int lightType = light.lightType;
+
+		float3x3 lightToWorld = float3x3(light.right, light.up, light.forward);
+		float3 positionLS = mul(lightToSample, transpose(lightToWorld));
+
+		if (lightType == GPULIGHTTYPE_POINT)
+		{
+			cookie.rgb = SamplePointCookie(mul(lightToWorld, lightToSample), light.cookieScaleOffset);
+			return cookie;
+		}
+
+		float perspectiveZ = (lightType != GPULIGHTTYPE_PROJECTOR_BOX) ? positionLS.z : 1.0;
+		float2 positionCS = positionLS.xy / perspectiveZ;
+
+		float z = positionLS.z;
+		float r = light.range;
+		if (Max3(abs(positionCS.x), abs(positionCS.y), abs(z - 0.5 * r) - 0.5 * r + 1) > light.boxLightSafeExtent)
+		{
+			cookie.a = 0.0;
+			return cookie;
+		}
+
+		if (lightType != GPULIGHTTYPE_PROJECTOR_PYRAMID && lightType != GPULIGHTTYPE_PROJECTOR_BOX)
+		{
+			float iesCut = light.iesCut;
+			if (dot(positionCS, positionCS) > (iesCut * iesCut))
+			{
+				cookie.a = 0.0;
+				return cookie;
+			}
+		}
+
+		float2 positionNDC = positionCS * 0.5 + 0.5;
+		cookie.rgb = SampleCookie2D(positionNDC, light.cookieScaleOffset, 0.0);
+		return cookie;
 	}
 
 	float ComputeDirectionalVisibility(PositionInputs posInput, float3 normalWS, LightLoopContext lightLoopContext, uint targetLayerMask)
@@ -93,6 +134,18 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 			if (distances.x >= light.range || punctualAttenuation <= 0.0)
 				continue;
 
+			float cookieAttenuation = 1.0;
+			if (light.cookieMode != COOKIEMODE_NONE)
+			{
+				float3 lightToSample = posInput.positionWS - light.positionRWS;
+				float4 cookie = EvaluateCookiePunctualMask(light, lightToSample);
+				float cookieLuminance = max(cookie.r, max(cookie.g, cookie.b));
+				cookieAttenuation = saturate(cookieLuminance * cookie.a);
+			}
+
+			if (cookieAttenuation <= 0.0)
+				continue;
+
 			float shadow = GetPunctualShadowAttenuation(
 				lightLoopContext.shadowContext,
 				posInput.positionSS,
@@ -105,7 +158,7 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 				light.lightType != GPULIGHTTYPE_PROJECTOR_BOX);
 
 			shadow = lerp(1.0, shadow, light.shadowDimmer);
-			visibility += punctualAttenuation * light.lightDimmer * shadow;
+			visibility += punctualAttenuation * cookieAttenuation * light.lightDimmer * shadow;
 		}
 
 		return visibility;

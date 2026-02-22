@@ -23,6 +23,12 @@ namespace TPSBR
 				var oldInstance = objects.Pop();
 				_borrowed[oldInstance] = context.PrefabId;
 
+				AssignContext(oldInstance);
+				for (int i = 0; i < oldInstance.NestedObjects.Length; i++)
+				{
+					AssignContext(oldInstance.NestedObjects[i]);
+				}
+
 				oldInstance.SetActive(true);
 
 				result = oldInstance;
@@ -61,7 +67,11 @@ namespace TPSBR
 			if (instance == null)
 				return;
 
-			if (instance.NetworkTypeId.IsSceneObject == false && runner.IsShutdown == false)
+			bool canPool = instance.NetworkTypeId.IsSceneObject == false &&
+				runner.IsShutdown == false &&
+				CanPoolInstance(instance);
+
+			if (canPool == true)
 			{
 				if (_borrowed.TryGetValue(instance, out var prefabID) == true)
 				{
@@ -79,6 +89,7 @@ namespace TPSBR
 			}
 			else
 			{
+				_borrowed.Remove(instance);
 				Object.Destroy(instance.gameObject);
 			}
 		}
@@ -97,6 +108,19 @@ namespace TPSBR
 					cachedBehaviour.Context = Context;
 				}
 			}
+		}
+
+		private static bool CanPoolInstance(NetworkObject instance)
+		{
+			if (instance == null)
+				return false;
+
+			// Agent instances carry complex local presentation state (camera/vision/FX).
+			// Destroy instead of pooling to avoid stale-state reuse across respawns.
+			if (instance.GetComponent<Agent>() != null)
+				return false;
+
+			return true;
 		}
 	}
 }

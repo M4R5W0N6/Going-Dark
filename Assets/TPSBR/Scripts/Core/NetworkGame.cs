@@ -217,6 +217,13 @@ namespace TPSBR
 
 				playersToRemove.Add(playerRef);
 
+				if (TryGetConnectedDuplicateByUserID(player, out Player connectedDuplicate) == true)
+				{
+					Debug.LogWarning($"Duplicate connected player detected for UserID '{player.UserID}'. Keeping player {connectedDuplicate.Object.InputAuthority} and despawning duplicate {player.Object.InputAuthority}.");
+					Runner.Despawn(player.Object);
+					continue;
+				}
+
 				if (_disconnectedPlayers.TryGetValue(player.UserID, out Player disconnectedPlayer) == true)
 				{
 					_disconnectedPlayers.Remove(player.UserID);
@@ -255,6 +262,32 @@ namespace TPSBR
 			}
 
 			ListPool.Return(playersToRemove);
+		}
+
+		private bool TryGetConnectedDuplicateByUserID(Player player, out Player duplicatePlayer)
+		{
+			duplicatePlayer = null;
+
+			if (player == null || player.UserID.HasValue() == false)
+				return false;
+
+			for (int i = 0; i < _allPlayers.Count; ++i)
+			{
+				Player candidate = _allPlayers[i];
+				if (candidate == null || candidate == player)
+					continue;
+				if (candidate.UserID != player.UserID)
+					continue;
+				if (candidate.Object == null || candidate.Object.InputAuthority.IsRealPlayer == false)
+					continue;
+				if (Runner.IsPlayerValid(candidate.Object.InputAuthority) == false)
+					continue;
+
+				duplicatePlayer = candidate;
+				return true;
+			}
+
+			return false;
 		}
 
 		// IPlayerJoined/IPlayerLeft INTERFACES

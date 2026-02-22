@@ -36,6 +36,12 @@ namespace TPSBR
 	// functionality and directly starting via NetworkRunner) for your game unless such functionality is needed.
 	public class Networking : MonoBehaviour
 	{
+		private struct DirectionalLightDefaults
+		{
+			public bool Enabled;
+			public LightShadows Shadows;
+		}
+
 		// CONSTANTS
 
 		public const string DISPLAY_NAME_KEY = "name";
@@ -258,6 +264,7 @@ namespace TPSBR
 
 			UpdatePeerSwitch(_currentSession.GamePeers);
 			ValidateMultiPeers(_currentSession.GamePeers);
+			SyncDirectionalLightOwnership(_currentSession.GamePeers);
 		}
 
 		private IEnumerator ConnectPeerCoroutine(GamePeer peer, float connectionTimeout = 10f, float loadTimeout = 45f)
@@ -503,6 +510,7 @@ namespace TPSBR
 
 			peer.Context = sceneContext;
 			pool.Context = sceneContext;
+			SyncDirectionalLightOwnership(_currentSession.GamePeers);
 
 			StatusDescription = "Waiting for networked game";
 
@@ -687,6 +695,7 @@ namespace TPSBR
 			peer.Runner       = default;
 			peer.SceneManager = default;
 			peer.LoadedScene  = default;
+			peer.DirectionalLightDefaults.Clear();
 
 			_coroutine = null;
 
@@ -835,6 +844,114 @@ namespace TPSBR
 
 					peer.Context.HasInput = peer.ID == selectedPeerID;
 					peer.Context.IsVisible = peer.ID == selectedPeerID;
+				}
+
+				SyncDirectionalLightOwnership(peers);
+			}
+		}
+
+		private void SyncDirectionalLightOwnership(GamePeer[] peers)
+		{
+			if (peers.SafeCount() <= 0)
+				return;
+
+			int ownerPeerID = -1;
+			for (int i = 0; i < peers.Length; ++i)
+			{
+				GamePeer peer = peers[i];
+				if (peer == null || peer.Context == null || peer.Context.HasInput == false)
+					continue;
+
+				ownerPeerID = peer.ID;
+				break;
+			}
+
+			if (ownerPeerID < 0)
+			{
+				ownerPeerID = peers[0].ID;
+			}
+
+			for (int i = 0; i < peers.Length; ++i)
+			{
+				GamePeer peer = peers[i];
+				if (peer == null)
+					continue;
+
+				ApplyDirectionalLightsForPeer(peer, peer.ID == ownerPeerID);
+			}
+		}
+
+		private void ApplyDirectionalLightsForPeer(GamePeer peer, bool ownsDirectionalLighting)
+		{
+			if (peer.Runner == null)
+				return;
+
+			UnityScene simulationScene = peer.Runner.SimulationUnityScene;
+			if (simulationScene.IsValid() == false || simulationScene.isLoaded == false)
+				return;
+
+			var sceneLights = simulationScene.GetComponents<Light>(true);
+			Light primaryDirectional = null;
+
+			if (ownsDirectionalLighting == true)
+			{
+				Light renderSun = RenderSettings.sun;
+				if (renderSun != null && renderSun.type == LightType.Directional)
+				{
+					for (int i = 0; i < sceneLights.Count; ++i)
+					{
+						if (sceneLights[i] == renderSun)
+						{
+							primaryDirectional = renderSun;
+							break;
+						}
+					}
+				}
+
+				if (primaryDirectional == null)
+				{
+					for (int i = 0; i < sceneLights.Count; ++i)
+					{
+						Light sceneLight = sceneLights[i];
+						if (sceneLight != null && sceneLight.type == LightType.Directional)
+						{
+							primaryDirectional = sceneLight;
+							break;
+						}
+					}
+				}
+			}
+
+			for (int i = 0; i < sceneLights.Count; ++i)
+			{
+				Light sceneLight = sceneLights[i];
+				if (sceneLight == null || sceneLight.type != LightType.Directional)
+					continue;
+
+				int lightID = sceneLight.GetInstanceID();
+				if (peer.DirectionalLightDefaults.ContainsKey(lightID) == false)
+				{
+					peer.DirectionalLightDefaults.Add(lightID, new DirectionalLightDefaults
+					{
+						Enabled = sceneLight.enabled,
+						Shadows = sceneLight.shadows
+					});
+				}
+
+				DirectionalLightDefaults defaults = peer.DirectionalLightDefaults[lightID];
+				bool shouldEnable = ownsDirectionalLighting == true && sceneLight == primaryDirectional;
+				if (sceneLight.enabled != shouldEnable)
+				{
+					sceneLight.enabled = shouldEnable;
+				}
+
+				LightShadows targetShadows = shouldEnable == true
+					? (defaults.Shadows != LightShadows.None ? defaults.Shadows : LightShadows.Soft)
+					: LightShadows.None;
+
+				if (sceneLight.shadows != targetShadows)
+				{
+					sceneLight.shadows = targetShadows;
 				}
 			}
 		}
@@ -1025,6 +1142,7 @@ namespace TPSBR
 			public bool                        Loaded;
 			public bool                        WasConnected;
 			public bool                        CanConnect => WasConnected == true ? ReconnectionTries > 0 : ConnectionTries > 0;
+			public Dictionary<int, DirectionalLightDefaults> DirectionalLightDefaults = new Dictionary<int, DirectionalLightDefaults>(4);
 
 			public bool IsConnected
 			{

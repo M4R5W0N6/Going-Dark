@@ -1,6 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace TPSBR.UI
 {
@@ -89,6 +90,10 @@ namespace TPSBR.UI
 		private bool _hasCachedBaseScales;
 		private Canvas _rootCanvas;
 		private RectTransform _canvasRect;
+		private Graphic[] _armedCrosshairGraphics;
+		private Color[] _armedCrosshairBaseColors;
+		private static readonly Color DEFAULT_CROSSHAIR_COLOR = Color.white;
+		private static readonly Color HIDDEN_HIT_CROSSHAIR_COLOR = Color.red;
 
 		// PUBLIC METHODS
 
@@ -112,16 +117,21 @@ namespace TPSBR.UI
 			bool hasFireHitPoint = false;
 			Vector3 screenHitPoint = default;
 			Vector3 fireHitPoint = default;
-			bool isUndesiredTargetPoint = false;
 			float crosshairDeltaScale = 1.0f;
+			bool isCrosshairOccluded = false;
+			bool isCrosshairHittingHidden = false;
+			bool isCrosshairHittingAgent = false;
 
 			bool canUseLocalAimData = agent != null && agent.HasInputAuthority == true && Context != null && Context.HasInput == true;
 			if (canUseLocalAimData == true && agent.Aiming != null)
 			{
-				if (agent.Aiming.TryGetCrosshairAndHitPoints(false, out _, out screenHitPoint, out fireHitPoint, out isUndesiredTargetPoint) == true)
+				if (agent.Aiming.TryGetCrosshairAndHitPoints(false, out _, out screenHitPoint, out fireHitPoint, out _) == true)
 				{
 					hasScreenHitPoint = true;
 					hasFireHitPoint = true;
+					isCrosshairOccluded = agent.Aiming.IsCrosshairOccluded;
+					isCrosshairHittingHidden = agent.Aiming.IsCrosshairOnHiddenLayer;
+					isCrosshairHittingAgent = agent.Aiming.IsCrosshairOnAgent;
 
 					float hitDelta = Vector3.Distance(screenHitPoint, fireHitPoint);
 					crosshairDeltaScale = EvaluateHitDeltaScale(hitDelta);
@@ -151,6 +161,7 @@ namespace TPSBR.UI
 				SetCrosshairToScreenCenter(projectionPixelRect);
 				ApplyDistanceScale(_crosshairWorldRoot, _crosshairBaseScale, 0.0f, 1.0f);
 			}
+			SetCrosshairColor(isCrosshairHittingHidden || isCrosshairHittingAgent);
 
 			var weapon = agent.Weapons.CurrentWeapon;
 			float size = _defaultSize;
@@ -173,8 +184,7 @@ namespace TPSBR.UI
 				_sniperScope.SetActive(false);
 			}
 
-			bool showUndesiredFirePosition = weaponValid == true && isUndesiredTargetPoint == true;
-			bool showFireHitMarker = weaponValid == true && hasProjectionData == true && hasPostBlendCameraPose == true && hasFireHitPoint == true;
+			bool showFireHitMarker = weaponValid == true && hasProjectionData == true && hasPostBlendCameraPose == true && hasFireHitPoint == true && isCrosshairOccluded == true;
 			_undesiredFirePosition.SetActive(showFireHitMarker);
 
 			if (showFireHitMarker == true)
@@ -192,7 +202,7 @@ namespace TPSBR.UI
 				ApplyDistanceScale(_undesiredFirePosition.transform, _undesiredFireBaseScale, 0.0f, 1.0f);
 			}
 
-			_crosshairRootGroup.alpha = Mathf.Lerp(_crosshairRootGroup.alpha, showUndesiredFirePosition == true ? _undesiredFireCrosshairAlpha : 1f, Time.deltaTime * 8f);
+			_crosshairRootGroup.alpha = Mathf.Lerp(_crosshairRootGroup.alpha, showFireHitMarker == true ? _undesiredFireCrosshairAlpha : 1f, Time.deltaTime * 8f);
 		}
 
 		// MONOBEHAVIOUR
@@ -208,6 +218,8 @@ namespace TPSBR.UI
 			}
 
 			CacheBaseScales();
+			CacheCrosshairGraphicColors();
+			SanitizeCanvasGraphicMaterials();
 		}
 
 		// PRIVATE MEMBERS
@@ -219,6 +231,26 @@ namespace TPSBR.UI
 
 			SceneUI.PlaySound(setup);
 			_lastSoundFrame = Time.frameCount;
+		}
+
+		private void SanitizeCanvasGraphicMaterials()
+		{
+			Graphic[] graphics = GetComponentsInChildren<Graphic>(true);
+			for (int i = 0; i < graphics.Length; ++i)
+			{
+				Graphic graphic = graphics[i];
+				if (graphic == null)
+					continue;
+
+				Material material = graphic.material;
+				if (material == null || material.shader == null)
+					continue;
+
+				if (material.shader.name == "Sprites/Default")
+				{
+					graphic.material = null;
+				}
+			}
 		}
 
 		private Camera ResolveProjectionCamera()
@@ -284,6 +316,45 @@ namespace TPSBR.UI
 			}
 
 			_hasCachedBaseScales = true;
+		}
+
+		private void CacheCrosshairGraphicColors()
+		{
+			if (_armedCrosshairGraphics != null)
+				return;
+
+			Transform colorRoot = _armedGroup != null ? _armedGroup.transform : _crosshairWorldRoot;
+			if (colorRoot == null)
+				return;
+
+			_armedCrosshairGraphics = colorRoot.GetComponentsInChildren<Graphic>(true);
+			_armedCrosshairBaseColors = new Color[_armedCrosshairGraphics.Length];
+			for (int i = 0; i < _armedCrosshairGraphics.Length; ++i)
+			{
+				_armedCrosshairBaseColors[i] = _armedCrosshairGraphics[i] != null ? _armedCrosshairGraphics[i].color : Color.white;
+			}
+		}
+
+		private void SetCrosshairColor(bool hiddenHit)
+		{
+			CacheCrosshairGraphicColors();
+			if (_armedCrosshairGraphics == null || _armedCrosshairBaseColors == null)
+				return;
+
+			Color tint = hiddenHit == true ? HIDDEN_HIT_CROSSHAIR_COLOR : DEFAULT_CROSSHAIR_COLOR;
+			for (int i = 0; i < _armedCrosshairGraphics.Length; ++i)
+			{
+				Graphic graphic = _armedCrosshairGraphics[i];
+				if (graphic == null)
+					continue;
+
+				Color baseColor = i < _armedCrosshairBaseColors.Length ? _armedCrosshairBaseColors[i] : Color.white;
+				Color targetColor = new Color(baseColor.r * tint.r, baseColor.g * tint.g, baseColor.b * tint.b, baseColor.a);
+				if (graphic.color != targetColor)
+				{
+					graphic.color = targetColor;
+				}
+			}
 		}
 
 		private void ApplyDistanceScale(Transform target, Vector3 baseScale, float worldDistance, float extraScale)

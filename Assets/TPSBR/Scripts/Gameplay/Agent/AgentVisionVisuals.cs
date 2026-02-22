@@ -114,7 +114,7 @@ namespace TPSBR
 				return;
 
 			SceneContext context = _agent.Context;
-			bool isLocalControlled = context != null ? (_agent.HasInputAuthority && context.HasInput) : _agent.HasInputAuthority;
+			bool isLocalControlled = IsLocalControlledAgent(context);
 			uint visionMask = _agentVision.VisionLightLayerMask;
 			int overrideObjectLayer = ResolveSingleLayer(_remoteVisualObjectLayerMask);
 			int localObjectLayer = ResolveLocalObjectLayer();
@@ -290,6 +290,18 @@ namespace TPSBR
 			}
 
 			return -1;
+		}
+
+		private bool IsLocalControlledAgent(SceneContext context)
+		{
+			if (_agent == null)
+				return false;
+			if (context == null || context.HasInput == false)
+				return false;
+			if (_agent.HasInputAuthority == false)
+				return false;
+
+			return true;
 		}
 	}
 }

@@ -315,7 +315,15 @@ namespace TPSBR
 
 			if (statistics.IsEliminated == false)
 			{
-				TrySpawnAgent(player);
+				Agent activeAgent = player.ActiveAgent;
+				bool hasValidAgent = activeAgent != null &&
+					activeAgent.Object != null &&
+					Runner.Exists(activeAgent.Object) == true;
+
+				if (hasValidAgent == false)
+				{
+					TrySpawnAgent(player);
+				}
 			}
 
 			RecalculatePositions();
@@ -430,6 +438,33 @@ namespace TPSBR
 			{
 				throw new InvalidOperationException(nameof(player.AgentPrefab));
 			}
+
+			// Authoritative safety: ensure there is no stray/previous agent for this player ref
+			// before creating a new one (can happen during reconnect/respawn ref churn).
+			var allAgents = ListPool.Get<Agent>(32);
+			Runner.GetAllBehaviours<Agent>(allAgents);
+			for (int i = allAgents.Count - 1; i >= 0; --i)
+			{
+				Agent candidate = allAgents[i];
+				if (candidate == null || candidate.Object == null)
+					continue;
+				if (candidate.Object.InputAuthority != playerRef)
+					continue;
+
+				Agent activeAgent = player.ActiveAgent;
+				bool isTrackedActiveAgent = activeAgent != null &&
+					activeAgent.Object != null &&
+					candidate.Object == activeAgent.Object;
+
+				if (isTrackedActiveAgent == true)
+				{
+					Runner.Despawn(candidate.Object);
+					continue;
+				}
+
+				Runner.Despawn(candidate.Object);
+			}
+			ListPool.Return(allAgents);
 
 			var agentObject = Runner.Spawn(player.AgentPrefab, position, rotation, playerRef);
 			var agent       = agentObject.GetComponent<Agent>();

@@ -64,6 +64,16 @@ namespace TPSBR
 
 		public void SetActiveAgent(Agent agent)
 		{
+			if (HasStateAuthority == true &&
+				ActiveAgent != null &&
+				ActiveAgent != agent &&
+				ActiveAgent.Object != null &&
+				Runner != null &&
+				Runner.Exists(ActiveAgent.Object) == true)
+			{
+				Runner.Despawn(ActiveAgent.Object);
+			}
+
 			ActiveAgent = agent;
 
 			UpdateLocalState();
@@ -74,12 +84,19 @@ namespace TPSBR
 			if (Runner.IsServer == false)
 				return;
 
-			if (ActiveAgent != null && ActiveAgent.Object != null)
+			Agent agentToDespawn = ActiveAgent;
+			if (agentToDespawn == null)
 			{
-				Runner.Despawn(ActiveAgent.Object);
-				ActiveAgent = null;
-				_activeAgent = null;
-				_platformAgent = null;
+				agentToDespawn = _activeAgent;
+			}
+
+			ActiveAgent = null;
+			_activeAgent = null;
+			_platformAgent = null;
+
+			if (agentToDespawn != null && agentToDespawn.Object != null)
+			{
+				Runner.Despawn(agentToDespawn.Object);
 			}
 		}
 
