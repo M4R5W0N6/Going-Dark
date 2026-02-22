@@ -21,6 +21,7 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 	int _TargetLightLayerMask;
 	float _UseLinearDepthTex;
 	float _UseLocalDepthTex;
+	float _CookieLodBias;
 	CBUFFER_END
 
 	TEXTURE2D_X(_LinearDepthTex);
@@ -68,7 +69,16 @@ Shader "Hidden/TPSBR/HDRP/VisionMask"
 		}
 
 		float2 positionNDC = positionCS * 0.5 + 0.5;
-		cookie.rgb = SampleCookie2D(positionNDC, light.cookieScaleOffset, 0.0);
+		float3 sharpCookie = SampleCookie2D(positionNDC, light.cookieScaleOffset, 0.0);
+		if (_CookieLodBias > 0.0001)
+		{
+			float3 softCookie = SampleCookie2D(positionNDC, light.cookieScaleOffset, _CookieLodBias);
+			cookie.rgb = max(sharpCookie, softCookie);
+		}
+		else
+		{
+			cookie.rgb = sharpCookie;
+		}
 		return cookie;
 	}
 

@@ -2874,11 +2874,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _lookAtMode: 2
-  _hybridMaxEllipseAspect: 3
-  _hybridMaxSeparationAngle: 1
-  _hybridCookieResolution: 128
-  _hybridResponseSpeed: 8
+  _lookAtMode: 3
+  _useEllipsoidalCookie: 0
 --- !u!1 &4615604339238093075
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,9 @@ namespace TPSBR
 	public sealed class AgentVision : MonoBehaviour
 	{
 		private const float EPSILON = 0.0001f;
+		private const float MAX_VISION_SPOT_ANGLE = 177.0f;
+		private const float BLEND_MAX_FOV_MULTIPLIER = 1.67f;
+		private const int BLEND_COOKIE_SIZE = 128;
 		private const string DEFAULT_OBJECT_LAYER_NAME = "Default";
 		private const string HIDDEN_OBJECT_LAYER_NAME = "Hidden";
 
@@ -18,6 +21,8 @@ namespace TPSBR
 			Fixed,
 			Dynamic,
 			Hybrid,
+			Blend,
+			Procedural,
 		}
 
 		[Header("Vision FoV Mapping")]
@@ -25,12 +30,12 @@ namespace TPSBR
 		[Tooltip("Maps camera FoV ratio to vision-cone FoV ratio. X = CurrentFoV / BaseFoV, Y = VisionFoV / BaseFoV.")]
 		private AnimationCurve _visionFovRatioCurve = AnimationCurve.Linear(0.0f, 0.0f, 2.0f, 2.0f);
 		[SerializeField]
-		[Tooltip("Fixed uses fire transform forward. Dynamic uses fire-origin to fire-hit look-at. Hybrid blends fixed and dynamic directions.")]
+		[Tooltip("Fixed uses fire transform forward. Dynamic uses fire-origin to fire-hit look-at. Hybrid blends fixed and dynamic directions. Blend computes an enclosing cone for fixed+dynamic. Procedural keeps both camera-hit and fire-hit directions inside the cone when possible, otherwise aims between them.")]
 		private LookAtMode _lookAtMode = LookAtMode.Dynamic;
 		[SerializeField]
-		[Range(0.0f, 10.0f)]
-		[Tooltip("Hybrid blend response speed. 0 = instant, higher = smoother/faster response.")]
-		private float _hybridResponseSpeed = 5.0f;
+		[Tooltip("Applies runtime ellipsoidal cookie shaping while in Blend mode.")]
+		private bool _useEllipsoidalCookie = true;
+		private float _hybridResponseSpeed = 8.0f;
 
 		public uint VisionLightLayerMask
 		{
@@ -67,6 +72,11 @@ namespace TPSBR
 		private bool _hasHybridState;
 		private Quaternion _hybridSmoothedRotation = Quaternion.identity;
 		private float _hybridSmoothedAspect = 1.0f;
+		private bool _hasBlendState;
+		private Vector3 _blendSmoothedDynamicDirection = Vector3.forward;
+		private Texture2D _blendCookieTexture;
+		private Color32[] _blendCookiePixels;
+		private float _lastBlendCookieMinorAxis = -1.0f;
 
 		private void Awake()
 		{
@@ -107,6 +117,23 @@ namespace TPSBR
 			_lastLightEnabled = false;
 			_hasHybridState = false;
 			_hybridSmoothedAspect = 1.0f;
+			_hasBlendState = false;
+			ClearBlendCookie();
+			if (_blendCookieTexture != null)
+			{
+				if (Application.isPlaying)
+				{
+					Destroy(_blendCookieTexture);
+				}
+				else
+				{
+					DestroyImmediate(_blendCookieTexture);
+				}
+
+				_blendCookieTexture = null;
+				_blendCookiePixels = null;
+				_lastBlendCookieMinorAxis = -1.0f;
+			}
 			if (_spotLight != null)
 			{
 				_spotLight.enabled = false;
@@ -217,7 +244,7 @@ namespace TPSBR
 			}
 
 			float mappedFov = defaultFov * Mathf.Max(0.01f, mappedRatio);
-			float viewAngle = Mathf.Clamp(mappedFov, 1.0f, 179.0f);
+			float viewAngle = Mathf.Clamp(mappedFov, 1.0f, MAX_VISION_SPOT_ANGLE);
 			_baseMappedViewAngle = viewAngle;
 			if (Mathf.Abs(_lastAppliedViewAngle - viewAngle) <= 0.001f)
 				return;
@@ -231,7 +258,7 @@ namespace TPSBR
 			if (_spotLight == null)
 				return;
 
-			float clampedSpotAngle = Mathf.Clamp(spotAngle, 1.0f, 179.0f);
+			float clampedSpotAngle = Mathf.Clamp(spotAngle, 1.0f, MAX_VISION_SPOT_ANGLE);
 			if (Mathf.Abs(_spotLight.spotAngle - clampedSpotAngle) > 0.001f)
 			{
 				_spotLight.spotAngle = clampedSpotAngle;
@@ -247,7 +274,7 @@ namespace TPSBR
 		private void ApplyHybridSpotlightFovCompensation(float hybridAspect)
 		{
 			float baseViewAngle = _lastAppliedViewAngle > 0.0f ? _lastAppliedViewAngle : _baseMappedViewAngle;
-			baseViewAngle = Mathf.Clamp(baseViewAngle, 1.0f, 179.0f);
+			baseViewAngle = Mathf.Clamp(baseViewAngle, 1.0f, MAX_VISION_SPOT_ANGLE);
 
 			float compensation = 1.0f;
 			if (compensation <= 0.0001f)
@@ -274,6 +301,125 @@ namespace TPSBR
 			}
 
 			ApplySpotLightAngles(compensatedViewAngle);
+		}
+
+		private float GetUnifiedLerpFactor()
+		{
+			float dt = Mathf.Max(0.0f, Time.unscaledDeltaTime);
+			float response = Mathf.Max(0.0f, _hybridResponseSpeed);
+			return response <= EPSILON ? 1.0f : (dt > 0.0f ? 1.0f - Mathf.Exp(-response * dt) : 1.0f);
+		}
+
+		private static void BuildEnclosingCone(Vector3 fixedDirection, float fixedFovDeg, Vector3 dynamicDirection, float dynamicFovDeg, out Vector3 axis, out float fovDeg)
+		{
+			if (fixedDirection.sqrMagnitude <= EPSILON)
+				fixedDirection = Vector3.forward;
+			if (dynamicDirection.sqrMagnitude <= EPSILON)
+				dynamicDirection = fixedDirection;
+
+			fixedDirection.Normalize();
+			dynamicDirection.Normalize();
+
+			float fixedHalf = Mathf.Clamp(fixedFovDeg, 1.0f, MAX_VISION_SPOT_ANGLE) * Mathf.Deg2Rad * 0.5f;
+			float dynamicHalf = Mathf.Clamp(dynamicFovDeg, 1.0f, MAX_VISION_SPOT_ANGLE) * Mathf.Deg2Rad * 0.5f;
+			float dot = Mathf.Clamp(Vector3.Dot(fixedDirection, dynamicDirection), -1.0f, 1.0f);
+			float separation = Mathf.Acos(dot);
+
+			if (fixedHalf >= separation + dynamicHalf - EPSILON)
+			{
+				axis = fixedDirection;
+				fovDeg = Mathf.Clamp(fixedFovDeg, 1.0f, MAX_VISION_SPOT_ANGLE);
+				return;
+			}
+
+			if (dynamicHalf >= separation + fixedHalf - EPSILON)
+			{
+				axis = dynamicDirection;
+				fovDeg = Mathf.Clamp(dynamicFovDeg, 1.0f, MAX_VISION_SPOT_ANGLE);
+				return;
+			}
+
+			float enclosingHalf = 0.5f * (separation + fixedHalf + dynamicHalf);
+			float t = separation > EPSILON ? Mathf.Clamp01((enclosingHalf - fixedHalf) / separation) : 0.0f;
+
+			axis = Vector3.Slerp(fixedDirection, dynamicDirection, t);
+			if (axis.sqrMagnitude <= EPSILON)
+			{
+				axis = fixedDirection;
+			}
+			axis.Normalize();
+
+			fovDeg = Mathf.Clamp(enclosingHalf * Mathf.Rad2Deg * 2.0f, 1.0f, MAX_VISION_SPOT_ANGLE);
+		}
+
+		private void EnsureBlendCookieTexture()
+		{
+			if (_blendCookieTexture != null)
+				return;
+
+			_blendCookieTexture = new Texture2D(BLEND_COOKIE_SIZE, BLEND_COOKIE_SIZE, TextureFormat.RGBA32, true, true)
+			{
+				name = "VisionBlendCookieRuntime",
+				filterMode = FilterMode.Trilinear,
+				wrapMode = TextureWrapMode.Clamp
+			};
+			_blendCookieTexture.anisoLevel = 4;
+			_blendCookiePixels = new Color32[BLEND_COOKIE_SIZE * BLEND_COOKIE_SIZE];
+			_lastBlendCookieMinorAxis = -1.0f;
+		}
+
+		private void ClearBlendCookie()
+		{
+			if (_spotLight != null && _blendCookieTexture != null && _spotLight.cookie == _blendCookieTexture)
+			{
+				_spotLight.cookie = null;
+			}
+		}
+
+		private void ApplyBlendCookie(float minorAxis)
+		{
+			if (_spotLight == null)
+				return;
+
+			minorAxis = Mathf.Clamp(minorAxis, 0.01f, 1.0f);
+			EnsureBlendCookieTexture();
+			if (_blendCookieTexture == null || _blendCookiePixels == null)
+				return;
+
+			if (Mathf.Abs(_lastBlendCookieMinorAxis - minorAxis) > 0.0025f)
+			{
+				float invMinorAxis = 1.0f / Mathf.Max(minorAxis, 0.0001f);
+				float solidCoreRadius = 0.96f;
+				float feather = 0.03f;
+				float featherEnd = solidCoreRadius + feather;
+
+				for (int y = 0; y < BLEND_COOKIE_SIZE; ++y)
+				{
+					float v = ((y + 0.5f) / BLEND_COOKIE_SIZE) * 2.0f - 1.0f;
+
+					for (int x = 0; x < BLEND_COOKIE_SIZE; ++x)
+					{
+						float u = ((x + 0.5f) / BLEND_COOKIE_SIZE) * 2.0f - 1.0f;
+						float oy = v * invMinorAxis;
+						float distance = Mathf.Sqrt(u * u + oy * oy);
+						float mask = distance <= solidCoreRadius
+							? 1.0f
+							: 1.0f - Mathf.SmoothStep(solidCoreRadius, featherEnd, distance);
+
+						byte v8 = (byte)Mathf.RoundToInt(Mathf.Clamp01(mask) * 255.0f);
+						_blendCookiePixels[y * BLEND_COOKIE_SIZE + x] = new Color32(v8, v8, v8, 255);
+					}
+				}
+
+				_blendCookieTexture.SetPixels32(_blendCookiePixels);
+				_blendCookieTexture.Apply(true, false);
+				_lastBlendCookieMinorAxis = minorAxis;
+			}
+
+			if (_spotLight.cookie != _blendCookieTexture)
+			{
+				_spotLight.cookie = _blendCookieTexture;
+			}
 		}
 
 		private void ApplyState(bool force)
@@ -331,7 +477,7 @@ namespace TPSBR
 			}
 			fixedDirection.Normalize();
 
-			if (_lookAtMode == LookAtMode.Dynamic || _lookAtMode == LookAtMode.Hybrid)
+			if (_lookAtMode != LookAtMode.Fixed)
 			{
 				if (_agent == null || _agent.Aiming == null ||
 					_agent.Aiming.TryGetCrosshairAndHitPoints(false, out Vector3 aimFireOrigin, out Vector3 cameraHitPoint, out Vector3 characterHitPoint, out _) == false)
@@ -363,6 +509,7 @@ namespace TPSBR
 				Vector3 dynamicDirection;
 				if (_lookAtMode == LookAtMode.Dynamic)
 				{
+					ClearBlendCookie();
 					dynamicDirection = characterHitPoint - firePosition;
 					if (dynamicDirection.sqrMagnitude <= EPSILON)
 						return;
@@ -373,8 +520,9 @@ namespace TPSBR
 					_hybridSmoothedAspect = 1.0f;
 					ApplySpotLightAngles(_baseMappedViewAngle);
 				}
-				else
+				else if (_lookAtMode == LookAtMode.Hybrid)
 				{
+					ClearBlendCookie();
 					// Hybrid should blend fixed forward with the same dynamic target used by gameplay/undesired marker.
 					dynamicDirection = characterHitPoint - firePosition;
 					if (dynamicDirection.sqrMagnitude <= EPSILON)
@@ -430,9 +578,7 @@ namespace TPSBR
 					float targetAspect = Mathf.Lerp(1.0f, 1.75f, separation01);
 
 					Quaternion hybridTargetRotation = Quaternion.LookRotation(centerDirection, upAxis);
-					float dt = Mathf.Max(0.0f, Time.unscaledDeltaTime);
-					float response = Mathf.Max(0.0f, _hybridResponseSpeed);
-					float lerpFactor = response <= EPSILON ? 1.0f : (dt > 0.0f ? 1.0f - Mathf.Exp(-response * dt) : 1.0f);
+					float lerpFactor = GetUnifiedLerpFactor();
 
 					if (_hasHybridState == false)
 					{
@@ -447,13 +593,147 @@ namespace TPSBR
 					}
 
 					targetRotation = _hybridSmoothedRotation;
-					ApplyHybridSpotlightFovCompensation(_hybridSmoothedAspect);
+					ApplySpotLightAngles(_baseMappedViewAngle);
+				}
+				else if (_lookAtMode == LookAtMode.Blend)
+				{
+					Vector3 rawDynamicDirection = characterHitPoint - firePosition;
+					if (rawDynamicDirection.sqrMagnitude <= EPSILON)
+					{
+						rawDynamicDirection = cameraHitPoint - cameraPosition;
+					}
+					if (rawDynamicDirection.sqrMagnitude <= EPSILON)
+					{
+						rawDynamicDirection = cameraRotation * Vector3.forward;
+					}
+					if (rawDynamicDirection.sqrMagnitude <= EPSILON)
+						return;
+					rawDynamicDirection.Normalize();
+
+					float lerpFactor = GetUnifiedLerpFactor();
+					if (_hasBlendState == false)
+					{
+						_blendSmoothedDynamicDirection = rawDynamicDirection;
+						_hasBlendState = true;
+					}
+					else
+					{
+						_blendSmoothedDynamicDirection = Vector3.Slerp(_blendSmoothedDynamicDirection, rawDynamicDirection, lerpFactor);
+						if (_blendSmoothedDynamicDirection.sqrMagnitude > EPSILON)
+						{
+							_blendSmoothedDynamicDirection.Normalize();
+						}
+						else
+						{
+							_blendSmoothedDynamicDirection = rawDynamicDirection;
+						}
+					}
+
+					float baseViewAngle = _lastAppliedViewAngle > 0.0f ? _lastAppliedViewAngle : _baseMappedViewAngle;
+					baseViewAngle = Mathf.Clamp(baseViewAngle, 1.0f, MAX_VISION_SPOT_ANGLE);
+
+					BuildEnclosingCone(fixedDirection, baseViewAngle, _blendSmoothedDynamicDirection, baseViewAngle, out Vector3 blendDirection, out float blendViewAngle);
+
+					float blendMaxViewAngle = Mathf.Min(MAX_VISION_SPOT_ANGLE, Mathf.Max(1.0f, baseViewAngle * BLEND_MAX_FOV_MULTIPLIER));
+					blendViewAngle = Mathf.Clamp(blendViewAngle, 1.0f, blendMaxViewAngle);
+
+					Vector3 blendMajorAxis = Vector3.ProjectOnPlane(_blendSmoothedDynamicDirection - fixedDirection, blendDirection);
+					if (blendMajorAxis.sqrMagnitude <= EPSILON)
+					{
+						blendMajorAxis = Vector3.ProjectOnPlane(cameraRotation * Vector3.right, blendDirection);
+					}
+					if (blendMajorAxis.sqrMagnitude <= EPSILON)
+					{
+						blendMajorAxis = Vector3.Cross(cameraUp, blendDirection);
+					}
+					if (blendMajorAxis.sqrMagnitude <= EPSILON)
+					{
+						blendMajorAxis = Vector3.right;
+					}
+					blendMajorAxis.Normalize();
+
+					Vector3 blendUp = Vector3.Cross(blendDirection, blendMajorAxis);
+					if (blendUp.sqrMagnitude <= EPSILON)
+					{
+						blendUp = cameraUp;
+					}
+					if (blendUp.sqrMagnitude <= EPSILON)
+					{
+						blendUp = Vector3.up;
+					}
+					blendUp.Normalize();
+
+					targetRotation = Quaternion.LookRotation(blendDirection, blendUp);
+					_hasHybridState = false;
+					_hybridSmoothedAspect = 1.0f;
+					ApplySpotLightAngles(blendViewAngle);
+					if (_useEllipsoidalCookie == true)
+					{
+						float minorAxis = Mathf.Clamp01(baseViewAngle / Mathf.Max(baseViewAngle, blendViewAngle));
+						ApplyBlendCookie(minorAxis);
+					}
+					else
+					{
+						ClearBlendCookie();
+					}
+				}
+				else
+				{
+					ClearBlendCookie();
+					_hasBlendState = false;
+					Vector3 crosshairWorldDirection = characterHitPoint - firePosition;
+					if (crosshairWorldDirection.sqrMagnitude <= EPSILON)
+					{
+						crosshairWorldDirection = fixedDirection;
+					}
+					if (crosshairWorldDirection.sqrMagnitude <= EPSILON)
+					{
+						crosshairWorldDirection = cameraRotation * Vector3.forward;
+					}
+					if (crosshairWorldDirection.sqrMagnitude <= EPSILON)
+						return;
+					crosshairWorldDirection.Normalize();
+
+					Vector3 screenHitDirection = cameraHitPoint - firePosition;
+					if (screenHitDirection.sqrMagnitude <= EPSILON)
+					{
+						screenHitDirection = cameraRotation * Vector3.forward;
+					}
+					if (screenHitDirection.sqrMagnitude <= EPSILON)
+					{
+						screenHitDirection = crosshairWorldDirection;
+					}
+					screenHitDirection.Normalize();
+
+					float viewAngle = _spotLight != null && _spotLight.spotAngle > 0.0f ? _spotLight.spotAngle : _baseMappedViewAngle;
+					float halfConeAngle = Mathf.Clamp(viewAngle, 1.0f, 179.0f) * 0.5f;
+
+					// Prefer gameplay-authoritative direction if it still keeps both points inside the cone.
+					Vector3 proceduralDirection = crosshairWorldDirection;
+					bool canContainBothFromWorldDirection = Vector3.Angle(proceduralDirection, screenHitDirection) <= halfConeAngle;
+					if (canContainBothFromWorldDirection == false)
+					{
+						// If both cannot be contained from authoritative direction, point directly between them.
+						Vector3 betweenDirection = crosshairWorldDirection + screenHitDirection;
+						if (betweenDirection.sqrMagnitude <= EPSILON)
+						{
+							betweenDirection = crosshairWorldDirection;
+						}
+						proceduralDirection = betweenDirection.normalized;
+					}
+
+					targetRotation = Quaternion.LookRotation(proceduralDirection, cameraUp);
+					_hasHybridState = false;
+					_hybridSmoothedAspect = 1.0f;
+					ApplySpotLightAngles(_baseMappedViewAngle);
 				}
 			}
 			else
 			{
+				ClearBlendCookie();
 				_hasHybridState = false;
 				_hybridSmoothedAspect = 1.0f;
+				_hasBlendState = false;
 				ApplySpotLightAngles(_baseMappedViewAngle);
 			}
 			if (Vector3.Distance(_spotLight.transform.position, firePosition) > 0.0001f)

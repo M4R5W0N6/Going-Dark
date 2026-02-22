@@ -13,12 +13,15 @@ namespace TPSBR
 		private uint _lightLayerMask = uint.MaxValue;
 		[SerializeField]
 		private LayerMask _localLayerMask;
+		[SerializeField, Range(0.0f, 4.0f)]
+		private float _cookieLodBias = 0.0f;
 
 		private const string SHADER_NAME = "Hidden/TPSBR/HDRP/VisionMask";
 		private static readonly int GLOBAL_TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_VisionMaskGlobalTargetLightLayerMask");
 		private static readonly int TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_TargetLightLayerMask");
 		private static readonly int USE_LINEAR_DEPTH_TEX = Shader.PropertyToID("_UseLinearDepthTex");
 		private static readonly int USE_LOCAL_DEPTH_TEX = Shader.PropertyToID("_UseLocalDepthTex");
+		private static readonly int COOKIE_LOD_BIAS = Shader.PropertyToID("_CookieLodBias");
 		private static readonly int LOCAL_DEPTH_TEX = Shader.PropertyToID("_LocalDepthTex");
 
 		private Material _material;
@@ -63,6 +66,7 @@ namespace TPSBR
 			_propertyBlock.SetInt(TARGET_LIGHT_LAYER_MASK, unchecked((int)_lightLayerMask));
 			_propertyBlock.SetFloat(USE_LINEAR_DEPTH_TEX, 0.0f);
 			_propertyBlock.SetFloat(USE_LOCAL_DEPTH_TEX, _localLayerMask.value != 0 ? 1.0f : 0.0f);
+			_propertyBlock.SetFloat(COOKIE_LOD_BIAS, Mathf.Max(0.0f, _cookieLodBias));
 			_propertyBlock.SetTexture(LOCAL_DEPTH_TEX, VisionPassBuffers.LocalDepth);
 			Shader.SetGlobalInt(GLOBAL_TARGET_LIGHT_LAYER_MASK, unchecked((int)_lightLayerMask));
 

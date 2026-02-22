@@ -9,9 +9,12 @@ namespace TPSBR
 	{
 		[SerializeField]
 		private LayerMask _hiddenLayerMask;
+		[SerializeField, Range(0.0f, 4.0f)]
+		private float _cookieLodBias = 0.0f;
 		private const string VISION_MASK_SHADER_NAME = "Hidden/TPSBR/HDRP/VisionMask";
 		private static readonly int TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_TargetLightLayerMask");
 		private static readonly int USE_LINEAR_DEPTH_TEX = Shader.PropertyToID("_UseLinearDepthTex");
+		private static readonly int COOKIE_LOD_BIAS = Shader.PropertyToID("_CookieLodBias");
 		private static readonly int LINEAR_DEPTH_TEX = Shader.PropertyToID("_LinearDepthTex");
 		private static readonly int GLOBAL_TARGET_LIGHT_LAYER_MASK = Shader.PropertyToID("_VisionMaskGlobalTargetLightLayerMask");
 
@@ -76,6 +79,7 @@ namespace TPSBR
 			_visionMaskProperties.Clear();
 			_visionMaskProperties.SetInt(TARGET_LIGHT_LAYER_MASK, lightLayerMask);
 			_visionMaskProperties.SetFloat(USE_LINEAR_DEPTH_TEX, 1.0f);
+			_visionMaskProperties.SetFloat(COOKIE_LOD_BIAS, Mathf.Max(0.0f, _cookieLodBias));
 			_visionMaskProperties.SetTexture(LINEAR_DEPTH_TEX, VisionPassBuffers.HiddenDepth);
 			CoreUtils.SetRenderTarget(ctx.cmd, VisionPassBuffers.HiddenMask, ClearFlag.Color);
 			CoreUtils.DrawFullScreen(ctx.cmd, _visionMaskMaterial, _visionMaskProperties, shaderPassId: 0);

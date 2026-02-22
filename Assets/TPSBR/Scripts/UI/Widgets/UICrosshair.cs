@@ -161,8 +161,6 @@ namespace TPSBR.UI
 				SetCrosshairToScreenCenter(projectionPixelRect);
 				ApplyDistanceScale(_crosshairWorldRoot, _crosshairBaseScale, 0.0f, 1.0f);
 			}
-			SetCrosshairColor(isCrosshairHittingHidden || isCrosshairHittingAgent);
-
 			var weapon = agent.Weapons.CurrentWeapon;
 			float size = _defaultSize;
 
@@ -185,6 +183,8 @@ namespace TPSBR.UI
 			}
 
 			bool showFireHitMarker = weaponValid == true && hasProjectionData == true && hasPostBlendCameraPose == true && hasFireHitPoint == true && isCrosshairOccluded == true;
+			bool shouldTintCrosshairRed = (isCrosshairHittingHidden || isCrosshairHittingAgent) && showFireHitMarker == false;
+			SetCrosshairColor(shouldTintCrosshairRed);
 			_undesiredFirePosition.SetActive(showFireHitMarker);
 
 			if (showFireHitMarker == true)
