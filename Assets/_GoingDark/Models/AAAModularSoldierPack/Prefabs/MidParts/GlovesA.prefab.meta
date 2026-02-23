@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 7a818e0c08e9b704984fb63f0adf404a
+guid: a1e68e6261e02d04ab6be80c07fc32c7
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/GlovesA.prefab
+  uploadId: 704093

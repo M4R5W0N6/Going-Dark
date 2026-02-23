@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 4ee1ee795037ecb47b5bb021ec3cc5ff
+guid: f24854d6af0cd194fa030a15d9220f48
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/Groin.prefab
+  uploadId: 704093

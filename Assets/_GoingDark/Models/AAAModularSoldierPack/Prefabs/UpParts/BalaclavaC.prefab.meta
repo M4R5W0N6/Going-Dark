@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: ba55844f6728fe7479c98db565dda2be
+guid: 4ca1021eaff973042801d5923c447da7
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/BalaclavaC.prefab
+  uploadId: 704093

@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: d213f774de182f443b0f56079ae6e322
+guid: 74edb888a093f58409cbf912e31c3a61
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/HelmetCoverA.prefab
+  uploadId: 704093

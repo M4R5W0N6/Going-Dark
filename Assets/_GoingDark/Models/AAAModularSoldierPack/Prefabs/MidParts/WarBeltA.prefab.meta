@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 230eaa349b0254a4894e648e73d63b7c
+guid: aa2379a0d8ca71248a95e0bb7c9d01b9
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/WarBeltA.prefab
+  uploadId: 704093

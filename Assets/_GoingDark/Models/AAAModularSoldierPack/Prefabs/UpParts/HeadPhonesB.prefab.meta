@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 989cc1299fb85c24f879091fb5e44dd5
+guid: 0d95a90fae968bd46b778c89b5052deb
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/HeadphonesB.prefab
+  uploadId: 704093

@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: d9fc17608dfdb8949aaaa1b6949e4459
+guid: fdcc47b216b518a46bdacf1ef4328bb3
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/HatA.prefab
+  uploadId: 704093

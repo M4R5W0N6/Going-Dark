@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: ac5ea85caf445c14aa0861399ebe6ead
+guid: 86d105c9e092e2c47b1ecbe67d3a81ed
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/VestA.prefab
+  uploadId: 704093

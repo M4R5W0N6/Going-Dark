@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 1ba6813bf646fac47b7148da3c175900
+guid: efd05bf006c57b74b9339395721e456a
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/LowParts/PantsC.prefab
+  uploadId: 704093

@@ -31,8 +31,6 @@ namespace TPSBR
 		private bool _surfaceDeflection = true;
 		[SerializeField, Range(1, 16)]
 		private int _surfaceDeflectionIterations = 6;
-		[SerializeField, Min(0.05f)]
-		private float _surfaceDeflectionStepDistance = 0.6f;
 		[SerializeField, Min(0.001f)]
 		private float _surfaceDeflectionSurfaceOffset = 0.02f;
 		[SerializeField, Min(0.05f)]

@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: b1cfd54de4a30e4408418c8eb118c81e
+guid: 466b205283b18ca418f838f9bfd5a5fd
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/HelmetPresetE.prefab
+  uploadId: 704093

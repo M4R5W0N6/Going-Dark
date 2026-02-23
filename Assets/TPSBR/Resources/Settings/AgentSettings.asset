@@ -13,24 +13,10 @@ MonoBehaviour:
   m_Name: AgentSettings
   m_EditorClassIdentifier: 
   _agents:
-  - _id: Agent.Marine
-    _displayName: Marine
-    _description: Marine, also known as The Beast, fought in several war conflicts
-      without single injury. Although struggling with a high temper, his experience
-      gives him excessive advantage on the battlefield. He was discharged from the
-      army due to his unhealthy obsession with explosives. Now working as a veteran
-      for hire.
-    _icon: {fileID: 21300000, guid: 074e27806d341f744a7b4c543c417d0f, type: 3}
+  - _id: Agent.SOF_A
+    _displayName: SOF_A
+    _description: 
+    _icon: {fileID: 21300000, guid: aeef3d390f8d3da4681f7c248ebff3b6, type: 3}
     _agentPrefab:
-      RawGuidValue: ae02aef1211f3264a935ca8d5f12b077
-    _menuAgentPrefab: {fileID: 3319942621441823766, guid: d2f400a1087a7f54cb70aaf57d3abc0e, type: 3}
-  - _id: Agent.Soldier
-    _displayName: Soldier 66
-    _description: Nobody knows where Soldier 66 came from. There are rumors that
-      he was a high profile hitman before undergoing a series of experimental operations
-      to become half human and half machine. He is famous for not following any sort
-      of rules which makes him particularly dangerous... thing.
-    _icon: {fileID: 21300000, guid: 9f4607891e0c46343aa052ce9c2017f4, type: 3}
-    _agentPrefab:
-      RawGuidValue: b9f04dd6fe389b04b8d0b0bfed89e770
-    _menuAgentPrefab: {fileID: 2529299778790674133, guid: 4e02b22e9ad831646a16d09da1821534, type: 3}
+      RawGuidValue: 6ddd135228f929446974c0181f5b8112
+    _menuAgentPrefab: {fileID: 7009816719026434345, guid: 71536409b2aa8fd45a315b2b6085942c, type: 3}

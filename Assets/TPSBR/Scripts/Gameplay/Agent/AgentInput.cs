@@ -782,19 +782,23 @@ namespace TPSBR
 
 		private void UpdateAutomaticLeaning()
 		{
+			bool leanLeftPressed = _leanLeftAction != null && _leanLeftAction.IsPressed();
+			bool leanRightPressed = _leanRightAction != null && _leanRightAction.IsPressed();
+
 			float leanSide = LeaningComponent == null
 				? 1.0f
 				: LeaningComponent.UpdateLeaning(
 					_renderMoveInputRaw,
 					_renderLookInputRaw,
-					_leanLeftAction != null && _leanLeftAction.IsPressed(),
-					_leanRightAction != null && _leanRightAction.IsPressed(),
+					leanLeftPressed,
+					leanRightPressed,
 					_renderInput.Aim,
 					Time.unscaledDeltaTime);
 
-			bool isRightSide = leanSide >= 0.5f;
-			_renderInput.LeanRight = isRightSide;
-			_renderInput.LeanLeft = isRightSide == false;
+			// Lean actions are reserved for explicit side-toggle input only.
+			// Automatic lean should drive camera blend, not character side switching.
+			_renderInput.LeanLeft = leanLeftPressed == true && leanRightPressed == false;
+			_renderInput.LeanRight = leanRightPressed == true && leanLeftPressed == false;
 
 			if (Context != null)
 			{

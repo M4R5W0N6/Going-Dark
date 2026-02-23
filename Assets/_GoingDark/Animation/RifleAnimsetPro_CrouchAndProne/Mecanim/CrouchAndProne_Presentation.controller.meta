@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: ba5bba9f568f50846bda2085a01bc32b
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 20380
+  packageName: Rifle Crouch And Prone Pro
+  packageVersion: 1.1
+  assetPath: Assets/RifleAnimsetPro_CrouchAndProne/Mecanim/CrouchAndProne_Presentation.controller
+  uploadId: 552002

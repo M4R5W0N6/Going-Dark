@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 6f318e1dbba14bb42bc8843009711e81
+guid: 47aefc4ce1023494884136809d4cca11
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/GlassesBallisticB.prefab
+  uploadId: 704093

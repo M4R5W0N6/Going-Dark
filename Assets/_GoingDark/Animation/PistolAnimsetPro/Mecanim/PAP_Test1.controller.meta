@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c2babfd2de5e2fc4fab6702d485bad4b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 15828
+  packageName: Pistol Animset Pro
+  packageVersion: 4.0
+  assetPath: Assets/PistolAnimsetPro/Mecanim/PAP_Test1.controller
+  uploadId: 701325

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e727cb85183d43029284b88ba97aba4c
+labels:
+- FusionPrefab
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226753
+  packageName: BR200 - Battle Royale Multiplayer - Photon Fusion
+  packageVersion: 2.0.2
+  assetPath: Assets/TPSBR/Prefabs/Agents/AgentBase.prefab
+  uploadId: 718661

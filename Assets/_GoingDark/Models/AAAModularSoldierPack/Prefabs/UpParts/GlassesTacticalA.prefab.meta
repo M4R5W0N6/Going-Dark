@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: e281fa43c9f6e9944b18f962d2388cdf
+guid: 5feb9cc21d091da409cc490455918962
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/UpParts/GlassesTacticalA.prefab
+  uploadId: 704093

@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: f5f0c476b20075d42a6bd50c52ff4ed7
+guid: 92a1e0f958c1ca1468a5b08f363cd740
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/DropPouch.prefab
+  uploadId: 704093

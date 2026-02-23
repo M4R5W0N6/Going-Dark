@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: d52b4a7757a241a4789f938338bd2719
+guid: 18ae3648df253254ab718b2027283b24
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222861
+  packageName: MODULAR SOLDIER PACK
+  packageVersion: 1.0
+  assetPath: Assets/_GoingDark/Models/AAAModularSoldierPack/Prefabs/MidParts/ShirtPatchA.prefab
+  uploadId: 704093

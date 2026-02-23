@@ -3,6 +3,7 @@ namespace TPSBR
 	using UnityEngine;
 	using Fusion.Addons.KCC;
 	using Fusion.Addons.AnimationController;
+	using RootMotion.FinalIK;
 
 	[DefaultExecutionOrder(3)]
 	public sealed class CharacterAnimationController : AnimationController
@@ -15,6 +16,10 @@ namespace TPSBR
 		private Transform       _leftLowerArm;
 		[SerializeField]
 		private Transform       _leftUpperArm;
+		[SerializeField]
+		private FullBodyBipedIK _fullBodyIK;
+		[SerializeField]
+		private bool            _enableLeftHandIK = false;
 		[SerializeField][Range(0.0f, 1.0f)]
 		private float           _aimSnapPower = 0.5f;
 
@@ -209,6 +214,7 @@ namespace TPSBR
 			_agent      = this.GetComponentNoAlloc<Agent>();
 			_weapons    = this.GetComponentNoAlloc<Weapons>();
 			_jetpack    = this.GetComponentNoAlloc<Jetpack>();
+			_fullBodyIK = _fullBodyIK != null ? _fullBodyIK : this.GetComponentNoAlloc<FullBodyBipedIK>();
 
 			_locomotion = FindLayer<LocomotionLayer>();
 			_fullBody   = FindLayer<FullBodyLayer>();
@@ -279,17 +285,42 @@ namespace TPSBR
 			}
 
 			Transform leftHandTarget = _weapons.CurrentWeapon.LeftHandTarget;
-			if (leftHandTarget != null)
-			{
-				bool leftSide = _agent.LeftSide;
+			if (_enableLeftHandIK == false)
+				return;
 
+			if (_fullBodyIK != null)
+			{
+				var leftEffector = _fullBodyIK.solver.leftHandEffector;
+
+				if (leftHandTarget != null)
+				{
+					leftEffector.position = leftHandTarget.position;
+					leftEffector.rotation = leftHandTarget.rotation;
+					leftEffector.positionWeight = 1.0f;
+					leftEffector.rotationWeight = 1.0f;
+
+					_fullBodyIK.solver.leftArmChain.pull = 1.0f;
+					_fullBodyIK.solver.leftArmChain.bendConstraint.weight = 1.0f;
+					_fullBodyIK.solver.leftArmMapping.weight = 1.0f;
+					return;
+				}
+
+				leftEffector.positionWeight = 0.0f;
+				leftEffector.rotationWeight = 0.0f;
+				_fullBodyIK.solver.leftArmChain.pull = 0.0f;
+				_fullBodyIK.solver.leftArmChain.bendConstraint.weight = 0.0f;
+				_fullBodyIK.solver.leftArmMapping.weight = 0.0f;
+			}
+
+			if (leftHandTarget != null && _leftHand != null && _leftLowerArm != null && _leftUpperArm != null)
+			{
 				Vector3    leftHandLocalPosition       = _leftLowerArm.InverseTransformPoint(_leftHand.position);
 				Vector3    leftHandTargetLocalPosition = _leftLowerArm.InverseTransformPoint(leftHandTarget.position);
 				Quaternion leftLowerArmRotation        = Quaternion.FromToRotation(leftHandLocalPosition, leftHandTargetLocalPosition);
 
-				_leftLowerArm.rotation *= leftSide == true ? Quaternion.Inverse(leftLowerArmRotation) : leftLowerArmRotation;
+				_leftLowerArm.rotation = leftLowerArmRotation * _leftLowerArm.rotation;
 
-				for (int i = 0; i < 2; ++i)
+				for (int i = 0; i < 1; ++i)
 				{
 					Vector3    leftLowerArmOffset              = leftHandTarget.position - _leftHand.position;
 					Vector3    leftLowerArmTargetPosition      = _leftLowerArm.position + leftLowerArmOffset;
@@ -297,17 +328,17 @@ namespace TPSBR
 					Vector3    leftLowerArmTargetLocalPosition = _leftUpperArm.InverseTransformPoint(leftLowerArmTargetPosition);
 					Quaternion leftUpperArmRotation            = Quaternion.FromToRotation(leftLowerArmLocalPosition, leftLowerArmTargetLocalPosition);
 
-					_leftUpperArm.rotation *= leftSide == true ? Quaternion.Inverse(leftUpperArmRotation) : leftUpperArmRotation;
+					_leftUpperArm.rotation = leftUpperArmRotation * _leftUpperArm.rotation;
 
 					leftHandLocalPosition       = _leftLowerArm.InverseTransformPoint(_leftHand.position);
 					leftHandTargetLocalPosition = _leftLowerArm.InverseTransformPoint(leftHandTarget.position);
 					leftLowerArmRotation        = Quaternion.FromToRotation(leftHandLocalPosition, leftHandTargetLocalPosition);
 
-					_leftLowerArm.rotation *= leftSide == true ? Quaternion.Inverse(leftLowerArmRotation) : leftLowerArmRotation;
+					_leftLowerArm.rotation = leftLowerArmRotation * _leftLowerArm.rotation;
 				}
 
-				_leftHand.position = leftHandTarget.position;
-				_leftHand.rotation = leftHandTarget.rotation;
+				_leftHand.position = Vector3.Lerp(_leftHand.position, leftHandTarget.position, 0.75f);
+				_leftHand.rotation = Quaternion.Slerp(_leftHand.rotation, leftHandTarget.rotation, 0.75f);
 			}
 		}
 

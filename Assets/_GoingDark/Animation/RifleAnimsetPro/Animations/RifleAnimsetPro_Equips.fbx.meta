@@ -1362,3 +1362,10 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 15098
+  packageName: Rifle Animset Pro
+  packageVersion: 2.0
+  assetPath: Assets/_GoingDark/Animation/RifleAnimsetPro/Animations/RifleAnimsetPro_Equips.fbx
+  uploadId: 701303
