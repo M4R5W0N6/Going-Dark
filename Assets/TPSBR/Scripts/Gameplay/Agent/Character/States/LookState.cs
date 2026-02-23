@@ -21,6 +21,7 @@ namespace TPSBR
 		private Jetpack                _jetpack;
 		private AnimationMixerPlayable _mixer;
 		private int                    _inputs;
+		private int[]                  _setInputOffsets;
 
 		// PUBLIC METHODS
 
@@ -35,10 +36,12 @@ namespace TPSBR
 		{
 			_mixer  = AnimationMixerPlayable.Create(Controller.Graph, 0);
 			_inputs = 0;
+			_setInputOffsets = new int[_sets.Length];
 
 			for (int j = 0, setCount = _sets.Length; j < setCount; ++j)
 			{
 				LookSet set = _sets[j];
+				_setInputOffsets[j] = _inputs;
 
 				for (int i = 0, nodeCount = set.Nodes.Length; i < nodeCount; ++i)
 				{
@@ -94,7 +97,7 @@ namespace TPSBR
 		private void Refresh(float pitch)
 		{
 			int setID = GetSetID();
-			if (setID < 0)
+			if (setID < 0 || setID >= _sets.Length)
 				return;
 
 			for (int i = 0, count = _inputs; i < count; ++i)
@@ -102,25 +105,38 @@ namespace TPSBR
 				_mixer.SetInputWeight(i, 0.0f);
 			}
 
-			int   node  = 0;
-			float angle = (pitch + 720.0f + _sets[setID].Offset) % 360.0f;
+			LookSet set = _sets[setID];
+			if (set.Nodes == null || set.Nodes.Length == 0)
+				return;
 
-			if (angle > 180.0f)
+			int   node  = 0;
+			float angle = (pitch + 720.0f + set.Offset) % 360.0f;
+
+			if (angle > 180.0f && set.Nodes.Length > 1)
 			{
 				node  = 1;
 				angle = 360.0f - angle;
 			}
 
-			angle = Mathf.Clamp(Mathf.Pow(angle, _sets[setID].Power), 0.0f, 90.0f);
+			angle = Mathf.Clamp(Mathf.Pow(angle, set.Power), 0.0f, 90.0f);
 
 			if (angle.IsNaN() == true)
 			{
 				angle = 0.0f;
 			}
 
-			int clipIndex = setID * 2 + node;
+			int clipIndex = _setInputOffsets[setID] + node;
+			if (clipIndex < 0 || clipIndex >= _inputs)
+				return;
 
-			_sets[setID].Nodes[node].PlayableClip.SetTime(angle / 90.0f);
+			if (set.Nodes.Length > 1)
+			{
+				set.Nodes[node].PlayableClip.SetTime(angle / 90.0f);
+			}
+			else
+			{
+				set.Nodes[node].PlayableClip.SetTime(0.0f);
+			}
 
 			_mixer.SetInputWeight(clipIndex, 1.0f);
 		}
