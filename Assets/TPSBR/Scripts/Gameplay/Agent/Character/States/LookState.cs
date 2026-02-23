@@ -130,7 +130,7 @@ namespace TPSBR
 			if (_jetpack.IsActive == true)
 				return -1;
 
-			int currentWeaponSlot = _weapons.CurrentWeaponSlot;
+			int currentWeaponSlot = _weapons.CurrentWeapon == null ? 0 : _weapons.CurrentWeaponSlot;
 			if (currentWeaponSlot > 2)
 			{
 				currentWeaponSlot = 1; // For grenades we use pistol set

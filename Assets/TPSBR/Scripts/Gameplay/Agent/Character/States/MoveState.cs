@@ -77,7 +77,7 @@ namespace TPSBR
 			int currentWeaponSlot = _weapons.CurrentWeaponSlot;
 			if (currentWeaponSlot > 2)
 			{
-				currentWeaponSlot = 1; // For grenades we use pistol set
+				currentWeaponSlot = 0; // For grenades we use unarmed set
 			}
 
 			if (currentWeaponSlot < 0)

@@ -1692,19 +1692,19 @@ MonoBehaviour:
       Position: {x: 2.4, y: 0}
   - _speed: 1
     _nodes:
-    - Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+    - Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Position: {x: 0, y: 0}
-    - Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+    - Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Position: {x: 0, y: 2.4}
-    - Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+    - Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Position: {x: 0, y: -2.4}
-    - Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+    - Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Position: {x: -2.4, y: 0}
-    - Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+    - Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Position: {x: 2.4, y: 0}
   - _speed: 1
@@ -2378,10 +2378,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sets:
   - Nodes:
-    - Clip: {fileID: 7400058, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400008, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
       Speed: 1
       IsLooping: 0
-    - Clip: {fileID: 7400056, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400006, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
       Speed: 1
       IsLooping: 0
     Offset: 0
@@ -2923,19 +2923,19 @@ MonoBehaviour:
   _sets:
   - _speed: 1
     _nodes:
-    - Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
       Speed: 1
       Position: {x: 0, y: 0}
-    - Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
       Speed: 1
       Position: {x: 0, y: 2.4}
-    - Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
       Speed: 1
       Position: {x: 0, y: -2.4}
-    - Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
       Speed: 1
       Position: {x: -2.4, y: 0}
-    - Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+    - Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
       Speed: 1
       Position: {x: 2.4, y: 0}
   - _speed: 1
