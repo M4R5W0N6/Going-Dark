@@ -140,14 +140,8 @@ namespace TPSBR
 
 		public override void Despawned(NetworkRunner runner, bool hasState)
 		{
-			if (hasState == true)
-			{
-				DisarmWeapon();
-			}
-			else
-			{
-				_isArmed = false;
-			}
+			// Avoid reparent operations while object is being destroyed.
+			_isArmed = false;
 
 			Deinitialize(_owner);
 		}

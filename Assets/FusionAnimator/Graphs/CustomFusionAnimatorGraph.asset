@@ -1,0 +1,3407 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18653635faea7ae4ca16776ae2da3364, type: 3}
+  m_Name: CustomFusionAnimatorGraph
+  m_EditorClassIdentifier: FusionAnimator.Runtime::FusionAnimator.FusionAnimatorGraphAsset
+  GraphId: graph_d790cd00d5a24021a03d1ababe609cb6
+  DisplayName: Fusion Animator Graph
+  EntryStateId: state_4fa18e013eeb4b01923e833d7e579a2a
+  ApplyRootMotion: 0
+  EntryNodePosition: {x: -564, y: -57}
+  AnyNodePosition: {x: -564, y: 83}
+  ExitNodePosition: {x: 580, y: 353}
+  PreviewSource: {fileID: 0}
+  PreviewTarget: {fileID: 919132149155446097, guid: 4577e9f627e3e5c4a84486473e623026, type: 3}
+  PreviewTargetGlobalObjectId: 
+  Parameters:
+  - Id: param_46d4d6948b114e198f8335dfe9f2321c
+    Name: Input_Move
+    Type: 4
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: vector2:LeftStick
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_23bddf65568349caacf214092d4b8d03
+    Name: Input_Look
+    Type: 4
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: vector2:RightStick
+    PreviewInputScale: 0.6
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+    Name: Input_Aim
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:LeftTrigger
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_bf3d1959c1624ba2911b621128b706c2
+    Name: Input_Shoot
+    Type: 3
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:RightTrigger
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_7e2055831edd487ba53f13730dce064d
+    Name: Input_Reload
+    Type: 3
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:ButtonWest
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_11e0ad9ba84a4768b2cdcba9acad05ec
+    Name: Input_Jump
+    Type: 3
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:ButtonSouth
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_ca501da3275c48e0be1f338fbb3d581c
+    Name: Input_Throw
+    Type: 3
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:LeftShoulder
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_5d6ea07fcc6744ac816d5fca6523d8c7
+    Name: State_IsDead
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:Select
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_08e42afc50814f6b826b5e200aac248d
+    Name: State_IsShooting
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:RightTrigger
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_e0be1bc95feb441db1163e13f5adf056
+    Name: State_IsReloading
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:ButtonWest
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_5ebe1fd6e81948568510f567363ed648
+    Name: State_IsGrounded
+    Type: 0
+    DefaultBool: 0
+    Invert: 1
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:ButtonSouth
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_9079d59bbe7c483cbec52edfc4c11bfa
+    Name: State_IsThrowing
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:LeftShoulder
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_cc8aead836874dabbbe5d427661a9100
+    Name: State_Jetpack
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:ButtonNorth
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  - Id: param_307a7f3ff5794fb8b04d2a7b0cc29bc4
+    Name: State_IsSprinting
+    Type: 0
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:LeftStickMagnitude
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 5
+    PreviewBoolInputCompareValue: 0.75
+  - Id: param_36ffec0edbbd4072bbebb35dceef08e6
+    Name: State_Weapon
+    Type: 1
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:RightShoulder
+    PreviewInputScale: 1
+    PreviewBoolInputSource: 0
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
+  BindingGroups:
+  - Id: group_77290d31cf034a73aa90d88964596d65
+    Name: Move
+  - Id: group_976d07a0980b464d99042379a175a400
+    Name: Look
+  - Id: group_d98eb2314c684ddfa46ce43780f8add2
+    Name: Grenade
+  ClipBindings:
+  - Id: binding_9282a3eb0e644b3183409a1c85653130
+    Name: Idle
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400010, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_7e661da6ffa845298b5cac4d5ceff97f
+    Name: WalkFwdStart
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400016, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400014, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_8e6d3c4ff6354441b0a6d41cc98cd182
+    Name: WalkFwdStop_LU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400020, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400018, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_29385a5914824330aaf8adef6633b1b3
+    Name: WalkFwdStop_RU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400022, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400020, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_2a8c453f55ae429b83f7f45e305c2305
+    Name: WalkBwdStart
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400024, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400022, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_5e6821db30a34b05b8ec06f4aae138e7
+    Name: ShootOnce
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400092, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400050, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_867c19eea13344989c4f65fb6cc5c928
+    Name: Reload
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400096, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400056, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_466e1467e12f494fbe9feb3dd45e4258
+    Name: Look_90U_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400056, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400076, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_eab260c10f8d47558ec786a2bdf13d2d
+    Name: Aim
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_39553c59d6344a2caee309725c84e919
+    Name: Look_45LU_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400010, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400080, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_a26d16f401ae471596f43bbe8b40b244
+    Name: Look_45RD_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400016, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400086, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_13aebb69b0804feba76f6de945757fb2
+    Name: Look_90D_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400008, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400078, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_9263354582b0475a9d120b41095aec24
+    Name: Look_90L_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400072, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_76da4402439f475b94315be0a9d7966d
+    Name: Look_90R_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400074, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_9a2536b0be164d11bb9414e3a9edcba9
+    Name: Look_90U_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400006, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400076, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_e64db18aa74a494c8a3c1636d55cdb7b
+    Name: Look_45RU_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400012, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400082, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_dc03c70c6fd949f99cca2dde4fa48bfa
+    Name: Look_90D_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400058, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400078, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_e2f20c5eaddb4ed28b2be00a0979f26b
+    Name: Look_45LD_Additive
+    GroupId: group_976d07a0980b464d99042379a175a400
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400064, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400084, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_a40151406e2449639b8a25e751d097de
+    Name: Grenade_Throw_Cancel
+    GroupId: group_d98eb2314c684ddfa46ce43780f8add2
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400116, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1.5
+      Loop: 0
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400110, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1.5
+      Loop: 0
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_46e4ced528f7476fa45803b7b1e66e19
+    Name: Grenade_Throw_Loop
+    GroupId: group_d98eb2314c684ddfa46ce43780f8add2
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400114, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400108, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_69bc38d3000b4285861572ca18849dfc
+    Name: Grenade_Throw_Far
+    GroupId: group_d98eb2314c684ddfa46ce43780f8add2
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400118, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400112, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_97813f4b63df468ba55e95d40f213f21
+    Name: Grenade_Throw_Start
+    GroupId: group_d98eb2314c684ddfa46ce43780f8add2
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400112, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400106, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_4562174b75eb48f0bd97838bab91f762
+    Name: WalkBwdLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400026, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400024, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_9d2f21de2de2422492b34b6531da3423
+    Name: WalkBwdStop_LU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400030, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400028, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_420d0d57f46b4f33a6e441403b9001e5
+    Name: WalkBwdStop_RU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400028, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400026, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_6016b8f866044628a6d273ddb5394be4
+    Name: WalkFwdLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400018, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400016, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_a10435b9a67d485c99f0fffe22c2dc50
+    Name: StrafeLeftStart
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400038, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400038, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_e7af9a4cf79c4132afa90d07afd86519
+    Name: StrafeLeft45Loop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400048, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400046, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_0157e4fab2524429bff7b6f332254bec
+    Name: StrafeLeft135Loop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400072, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_fe70a915b2c34a44adf4845ff02a59a6
+    Name: StrafeLeftLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400042, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400040, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_b443f0737f5546288aef057cec5ad202
+    Name: StrafeRight45Loop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400078, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400008, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_f38d0d29a0024b3a8687814fe58b1a57
+    Name: StrafeRightLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400034, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400032, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_d3dbc25d9f4a4958a49c9938c7594941
+    Name: StrafeRight135Loop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400050, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400048, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_ce669f0e12c24af2bc9681b90ec8693a
+    Name: StrafeRightStop_RU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400038, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400036, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_76f964d1583440bdbbc6f386754cf4c9
+    Name: StrafeRightStop_LU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400036, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400034, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_87717847f0b64c1cbb1d0189ded2ddc3
+    Name: StrafeLeftStop_RU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400044, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400042, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_7cba77f022fe4e65b46e6dc401bad339
+    Name: StrafeLeftStop_LU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400046, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400044, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_b75f2196ae084f8b80b6ca10fc7469aa
+    Name: RunBwdLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400062, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400024, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_8dc3950c30be4931992cf48f4644da25
+    Name: StrafeRun45LeftLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400068, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400030, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_9312dc8733f944b0a7277afb366535ed
+    Name: StrafeRunLeftLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400066, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400028, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_0d3b134a6c9d4526a04971fccba9fabb
+    Name: StrafeRunRightLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400064, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400026, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_e6fdb2adb9e8481a8f9fecebba922e04
+    Name: SprintStop_LU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400128, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400008, guid: 74ab6da24dee7ca40a83456cd2488156, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_7650a0f1617c4bcea599d20c8262dee7
+    Name: StrafeRightStart
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400032, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400030, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_f00ee7abdf854d0dbceb10f9e79b4c7b
+    Name: RunFwdLoop
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400060, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400022, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_1217bfb391864ee6ac1c02f96e9ed1a8
+    Name: SprintStop_RU
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400126, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400006, guid: 74ab6da24dee7ca40a83456cd2488156, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_7b4713d484114000b64eddf8c37143e9
+    Name: SprintStart
+    GroupId: group_77290d31cf034a73aa90d88964596d65
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400124, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: 74ab6da24dee7ca40a83456cd2488156, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  Layers:
+  - Id: layer_3e432cac3d0b4918b696995479a1444d
+    Name: Base
+    Priority: 0
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 0}
+    SyncedLayerIndex: -1
+    SyncTiming: 1
+    IKPass: 1
+  - Id: layer_22012c26606d4e40af6c1b18c6e2f47b
+    Name: Look
+    Priority: 1
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 101100000, guid: 254dcd44b67982b4eaf77a3e02f1651e, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 1
+    IKPass: 0
+  - Id: layer_4766da9aa1624562a91b0139bfb45cee
+    Name: Upper
+    Priority: 2
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 101100000, guid: 196c2a4d35623c44d901ca411b9557df, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 1
+    IKPass: 0
+  - Id: layer_486c3da5769347838f95c16b986ccf8a
+    Name: Top
+    Priority: 3
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 0}
+    SyncedLayerIndex: -1
+    SyncTiming: 1
+    IKPass: 0
+  States:
+  - Id: state_9404df2fc8ae4ab487c24198b17b3c3d
+    Name: Shoot
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: 90, y: -35}
+    MinDurationSeconds: 0.2
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Motion
+      ReferenceMode: 1
+      BindingId: binding_5e6821db30a34b05b8ec06f4aae138e7
+      Clip: {fileID: 7400092, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_9c372a49a89942df8d0b2a5b205fda9e
+    Name: Reload
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -198, y: 267}
+    MinDurationSeconds: 1
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Motion
+      ReferenceMode: 1
+      BindingId: binding_867c19eea13344989c4f65fb6cc5c928
+      Clip: {fileID: 7400096, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_6256137cab304779b0fc5d0fdeee5024
+    Name: Idle
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -315, y: -39}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_9282a3eb0e644b3183409a1c85653130
+      Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_00e9b6d941694303859053ecf36a7689
+    Name: Aim
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -315, y: -161}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_eab260c10f8d47558ec786a2bdf13d2d
+      Clip: {fileID: 7400004, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_e618232f27c5468384ccf9b17d2bfa14
+    Name: Death
+    LayerId: layer_486c3da5769347838f95c16b986ccf8a
+    NodePosition: {x: -550, y: 153}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400122, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4fa18e013eeb4b01923e833d7e579a2a
+    Name: Look
+    LayerId: layer_22012c26606d4e40af6c1b18c6e2f47b
+    NodePosition: {x: -724, y: 13}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 5
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_23bddf65568349caacf214092d4b8d03
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1.4
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_e2f20c5eaddb4ed28b2be00a0979f26b
+        Clip: {fileID: 7400064, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 1
+        Position: {x: -0.5, y: -0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_39553c59d6344a2caee309725c84e919
+        Clip: {fileID: 7400010, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: -0.5, y: 0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_a26d16f401ae471596f43bbe8b40b244
+        Clip: {fileID: 7400016, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: 0.5, y: -0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_13aebb69b0804feba76f6de945757fb2
+        Clip: {fileID: 7400008, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9263354582b0475a9d120b41095aec24
+        Clip: {fileID: 7400002, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_76da4402439f475b94315be0a9d7966d
+        Clip: {fileID: 7400004, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9a2536b0be164d11bb9414e3a9edcba9
+        Clip: {fileID: 7400006, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_e64db18aa74a494c8a3c1636d55cdb7b
+        Clip: {fileID: 7400012, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+        Threshold: 1
+        Position: {x: 0.5, y: 0.5}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_0719c87eae2c4c26969032bd8819158e
+    Name: Jetpack
+    LayerId: layer_486c3da5769347838f95c16b986ccf8a
+    NodePosition: {x: -550, y: 13}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400000, guid: a4b75c3f5486a447e96bbe666ed68c1f, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_33214ce7cc3749aca345dec71b662976
+    Name: Idle
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -339, y: 227}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_9282a3eb0e644b3183409a1c85653130
+      Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_09a6d70288e34bd9abe021d67e6ae4f1
+    Name: Start_Jump
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -339, y: 87}
+    MinDurationSeconds: 0.5
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_350c6b5ac014473b8b4af0aed6293534
+    Name: Loop_Jump
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -200, y: -8}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400114, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_ab620122124043428e098db78b3989b9
+    Name: End_Jump
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -66, y: 87}
+    MinDurationSeconds: 0.5
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400110, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_0d12cb3500364d3ca14211d3daa8da3e
+    Name: Grenade/__fa_scope_anchor__
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: 300, y: -40}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_b67ee98cddc5439da7a2cf863e2ad6e2
+    Name: Grenade/Unequip Grenade
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -497, y: 284}
+    MinDurationSeconds: 0.6
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_a40151406e2449639b8a25e751d097de
+      Clip: {fileID: 7400116, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1.5
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_d831572fa72a422382fd9ebdcc1121fc
+    Name: Grenade/Hold Grenade
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -654, y: 604}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_46e4ced528f7476fa45803b7b1e66e19
+      Clip: {fileID: 7400114, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_0c757e792ee84838a7778718d4272cf4
+    Name: Grenade/Throw Grenade Far
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -444, y: 604}
+    MinDurationSeconds: 1.2
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_69bc38d3000b4285861572ca18849dfc
+      Clip: {fileID: 7400118, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_43c7960140cd4a0ab7f00c660a931d40
+    Name: Grenade/Equip Grenade
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -857, y: 284}
+    MinDurationSeconds: 0.4
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_97813f4b63df468ba55e95d40f213f21
+      Clip: {fileID: 7400112, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_ae2925b990e441d88057e072aac08d58
+    Name: Move/Walk Start
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -1034, y: 245}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 1
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_7e661da6ffa845298b5cac4d5ceff97f
+        Clip: {fileID: 7400016, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_2a8c453f55ae429b83f7f45e305c2305
+        Clip: {fileID: 7400024, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_7650a0f1617c4bcea599d20c8262dee7
+        Clip: {fileID: 7400032, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_a10435b9a67d485c99f0fffe22c2dc50
+        Clip: {fileID: 7400038, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9282a3eb0e644b3183409a1c85653130
+        Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_af542725c9ef4c918805e85bfca1dfdb
+    Name: Move/Walk Loop
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -744, y: 323}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 3
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_6016b8f866044628a6d273ddb5394be4
+        Clip: {fileID: 7400018, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_4562174b75eb48f0bd97838bab91f762
+        Clip: {fileID: 7400026, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: -0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_e7af9a4cf79c4132afa90d07afd86519
+        Clip: {fileID: 7400048, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.354, y: 0.354}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_0157e4fab2524429bff7b6f332254bec
+        Clip: {fileID: 7400072, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.354, y: -0.354}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_fe70a915b2c34a44adf4845ff02a59a6
+        Clip: {fileID: 7400042, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.5, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_b443f0737f5546288aef057cec5ad202
+        Clip: {fileID: 7400078, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0.354, y: 0.354}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_f38d0d29a0024b3a8687814fe58b1a57
+        Clip: {fileID: 7400034, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_d3dbc25d9f4a4958a49c9938c7594941
+        Clip: {fileID: 7400050, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0.354, y: -0.354}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_5093fae8f30a407caf20331150391d9d
+    Name: Move/Walk End
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -744, y: 78}
+    MinDurationSeconds: 1
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 1
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_29385a5914824330aaf8adef6633b1b3
+        Clip: {fileID: 7400022, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_8e6d3c4ff6354441b0a6d41cc98cd182
+        Clip: {fileID: 7400020, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.334
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_420d0d57f46b4f33a6e441403b9001e5
+        Clip: {fileID: 7400028, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: -1
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9d2f21de2de2422492b34b6531da3423
+        Clip: {fileID: 7400030, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.843
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_ce669f0e12c24af2bc9681b90ec8693a
+        Clip: {fileID: 7400038, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.297
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_76f964d1583440bdbbc6f386754cf4c9
+        Clip: {fileID: 7400036, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.776
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_87717847f0b64c1cbb1d0189ded2ddc3
+        Clip: {fileID: 7400044, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.691
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_7cba77f022fe4e65b46e6dc401bad339
+        Clip: {fileID: 7400046, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.893
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_0ab0994bf1ab4ed6b7af125b3789d91b
+    Name: Move/__fa_scope_anchor__
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: 300, y: -40}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_8eb4f5f716be4c629d8a056310d7a763
+    Name: Move/Run Loop
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -744, y: 502}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 3
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 0
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_f00ee7abdf854d0dbceb10f9e79b4c7b
+        Clip: {fileID: 7400060, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_b75f2196ae084f8b80b6ca10fc7469aa
+        Clip: {fileID: 7400062, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_8dc3950c30be4931992cf48f4644da25
+        Clip: {fileID: 7400068, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.707, y: 0.707}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_0157e4fab2524429bff7b6f332254bec
+        Clip: {fileID: 7400072, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.707, y: -0.707}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9312dc8733f944b0a7277afb366535ed
+        Clip: {fileID: 7400066, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_8dc3950c30be4931992cf48f4644da25
+        Clip: {fileID: 7400068, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: -0.707, y: 0.707}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_0d3b134a6c9d4526a04971fccba9fabb
+        Clip: {fileID: 7400064, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0.707, y: 0.707}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 0
+        BindingId: 
+        Clip: {fileID: 7400070, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0.707, y: -0.707}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_219a3d5eb40940b79540802677d268c9
+    Name: Move/Run End
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -445, y: 502}
+    MinDurationSeconds: 1
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 1
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_1217bfb391864ee6ac1c02f96e9ed1a8
+        Clip: {fileID: 7400126, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 1
+        Position: {x: 0.5, y: 0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_e6fdb2adb9e8481a8f9fecebba922e04
+        Clip: {fileID: 7400128, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0.334
+        Position: {x: -0.5, y: 0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_420d0d57f46b4f33a6e441403b9001e5
+        Clip: {fileID: 7400028, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: -1
+        Position: {x: 0.5, y: -0.5}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9d2f21de2de2422492b34b6531da3423
+        Clip: {fileID: 7400030, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0.843
+        Position: {x: -0.5, y: -0.5}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_887f32f0f5c542d8acce2441a16c50c6
+    Name: Move/Run Start
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -983, y: 502}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 1
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: param_46d4d6948b114e198f8335dfe9f2321c
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 0
+      Children:
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_7b4713d484114000b64eddf8c37143e9
+        Clip: {fileID: 7400124, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_2a8c453f55ae429b83f7f45e305c2305
+        Clip: {fileID: 7400024, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: -1}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_7650a0f1617c4bcea599d20c8262dee7
+        Clip: {fileID: 7400032, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_a10435b9a67d485c99f0fffe22c2dc50
+        Clip: {fileID: 7400038, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 1
+        BindingId: binding_9282a3eb0e644b3183409a1c85653130
+        Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_8af876e1eb7948eda598d636a52404e9
+    Name: Turn
+    LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    NodePosition: {x: -228, y: 277}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips:
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400006, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
+      Speed: 1
+      Loop: 1
+    - Slot: Default
+      ReferenceMode: 0
+      BindingId: 
+      Clip: {fileID: 7400002, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 1
+      ParameterXId: param_23bddf65568349caacf214092d4b8d03.x
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 1
+      Children:
+      - Name: Motion
+        ReferenceMode: 0
+        BindingId: 
+        Clip: {fileID: 7400006, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
+        Threshold: 0
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Motion
+        ReferenceMode: 0
+        BindingId: 
+        Clip: {fileID: 7400002, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
+        Threshold: 0
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  Transitions:
+  - Id: transition_6a468d3c3b064edbbfe0415d923d1717
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_9c372a49a89942df8d0b2a5b205fda9e
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_7e2055831edd487ba53f13730dce064d
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_ebc63f971b67493f92dca2d66e5f2d79
+    Name: Transition
+    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
+    ToStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_ccf4a8677ef24452b67abcaf66500e44
+    Name: Transition
+    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
+    ToStateId: state_9c372a49a89942df8d0b2a5b205fda9e
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_7e2055831edd487ba53f13730dce064d
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3eb5f5e360854943b6303e5b63eef2f8
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_9e15c50fc6f940e1a3880594056af058
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_4f630e918da4483f90c3c379804b58d2
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_8d67bcc3e58d428e9b8e183fbc9c21f5
+    Name: Transition
+    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
+    ToStateId: state_00e9b6d941694303859053ecf36a7689
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_cace276310694faa86c67daa5a4a5006
+    Name: Transition
+    FromStateId: state_00e9b6d941694303859053ecf36a7689
+    ToStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_7eed70b8625b42218f58ec9ab8821740
+    Name: Transition
+    FromStateId: state_00e9b6d941694303859053ecf36a7689
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_dbf89ffd7e924e98931838ba083dafb9
+    Name: Transition
+    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_5e8bebae05e54cc38560a172aa3793bf
+    Name: Transition
+    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    ToStateId: state_00e9b6d941694303859053ecf36a7689
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_9c71295a77814505976bb3e1f5c4d791
+    Name: Transition
+    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
+    ToStateId: state_9c372a49a89942df8d0b2a5b205fda9e
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_7e2055831edd487ba53f13730dce064d
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c33e57d5f78247ee8688be3a83247eae
+    Name: Transition
+    FromStateId: state_9c372a49a89942df8d0b2a5b205fda9e
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_a32513ec7c5d4e048ad2f38c31bf050f
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_e618232f27c5468384ccf9b17d2bfa14
+    Priority: -10
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5d6ea07fcc6744ac816d5fca6523d8c7
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_bc278b05630041dd92cf060ce655b510
+    Name: Transition
+    FromStateId: state_e618232f27c5468384ccf9b17d2bfa14
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5d6ea07fcc6744ac816d5fca6523d8c7
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_6118994434cd4f3f8fddcf5863db4725
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_0719c87eae2c4c26969032bd8819158e
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_cc8aead836874dabbbe5d427661a9100
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_5d6ea07fcc6744ac816d5fca6523d8c7
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_1fd2554f77114a1ea94d39652f03bf95
+    Name: Transition
+    FromStateId: state_0719c87eae2c4c26969032bd8819158e
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_cc8aead836874dabbbe5d427661a9100
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_49a2249e623f44008bedbd6a49cdf773
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_33214ce7cc3749aca345dec71b662976
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_0f50d04b29b34dba9fb753248139b506
+    Name: Transition
+    FromStateId: state_09a6d70288e34bd9abe021d67e6ae4f1
+    ToStateId: state_350c6b5ac014473b8b4af0aed6293534
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_36df2824b69e4e8c9873de30b37e0510
+    Name: Transition
+    FromStateId: state_350c6b5ac014473b8b4af0aed6293534
+    ToStateId: state_ab620122124043428e098db78b3989b9
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_6068db152a3741cbac5719097332441b
+    Name: Transition
+    FromStateId: state_09a6d70288e34bd9abe021d67e6ae4f1
+    ToStateId: state_ab620122124043428e098db78b3989b9
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c28e11c66cd141079b67e51723e5a5b4
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_350c6b5ac014473b8b4af0aed6293534
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_0840b7ee0cb3481685c280643255b9bd
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_09a6d70288e34bd9abe021d67e6ae4f1
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_11e0ad9ba84a4768b2cdcba9acad05ec
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_db06ff0944bd4dbc901707b90d77c53c
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_33214ce7cc3749aca345dec71b662976
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_23bddf65568349caacf214092d4b8d03
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_6e5c6b17fc3344f6b8b16235ae6970c4
+    Name: Transition
+    FromStateId: state_d831572fa72a422382fd9ebdcc1121fc
+    ToStateId: state_0c757e792ee84838a7778718d4272cf4
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_cef2c0c85a304e5e81e7fffc0b15b01e
+    Name: Transition
+    FromStateId: state_d831572fa72a422382fd9ebdcc1121fc
+    ToStateId: state_b67ee98cddc5439da7a2cf863e2ad6e2
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b5d4daea38ad43c789708a37a3274e0c
+    Name: Transition
+    FromStateId: state_b67ee98cddc5439da7a2cf863e2ad6e2
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_52a07b17767641b78ee6415edc743a23
+    Name: Transition
+    FromStateId: state_0c757e792ee84838a7778718d4272cf4
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 1
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_1bdb5234646d44bcab1aa7d696307d2c
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_0d12cb3500364d3ca14211d3daa8da3e
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 1
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_ca501da3275c48e0be1f338fbb3d581c
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_8055b15faa274cdc9177417f36ff85ad
+    Name: Transition
+    FromStateId: state_43c7960140cd4a0ab7f00c660a931d40
+    ToStateId: state_b67ee98cddc5439da7a2cf863e2ad6e2
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_40fb0032bf244fc39f4341a55e2d8590
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_43c7960140cd4a0ab7f00c660a931d40
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_4c7e8c691c7a427dba9b3cc7779ee322
+    Name: Transition
+    FromStateId: state_43c7960140cd4a0ab7f00c660a931d40
+    ToStateId: state_d831572fa72a422382fd9ebdcc1121fc
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b78c07fb7c8a4c5cb9379138e242b695
+    Name: Transition
+    FromStateId: state_ae2925b990e441d88057e072aac08d58
+    ToStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    Priority: 1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 0.25
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_35a57b6b21c647f0843f4cf81c5b471b
+    Name: Transition
+    FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    ToStateId: state_5093fae8f30a407caf20331150391d9d
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_42e107cd771544afa2fbbc78e849093b
+    Name: Transition
+    FromStateId: state_ae2925b990e441d88057e072aac08d58
+    ToStateId: state_5093fae8f30a407caf20331150391d9d
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.4
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_86a1b9c5d0d14b939dd5bf58600d4172
+    Name: Transition
+    FromStateId: state_ae2925b990e441d88057e072aac08d58
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_50c2f1aa081e4de99b7b89374fd32a8b
+    Name: Transition
+    FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_aac469c81aba45549d2e02affa39b0b6
+    Name: Transition
+    FromStateId: state_5093fae8f30a407caf20331150391d9d
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_879933c9ac52410f8b11998d45da1c77
+    Name: Transition
+    FromStateId: state_5093fae8f30a407caf20331150391d9d
+    ToStateId: state_ae2925b990e441d88057e072aac08d58
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_5a86a66a4fe0411ebf28cf929876f929
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_307a7f3ff5794fb8b04d2a7b0cc29bc4
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_bbeb559251aa4937b97664f4ecf0f00d
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_ae2925b990e441d88057e072aac08d58
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b01c71b88583453ebddbd76db8049e08
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_0ab0994bf1ab4ed6b7af125b3789d91b
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d3353a73ef5c4c03b5de77efad22d1df
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_4fa18e013eeb4b01923e833d7e579a2a
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_27969a6dbe444c9e8cd2a925d18e6172
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_4fa18e013eeb4b01923e833d7e579a2a
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_ae74205f90b840f185a182e542f02422
+    Name: Transition
+    FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    ToStateId: state_8eb4f5f716be4c629d8a056310d7a763
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_307a7f3ff5794fb8b04d2a7b0cc29bc4
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_a27e8f7eb41b428eac7ce9eb584f8813
+    Name: Transition
+    FromStateId: state_8eb4f5f716be4c629d8a056310d7a763
+    ToStateId: state_af542725c9ef4c918805e85bfca1dfdb
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_307a7f3ff5794fb8b04d2a7b0cc29bc4
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 4
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d0a0c3b0298d4dd5821a92f2d756c917
+    Name: Transition
+    FromStateId: state_8eb4f5f716be4c629d8a056310d7a763
+    ToStateId: state_219a3d5eb40940b79540802677d268c9
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3cc9c37b90bc4b4eb8e07e4fddd2c344
+    Name: Transition
+    FromStateId: state_219a3d5eb40940b79540802677d268c9
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_ab1f6c8a48ad4a08bcd5fce6893e7cb0
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_8af876e1eb7948eda598d636a52404e9
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_23bddf65568349caacf214092d4b8d03.x
+      Operator: 4
+      UseAbsoluteValue: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c3be1272710e4a19bda60fbcd95a61c2
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_8af876e1eb7948eda598d636a52404e9
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_23bddf65568349caacf214092d4b8d03.x
+      Operator: 4
+      UseAbsoluteValue: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  ScopeUtilityNodeLayouts:
+  - LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    ScopePath: 
+    HasScopeNodePosition: 0
+    ScopeNodePosition: {x: 0, y: 0}
+    EntryNodePosition: {x: -587, y: 87}
+    AnyNodePosition: {x: -587, y: 226.5}
+    ExitNodePosition: {x: -587, y: 331}
+  - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: 
+    HasScopeNodePosition: 0
+    ScopeNodePosition: {x: 0, y: 0}
+    EntryNodePosition: {x: -587, y: 127}
+    AnyNodePosition: {x: -587, y: 267}
+    ExitNodePosition: {x: 185, y: 127}
+  - LayerId: layer_486c3da5769347838f95c16b986ccf8a
+    ScopePath: 
+    HasScopeNodePosition: 0
+    ScopeNodePosition: {x: 0, y: 0}
+    EntryNodePosition: {x: -735, y: 12.5}
+    AnyNodePosition: {x: -735, y: 152.5}
+    ExitNodePosition: {x: -359, y: 153}
+  - LayerId: layer_22012c26606d4e40af6c1b18c6e2f47b
+    ScopePath: 
+    HasScopeNodePosition: 0
+    ScopeNodePosition: {x: 0, y: 0}
+    EntryNodePosition: {x: -850, y: 13}
+    AnyNodePosition: {x: -876, y: 114}
+    ExitNodePosition: {x: -841, y: 212}
+  - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: Grenade
+    HasScopeNodePosition: 1
+    ScopeNodePosition: {x: -212, y: 398}
+    EntryNodePosition: {x: -1119, y: 182}
+    AnyNodePosition: {x: -1119, y: 280}
+    ExitNodePosition: {x: -179, y: 280}
+  - LayerId: layer_3e432cac3d0b4918b696995479a1444d
+    ScopePath: Move
+    HasScopeNodePosition: 1
+    ScopeNodePosition: {x: -339, y: 383}
+    EntryNodePosition: {x: -1157, y: 140}
+    AnyNodePosition: {x: -1183, y: 323}
+    ExitNodePosition: {x: -445, y: 242}
+  ScopeTransitionSuppressions:
+  - TransitionId: transition_52a07b17767641b78ee6415edc743a23
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: 
+  - TransitionId: transition_b5d4daea38ad43c789708a37a3274e0c
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: 

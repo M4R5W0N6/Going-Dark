@@ -21,6 +21,7 @@ namespace TPSBR
 		private const string STAGE_SCENE_PATH = "Assets/TPSBR/Scenes/Stage.unity";
 		private const string DEFAULT_OUTPUT_FOLDER = "Assets/TPSBR/Prefabs/Agents";
 		private const string MENU_OUTPUT_FOLDER = "Assets/TPSBR/Prefabs/Agents/Menu";
+		private const string FUSION_ANIMATOR_GRAPH_PATH = "Assets/FusionAnimator/Graphs/FusionAnimatorGraph.asset";
 		private const int SLOT_COUNT = 8;
 		private const int DEFAULT_AGENT_LAYER = 8;
 		private const int ICON_CAPTURE_LAYER = 31;
@@ -41,6 +42,7 @@ namespace TPSBR
 		private IconGenerationJob _iconGenerationJob;
 
 		[MenuItem("Assets/Create/TPSBR/Expansion/Custom Agent", false, 320)]
+		[MenuItem("Tools/Fusion/Custom Agent", false, 251)]
 		private static void OpenWindow()
 		{
 			CustomAgentEditor window = GetWindow<CustomAgentEditor>("Custom Agent");
@@ -1220,6 +1222,39 @@ namespace TPSBR
 			SetObjectReference(animationSO.FindProperty("_leftHand"), rig.LeftHand);
 			SetObjectReference(animationSO.FindProperty("_leftLowerArm"), rig.LeftLowerArm);
 			SetObjectReference(animationSO.FindProperty("_leftUpperArm"), rig.LeftUpperArm);
+
+			SerializedProperty animationRootProperty = animationSO.FindProperty("_root");
+			if (animationRootProperty != null)
+			{
+				Transform fusionAnimatorRoot = FindDeepChild(agentInstance.transform, "FusionAnimatorRoot");
+				if (fusionAnimatorRoot == null)
+				{
+					GameObject rootObject = new GameObject("FusionAnimatorRoot");
+					fusionAnimatorRoot = rootObject.transform;
+					Transform parent = rig.CharacterRoot != null ? rig.CharacterRoot : agentInstance.transform;
+					fusionAnimatorRoot.SetParent(parent, false);
+					fusionAnimatorRoot.localPosition = Vector3.zero;
+					fusionAnimatorRoot.localRotation = Quaternion.identity;
+					fusionAnimatorRoot.localScale = Vector3.one;
+				}
+
+				animationRootProperty.objectReferenceValue = fusionAnimatorRoot;
+			}
+
+			SerializedProperty useFusionAnimatorGraph = animationSO.FindProperty("_useFusionAnimatorGraph");
+			SerializedProperty fusionAnimatorGraph = animationSO.FindProperty("_fusionAnimatorGraph");
+			SerializedProperty fusionControlShootLayer = animationSO.FindProperty("_fusionControlShootLayer");
+			if (useFusionAnimatorGraph != null && fusionAnimatorGraph != null)
+			{
+				UnityEngine.Object fusionGraphAsset = AssetDatabase.LoadMainAssetAtPath(FUSION_ANIMATOR_GRAPH_PATH);
+				fusionAnimatorGraph.objectReferenceValue = fusionGraphAsset;
+				useFusionAnimatorGraph.boolValue = fusionGraphAsset != null;
+				if (fusionControlShootLayer != null)
+				{
+					fusionControlShootLayer.boolValue = fusionGraphAsset != null;
+				}
+			}
+
 			animationSO.ApplyModifiedPropertiesWithoutUndo();
 
 			if (rig.Animator != null)

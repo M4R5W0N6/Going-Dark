@@ -1,0 +1,6901 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18653635faea7ae4ca16776ae2da3364, type: 3}
+  m_Name: FusionAnimatorGraph
+  m_EditorClassIdentifier: FusionAnimator.Runtime::FusionAnimator.FusionAnimatorGraphAsset
+  GraphId: graph_fd40f9e576834da5aaaf4aa5f6a657fc
+  DisplayName: SOF_A
+  EntryStateId: state_184519964612162334_set0
+  ApplyRootMotion: 0
+  EntryNodePosition: {x: -120, y: 40}
+  AnyNodePosition: {x: -120, y: 180}
+  ExitNodePosition: {x: 1140, y: 100}
+  PreviewSource: {fileID: 5975601951779756851, guid: 6ddd135228f929446974c0181f5b8112, type: 3}
+  PreviewTarget: {fileID: 919132149155446097, guid: f6f6c0f2680a556449b9fc72636def5e, type: 3}
+  PreviewTargetGlobalObjectId: 
+  Parameters:
+  - Id: param_weapon_slot
+    Name: Weapon Slot
+    Type: 1
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_pending_weapon_slot
+    Name: Pending Weapon Slot
+    Type: 1
+    DefaultBool: 0
+    DefaultInt: -1
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_move_x
+    Name: Move X
+    Type: 2
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: <Gamepad>/leftStick/x
+    PreviewInputScale: 1
+  - Id: param_move_y
+    Name: Move Y
+    Type: 2
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: <Gamepad>/leftStick/y
+    PreviewInputScale: 1
+  - Id: param_look_pitch
+    Name: Look Pitch
+    Type: 2
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: <Gamepad>/rightStick/y
+    PreviewInputScale: 1
+  - Id: param_turn_direction
+    Name: Turn Direction
+    Type: 2
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: <Gamepad>/rightStick/x
+    PreviewInputScale: 1
+  - Id: param_is_dead
+    Name: Is Dead
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_jetpack_active
+    Name: Is Jetpack Active
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_grounded
+    Name: Is Grounded
+    Type: 0
+    DefaultBool: 1
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_has_jumped
+    Name: Has Jumped
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_reloading
+    Name: Is Reloading
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_equipping
+    Name: Is Equipping
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_unequipping
+    Name: Is Unequipping
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_throwing
+    Name: Is Throwing
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_is_turning
+    Name: Is Turning
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_shoot_trigger
+    Name: Shoot Trigger
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_throw_start
+    Name: Throw Start
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_throw_hold
+    Name: Throw Hold
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  - Id: param_grenade_equip
+    Name: Grenade Equip
+    Type: 0
+    DefaultBool: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: 
+    PreviewInputScale: 1
+  Layers:
+  - Id: layer_5217057232449210932
+    Name: Locomotion
+    Priority: 0
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 0}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  - Id: layer_9019185236305935368
+    Name: FullBody
+    Priority: 1
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 0}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  - Id: layer_7596546164085786028
+    Name: LowerBody
+    Priority: 2
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 101100000, guid: 735530dffb566c04d99208eddbead0ea, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  - Id: layer_1924677509726332009
+    Name: UpperBody
+    Priority: 3
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 0
+    AvatarMask: {fileID: 101100000, guid: a5b5bfc1e90b5514f9b30b23377aa15e, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  - Id: layer_7549257260256946189
+    Name: Shoot
+    Priority: 4
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 1
+    AvatarMask: {fileID: 101100000, guid: a5b5bfc1e90b5514f9b30b23377aa15e, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  - Id: layer_464095321581512868
+    Name: Look
+    Priority: 5
+    DefaultWeight: 1
+    EnabledByDefault: 1
+    BlendMode: 1
+    AvatarMask: {fileID: 101100000, guid: a5b5bfc1e90b5514f9b30b23377aa15e, type: 2}
+    SyncedLayerIndex: -1
+    SyncTiming: 0
+    IKPass: 0
+  States:
+  - Id: state_184519964612162334_set0
+    Name: Move (Unarmed)
+    LayerId: layer_5217057232449210932
+    NodePosition: {x: 160, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Fists_Idle
+        Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunFwdLoop
+        Clip: {fileID: 7400036, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 3.466
+        Position: {x: 0, y: 3.466}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunBwdLoop
+        Clip: {fileID: 7400050, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 2.4839
+        Position: {x: 0, y: -2.4839}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunLtLoop
+        Clip: {fileID: 7400052, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 3.1064
+        Position: {x: -3.1064, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunRtLoop
+        Clip: {fileID: 7400054, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 3.2702
+        Position: {x: 3.2702, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunStrafeLeft45Loop
+        Clip: {fileID: 7400056, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 3.2879
+        Position: {x: -2.3248963, y: 2.3248963}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunStrafeRight45Loop
+        Clip: {fileID: 7400060, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 3.3548002
+        Position: {x: 2.372202, y: 2.372202}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunStrafeLeft135Loop
+        Clip: {fileID: 7400062, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 2.8528001
+        Position: {x: -2.0172343, y: -2.0172343}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: RunStrafeRight135Loop
+        Clip: {fileID: 7400058, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 2.7797
+        Position: {x: 1.9655447, y: -1.9655447}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: WalkFwdLoop
+        Clip: {fileID: 7400012, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 1.733
+        Position: {x: 0, y: 1.733}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: WalkBwdLoop
+        Clip: {fileID: 7400010, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+        Threshold: 1.24195
+        Position: {x: 0, y: -1.24195}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeLeftLoop
+        Clip: {fileID: 7400026, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+        Threshold: 1.5532
+        Position: {x: -1.5532, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeRightLoop
+        Clip: {fileID: 7400018, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+        Threshold: 1.6351
+        Position: {x: 1.6351, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeLeft45Loop
+        Clip: {fileID: 7400034, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+        Threshold: 1.64395
+        Position: {x: -1.1624482, y: 1.1624482}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeRight45Loop
+        Clip: {fileID: 7400088, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 1.6774001
+        Position: {x: 1.186101, y: 1.186101}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeLeft135Loop
+        Clip: {fileID: 7400090, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+        Threshold: 1.4264001
+        Position: {x: -1.0086172, y: -1.0086172}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: StrafeRight135Loop
+        Clip: {fileID: 7400032, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+        Threshold: 1.38985
+        Position: {x: 0.98277235, y: -0.98277235}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_184519964612162334_set1
+    Name: Move (Pistol)
+    LayerId: layer_5217057232449210932
+    NodePosition: {x: 380, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_Idle
+        Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_RunFwdLoop
+        Clip: {fileID: 7400060, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 3.466
+        Position: {x: 0, y: 3.466}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_RunBwdLoop
+        Clip: {fileID: 7400062, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 2.4839
+        Position: {x: 0, y: -2.484}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRunLeftLoop
+        Clip: {fileID: 7400066, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 3.1064
+        Position: {x: -3.106, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRunRightLoop
+        Clip: {fileID: 7400064, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 3.2702
+        Position: {x: 3.27, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRun45LeftLoop
+        Clip: {fileID: 7400068, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 3.2879
+        Position: {x: -2.325, y: 2.325}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRun45RightLoop
+        Clip: {fileID: 7400074, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 3.3548002
+        Position: {x: 2.372, y: 2.372}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRun135LeftLoop
+        Clip: {fileID: 7400076, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 2.8528001
+        Position: {x: -2.017, y: -2.017}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRun135RightLoop
+        Clip: {fileID: 7400070, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 2.7797
+        Position: {x: 1.966, y: -1.966}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_WalkFwdLoop
+        Clip: {fileID: 7400018, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.733
+        Position: {x: 0, y: 1.733}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_WalkBwdLoop
+        Clip: {fileID: 7400026, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.24195
+        Position: {x: 0, y: -1.242}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeLeftLoop
+        Clip: {fileID: 7400042, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.5532
+        Position: {x: -1.553, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRightLoop
+        Clip: {fileID: 7400034, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.6351
+        Position: {x: 1.635, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeLeft45Loop
+        Clip: {fileID: 7400048, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.64395
+        Position: {x: -1.162, y: 1.162}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRight45Loop
+        Clip: {fileID: 7400078, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.6774001
+        Position: {x: 1.186, y: 1.186}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeLeft135Loop
+        Clip: {fileID: 7400072, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.4264001
+        Position: {x: -1.009, y: -1.009}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_StrafeRight135Loop
+        Clip: {fileID: 7400050, guid: 459a127509d869b40908dffa197da5fa, type: 3}
+        Threshold: 1.38985
+        Position: {x: 0.983, y: -0.983}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_184519964612162334_set2
+    Name: Move (Rifle)
+    LayerId: layer_5217057232449210932
+    NodePosition: {x: 600, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_Idle
+        Clip: {fileID: 7400004, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_RunFwdLoop
+        Clip: {fileID: 7400022, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+        Threshold: 3.466
+        Position: {x: 0, y: 3.466}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_RunBwdLoop
+        Clip: {fileID: 7400024, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+        Threshold: 2.4839
+        Position: {x: 0, y: -2.484}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRunLeftLoop
+        Clip: {fileID: 7400028, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+        Threshold: 3.1064
+        Position: {x: -3.106, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRunRightLoop
+        Clip: {fileID: 7400026, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+        Threshold: 3.2702
+        Position: {x: 3.27, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRun45LeftLoop
+        Clip: {fileID: 7400030, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+        Threshold: 3.2879
+        Position: {x: -2.325, y: 2.325}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRun45RightLoop
+        Clip: {fileID: 7400004, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+        Threshold: 3.3548002
+        Position: {x: 2.372, y: 2.372}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRun135LeftLoop
+        Clip: {fileID: 7400006, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+        Threshold: 2.8528001
+        Position: {x: -2.017, y: -2.017}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRight135Loop
+        Clip: {fileID: 7400048, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 2.7797
+        Position: {x: 1.966, y: -1.966}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_WalkFwdLoop
+        Clip: {fileID: 7400016, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.733
+        Position: {x: 0, y: 1.733}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_WalkBwdLoop
+        Clip: {fileID: 7400024, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.24195
+        Position: {x: 0, y: -1.242}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeLeftLoop
+        Clip: {fileID: 7400040, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.5532
+        Position: {x: -1.553, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRightLoop
+        Clip: {fileID: 7400032, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.6351
+        Position: {x: 1.635, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeLeft45Loop
+        Clip: {fileID: 7400046, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.64395
+        Position: {x: -1.162, y: 1.162}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRight45Loop
+        Clip: {fileID: 7400008, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+        Threshold: 1.6774001
+        Position: {x: 1.186, y: 1.186}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeLeft135Loop
+        Clip: {fileID: 7400002, guid: 47f3e97642d383d4dbfc479141f81683, type: 3}
+        Threshold: 1.4264001
+        Position: {x: -1.009, y: -1.009}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_StrafeRight135Loop
+        Clip: {fileID: 7400048, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1.38985
+        Position: {x: 0.983, y: -0.983}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4133555830263656256_set0
+    Name: Jump (Unarmed)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 200, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: JumpIdleStart
+        Clip: {fileID: 7400082, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4133555830263656256_set1
+    Name: Jump (Pistol)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 420, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_Jump_Platformer_Start
+        Clip: {fileID: 7400142, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4133555830263656256_set2
+    Name: Jump (Rifle)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 640, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_Jump_Platformer_Start
+        Clip: {fileID: 7400002, guid: 745db96b7ee03434b918668dbdf17465, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_74544910573468742_set0
+    Name: Fall (Unarmed)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 200, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: FallingLoop
+        Clip: {fileID: 7400114, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_74544910573468742_set1
+    Name: Fall (Pistol)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 420, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_Jump_Platformer_Fall
+        Clip: {fileID: 7400144, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_74544910573468742_set2
+    Name: Fall (Rifle)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 640, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_Jump_Platformer_Fall
+        Clip: {fileID: 7400004, guid: 745db96b7ee03434b918668dbdf17465, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_3566815674533241790_set0
+    Name: Land (Unarmed)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 200, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: JumpIdleLand
+        Clip: {fileID: 7400084, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: JumpWalk_RU_Land
+        Clip: {fileID: 7400092, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 2.4
+        Position: {x: 0, y: 2.4}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: JumpWalk_LU_Land
+        Clip: {fileID: 7400098, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 2.4
+        Position: {x: 0, y: -2.4}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_3566815674533241790_set1
+    Name: Land (Pistol)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 420, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_Jump_Platformer_Land
+        Clip: {fileID: 7400148, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_3566815674533241790_set2
+    Name: Land (Rifle)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 640, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 2
+      ParameterXId: param_move_x
+      ParameterYId: param_move_y
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_Jump_Platformer_Land
+        Clip: {fileID: 7400008, guid: 745db96b7ee03434b918668dbdf17465, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4163390495655362723_set0
+    Name: Dead (Unarmed)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 200, y: 660}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400032, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1.5
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4163390495655362723_set1
+    Name: Dead (Pistol)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 420, y: 660}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400000, guid: 18b8dd9ae0e03d0499c2b7815dba2012, type: 3}
+      Speed: 1.5
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4163390495655362723_set2
+    Name: Dead (Rifle)
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 640, y: 660}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400124, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1.5
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_2498669070453154055_set0
+    Name: Jetpack
+    LayerId: layer_9019185236305935368
+    NodePosition: {x: 200, y: 840}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400010, guid: fa608feaf64a07040bef63f640abf835, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_5592595534975978432_set0
+    Name: Turn (Unarmed)
+    LayerId: layer_7596546164085786028
+    NodePosition: {x: 240, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_turn_direction
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: TurnLt90_Loop
+        Clip: {fileID: 7400006, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: -1
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Fists_Idle
+        Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: TurnRt90_Loop
+        Clip: {fileID: 7400004, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+        Threshold: 1
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 2
+      Offset: 0
+      Power: 1
+      BlendSpeed: 4
+      TurnSpeed: 0.75
+      MaxMagnitude: 1.5
+      OverlayWeight: 1
+  - Id: state_5592595534975978432_set1
+    Name: Turn (Pistol)
+    LayerId: layer_7596546164085786028
+    NodePosition: {x: 460, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_turn_direction
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_TurnL_90Loop
+        Clip: {fileID: 7400070, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: -1
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_Idle
+        Clip: {fileID: 7400004, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_TurnR_90Loop
+        Clip: {fileID: 7400068, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 1
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 2
+      Offset: 0
+      Power: 1
+      BlendSpeed: 4
+      TurnSpeed: 0.75
+      MaxMagnitude: 1.5
+      OverlayWeight: 1
+  - Id: state_5592595534975978432_set2
+    Name: Turn (Rifle)
+    LayerId: layer_7596546164085786028
+    NodePosition: {x: 680, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_turn_direction
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_TurnL_90Loop
+        Clip: {fileID: 7400090, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: -1
+        Position: {x: -1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_Idle
+        Clip: {fileID: 7400004, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_TurnR_90Loop
+        Clip: {fileID: 7400088, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 1
+        Position: {x: 1, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 2
+      Offset: 0
+      Power: 1
+      BlendSpeed: 4
+      TurnSpeed: 0.75
+      MaxMagnitude: 1.5
+      OverlayWeight: 1
+  - Id: state_516784457197077775_set0
+    Name: Reload (Unarmed)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 280, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_516784457197077775_set1
+    Name: Reload (Pistol)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 500, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400096, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_516784457197077775_set2
+    Name: Reload (Rifle)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400056, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4236689650817613675_set0
+    Name: Equip (Unarmed)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 280, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4236689650817613675_set1
+    Name: Equip (Pistol)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 500, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400150, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 2
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_4236689650817613675_set2
+    Name: Equip (Rifle)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 300}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400000, guid: 6d0b268b0bd91c44eb369715ba96d320, type: 3}
+      Speed: 2
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_113108333135228981_set0
+    Name: Unequip (Unarmed)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 280, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400006, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_113108333135228981_set1
+    Name: Unequip (Pistol)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 500, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400152, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 2
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_113108333135228981_set2
+    Name: Unequip (Rifle)
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 480}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 6d0b268b0bd91c44eb369715ba96d320, type: 3}
+      Speed: 2
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_6616788816582484090_set0
+    Name: Grenade/Hold
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 660}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400114, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_99371444555125045_set0
+    Name: Grenade/Arm
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 840}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400114, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_7158914682901740979_set0
+    Name: Grenade/Throw
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 1020}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400110, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1.5
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_9056165166600464805_set0
+    Name: Grenade/Reload
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 1200}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400116, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_1691477609762418934_set0
+    Name: Grenade/Equip
+    LayerId: layer_1924677509726332009
+    NodePosition: {x: 720, y: 1380}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400112, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 2
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_7171382913282681196_set0
+    Name: Shoot (Unarmed)
+    LayerId: layer_7549257260256946189
+    NodePosition: {x: 320, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Idle
+      Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+    - Slot: Shoot
+      Clip: {fileID: 7400014, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 3
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 0.5
+  - Id: state_7171382913282681196_set1
+    Name: Shoot (Pistol)
+    LayerId: layer_7549257260256946189
+    NodePosition: {x: 540, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Idle
+      Clip: {fileID: 7400004, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    - Slot: Shoot
+      Clip: {fileID: 7400092, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 3
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 0.5
+  - Id: state_7171382913282681196_set2
+    Name: Shoot (Rifle)
+    LayerId: layer_7549257260256946189
+    NodePosition: {x: 760, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Idle
+      Clip: {fileID: 7400004, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+    - Slot: Shoot
+      Clip: {fileID: 7400050, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+      Speed: 1
+      Loop: 0
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children: []
+    Presentation:
+      Semantic: 3
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 0.5
+  - Id: state_5137903746742828731_set0
+    Name: LookState (Unarmed)
+    LayerId: layer_464095321581512868
+    NodePosition: {x: 360, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_look_pitch
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Fists_Idle
+        Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+        Threshold: 0
+        Position: {x: 0, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 1
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 90
+      OverlayWeight: 1
+  - Id: state_5137903746742828731_set1
+    Name: LookState (Pistol)
+    LayerId: layer_464095321581512868
+    NodePosition: {x: 580, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_look_pitch
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1.1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Pistol_Look_90D_Additive
+        Clip: {fileID: 7400058, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: 90
+        Position: {x: 90, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Pistol_Look_90U_Additive
+        Clip: {fileID: 7400056, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+        Threshold: -90
+        Position: {x: -90, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 1
+      Offset: 0
+      Power: 1.1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 90
+      OverlayWeight: 1
+  - Id: state_5137903746742828731_set2
+    Name: LookState (Rifle)
+    LayerId: layer_464095321581512868
+    NodePosition: {x: 800, y: 120}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 1
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: param_look_pitch
+      ParameterYId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1.1
+      NormalizeTimeScale: 1
+      Children:
+      - Name: Rifle_Look_90D_Additive
+        Clip: {fileID: 7400078, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: 90
+        Position: {x: 90, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+      - Name: Rifle_Look_90U_Additive
+        Clip: {fileID: 7400076, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
+        Threshold: -90
+        Position: {x: -90, y: 0}
+        DirectParameterId: 
+        TimeScale: 1
+    Presentation:
+      Semantic: 1
+      Offset: 0
+      Power: 1.1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 90
+      OverlayWeight: 1
+  Transitions:
+  - Id: transition_8a844a320cae47ea8d669169833b6866
+    Name: Locomotion.Entry
+    FromStateId: __entry__
+    ToStateId: state_184519964612162334_set0
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_9930e4d9e2da441d8dd61dbe28546966
+    Name: Look.Entry
+    FromStateId: __entry__
+    ToStateId: state_5137903746742828731_set0
+    Priority: 1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_cefcef7adca448849145ea2c4d9be49d
+    Name: 'Move: 0->1'
+    FromStateId: state_184519964612162334_set0
+    ToStateId: state_184519964612162334_set1
+    Priority: 2
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_addf6521a3aa44d296bbed7066b1522d
+    Name: 'Move: 0->2'
+    FromStateId: state_184519964612162334_set0
+    ToStateId: state_184519964612162334_set2
+    Priority: 3
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_01f6bae248fc48bdbb83fe141e68eaaf
+    Name: 'Move: 1->0'
+    FromStateId: state_184519964612162334_set1
+    ToStateId: state_184519964612162334_set0
+    Priority: 4
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3f0433d3feba454b9375f32f8bbcba97
+    Name: 'Move: 1->0'
+    FromStateId: state_184519964612162334_set1
+    ToStateId: state_184519964612162334_set0
+    Priority: 5
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_98eb36bde22a442d8637f3d81f3d6d9e
+    Name: 'Move: 1->2'
+    FromStateId: state_184519964612162334_set1
+    ToStateId: state_184519964612162334_set2
+    Priority: 6
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_7c0da48b73c2423980c239cf547cd448
+    Name: 'Move: 2->0'
+    FromStateId: state_184519964612162334_set2
+    ToStateId: state_184519964612162334_set0
+    Priority: 7
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d0b700a3017c43f1a8bcd31711a46795
+    Name: 'Move: 2->0'
+    FromStateId: state_184519964612162334_set2
+    ToStateId: state_184519964612162334_set0
+    Priority: 8
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_6b1dd923d66d4dd3b9bc9fd3a15b6160
+    Name: 'Move: 2->1'
+    FromStateId: state_184519964612162334_set2
+    ToStateId: state_184519964612162334_set1
+    Priority: 9
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_dcbe42cc3ead4886aa71ba320c63b4e3
+    Name: 'Jump: 0->1'
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_4133555830263656256_set1
+    Priority: 10
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_8caf2602f7ee4b0ba69297e54aad7680
+    Name: 'Jump: 0->2'
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_4133555830263656256_set2
+    Priority: 11
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_bd280254e7504e28807421a1365cb905
+    Name: 'Jump: 1->0'
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: state_4133555830263656256_set0
+    Priority: 12
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_6e58987c147343f0950bea172b49e382
+    Name: 'Jump: 1->0'
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: state_4133555830263656256_set0
+    Priority: 13
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_9e224bddeebe42cea2599b84ee737ac2
+    Name: 'Jump: 1->2'
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: state_4133555830263656256_set2
+    Priority: 14
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ef7b6040a4604aaeb22b14f8a4d6c95b
+    Name: 'Jump: 2->0'
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: state_4133555830263656256_set0
+    Priority: 15
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_aaae22f397da4cc5845575dfddcacde8
+    Name: 'Jump: 2->0'
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: state_4133555830263656256_set0
+    Priority: 16
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_40962ab58ed74afeb9d96e1bcfea864a
+    Name: 'Jump: 2->1'
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: state_4133555830263656256_set1
+    Priority: 17
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_ca4e819808df4917ad55bf069d7a46d5
+    Name: 'Fall: 0->1'
+    FromStateId: state_74544910573468742_set0
+    ToStateId: state_74544910573468742_set1
+    Priority: 18
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_3a9bde93c5c546c1a0dc742021d30515
+    Name: 'Fall: 0->2'
+    FromStateId: state_74544910573468742_set0
+    ToStateId: state_74544910573468742_set2
+    Priority: 19
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_7de26a56750e40ca93bfb8e3565a0066
+    Name: 'Fall: 1->0'
+    FromStateId: state_74544910573468742_set1
+    ToStateId: state_74544910573468742_set0
+    Priority: 20
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_10155e0cf07d4028aa40297815fd833c
+    Name: 'Fall: 1->0'
+    FromStateId: state_74544910573468742_set1
+    ToStateId: state_74544910573468742_set0
+    Priority: 21
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ba191c8dedf74565b35cabdd8cf7b2dc
+    Name: 'Fall: 1->2'
+    FromStateId: state_74544910573468742_set1
+    ToStateId: state_74544910573468742_set2
+    Priority: 22
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_8baae58388bd4050b8eeaf01f102a1d6
+    Name: 'Fall: 2->0'
+    FromStateId: state_74544910573468742_set2
+    ToStateId: state_74544910573468742_set0
+    Priority: 23
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_8e75ee47be6443d193ddb621699f6477
+    Name: 'Fall: 2->0'
+    FromStateId: state_74544910573468742_set2
+    ToStateId: state_74544910573468742_set0
+    Priority: 24
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_35679056d9284effaa4be024117ecd9a
+    Name: 'Fall: 2->1'
+    FromStateId: state_74544910573468742_set2
+    ToStateId: state_74544910573468742_set1
+    Priority: 25
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_7c9c221922e645a2b47849d2dd02aa60
+    Name: 'Land: 0->1'
+    FromStateId: state_3566815674533241790_set0
+    ToStateId: state_3566815674533241790_set1
+    Priority: 26
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_98a59dbcb6ac474f9e22cee5a5c74610
+    Name: 'Land: 0->2'
+    FromStateId: state_3566815674533241790_set0
+    ToStateId: state_3566815674533241790_set2
+    Priority: 27
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_2b42167cd71548e4ba8b4a1b7f077b62
+    Name: 'Land: 1->0'
+    FromStateId: state_3566815674533241790_set1
+    ToStateId: state_3566815674533241790_set0
+    Priority: 28
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_7c0121ff2ae8432f9d3dd3eab618eb36
+    Name: 'Land: 1->0'
+    FromStateId: state_3566815674533241790_set1
+    ToStateId: state_3566815674533241790_set0
+    Priority: 29
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_79866e367895412faf86a615c9b36481
+    Name: 'Land: 1->2'
+    FromStateId: state_3566815674533241790_set1
+    ToStateId: state_3566815674533241790_set2
+    Priority: 30
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_8331c21e92584fd49ce4bb18b62fdfee
+    Name: 'Land: 2->0'
+    FromStateId: state_3566815674533241790_set2
+    ToStateId: state_3566815674533241790_set0
+    Priority: 31
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3fef0a82cdcd43e59e858b70b626aaa2
+    Name: 'Land: 2->0'
+    FromStateId: state_3566815674533241790_set2
+    ToStateId: state_3566815674533241790_set0
+    Priority: 32
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_f6891560aaf6492eabbc2b7317e72c2b
+    Name: 'Land: 2->1'
+    FromStateId: state_3566815674533241790_set2
+    ToStateId: state_3566815674533241790_set1
+    Priority: 33
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_f6c3c940800b4e97a20e9c050769110b
+    Name: 'Dead: 0->1'
+    FromStateId: state_4163390495655362723_set0
+    ToStateId: state_4163390495655362723_set1
+    Priority: 34
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_60ceaa262e61445990755425a15c316b
+    Name: 'Dead: 0->1'
+    FromStateId: state_4163390495655362723_set0
+    ToStateId: state_4163390495655362723_set1
+    Priority: 35
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_4fc335333a5d497c81be3416fc4dad42
+    Name: 'Dead: 0->2'
+    FromStateId: state_4163390495655362723_set0
+    ToStateId: state_4163390495655362723_set2
+    Priority: 36
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_c1950641e0f14a0b85c5c767b52a2645
+    Name: 'Dead: 1->0'
+    FromStateId: state_4163390495655362723_set1
+    ToStateId: state_4163390495655362723_set0
+    Priority: 37
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_f0642d8411d34a9da66524ccf388492b
+    Name: 'Dead: 1->2'
+    FromStateId: state_4163390495655362723_set1
+    ToStateId: state_4163390495655362723_set2
+    Priority: 38
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_712f47b31ca847fd918d987684dd0e9d
+    Name: 'Dead: 2->0'
+    FromStateId: state_4163390495655362723_set2
+    ToStateId: state_4163390495655362723_set0
+    Priority: 39
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_21df6ca54c6d4c6cac0304a3bf853094
+    Name: 'Dead: 2->1'
+    FromStateId: state_4163390495655362723_set2
+    ToStateId: state_4163390495655362723_set1
+    Priority: 40
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_004ca6f963b446f5a00b652567c99477
+    Name: 'Dead: 2->1'
+    FromStateId: state_4163390495655362723_set2
+    ToStateId: state_4163390495655362723_set1
+    Priority: 41
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_bf3d41e4a60e46d7a6af9f67c56218f3
+    Name: Any->Dead (0)
+    FromStateId: __any__
+    ToStateId: state_4163390495655362723_set0
+    Priority: 42
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_434e73b14eed436eb5e176ac19562d17
+    Name: Any->Dead (1)
+    FromStateId: __any__
+    ToStateId: state_4163390495655362723_set1
+    Priority: 43
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_88884c4f18f94344a97d1dd591cc5ec1
+    Name: Any->Dead (1)
+    FromStateId: __any__
+    ToStateId: state_4163390495655362723_set1
+    Priority: 44
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_b0b1f03d08e04cd1b2a34904d833e360
+    Name: Any->Dead (2)
+    FromStateId: __any__
+    ToStateId: state_4163390495655362723_set2
+    Priority: 45
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_1ebe89b7364040a28f1695f99f5ea4eb
+    Name: 'Turn: 0->1'
+    FromStateId: state_5592595534975978432_set0
+    ToStateId: state_5592595534975978432_set1
+    Priority: 46
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_a443e397ff6c4c25ac3d662393cf8691
+    Name: 'Turn: 0->1'
+    FromStateId: state_5592595534975978432_set0
+    ToStateId: state_5592595534975978432_set1
+    Priority: 47
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_aa451e9e3fca4d41b3d80283b4760781
+    Name: 'Turn: 0->2'
+    FromStateId: state_5592595534975978432_set0
+    ToStateId: state_5592595534975978432_set2
+    Priority: 48
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_5f9c5fa8793941e98c20147646a496dd
+    Name: 'Turn: 1->0'
+    FromStateId: state_5592595534975978432_set1
+    ToStateId: state_5592595534975978432_set0
+    Priority: 49
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_cabeb3e690334b36af90816d9b33007e
+    Name: 'Turn: 1->2'
+    FromStateId: state_5592595534975978432_set1
+    ToStateId: state_5592595534975978432_set2
+    Priority: 50
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_7c21bacd42d7437e9e8601357ce671da
+    Name: 'Turn: 2->0'
+    FromStateId: state_5592595534975978432_set2
+    ToStateId: state_5592595534975978432_set0
+    Priority: 51
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_de6d88d36fc64345b33b33dab3607563
+    Name: 'Turn: 2->1'
+    FromStateId: state_5592595534975978432_set2
+    ToStateId: state_5592595534975978432_set1
+    Priority: 52
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_697178fe90dc41068ded86e95ba93669
+    Name: 'Turn: 2->1'
+    FromStateId: state_5592595534975978432_set2
+    ToStateId: state_5592595534975978432_set1
+    Priority: 53
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_24a79ab384f7404e96dae30e520c0cd4
+    Name: 'Reload: 0->1'
+    FromStateId: state_516784457197077775_set0
+    ToStateId: state_516784457197077775_set1
+    Priority: 54
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_07fc321a04954e9383d8a3f14f981fa5
+    Name: 'Reload: 0->1'
+    FromStateId: state_516784457197077775_set0
+    ToStateId: state_516784457197077775_set1
+    Priority: 55
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_0f089cfd3c724583b2af981110ea0971
+    Name: 'Reload: 0->2'
+    FromStateId: state_516784457197077775_set0
+    ToStateId: state_516784457197077775_set2
+    Priority: 56
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_a5b67900959c4902af9d80b92bd1cbb7
+    Name: 'Reload: 1->0'
+    FromStateId: state_516784457197077775_set1
+    ToStateId: state_516784457197077775_set0
+    Priority: 57
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3ccdbbcee17445aeb79c2fd5ff4eef04
+    Name: 'Reload: 1->2'
+    FromStateId: state_516784457197077775_set1
+    ToStateId: state_516784457197077775_set2
+    Priority: 58
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_500cb15bbd194415ba28ebbd7eb6bf22
+    Name: 'Reload: 2->0'
+    FromStateId: state_516784457197077775_set2
+    ToStateId: state_516784457197077775_set0
+    Priority: 59
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_f0fb39e95bb14691b16d0b8d556c928b
+    Name: 'Reload: 2->1'
+    FromStateId: state_516784457197077775_set2
+    ToStateId: state_516784457197077775_set1
+    Priority: 60
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_bf0a0e641b81476b85ea565ff69910b3
+    Name: 'Reload: 2->1'
+    FromStateId: state_516784457197077775_set2
+    ToStateId: state_516784457197077775_set1
+    Priority: 61
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_1e7ff0f84bd5414d99d8c57046b2922b
+    Name: 'Equip: 0->1'
+    FromStateId: state_4236689650817613675_set0
+    ToStateId: state_4236689650817613675_set1
+    Priority: 62
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_316fc265f9b14172a88780f30d734aaf
+    Name: 'Equip: 0->1'
+    FromStateId: state_4236689650817613675_set0
+    ToStateId: state_4236689650817613675_set1
+    Priority: 63
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_8c6404c17cb446b680c1f02b71e3251b
+    Name: 'Equip: 0->2'
+    FromStateId: state_4236689650817613675_set0
+    ToStateId: state_4236689650817613675_set2
+    Priority: 64
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_9ac53bc384754c03b5729f47ee72fdd3
+    Name: 'Equip: 1->0'
+    FromStateId: state_4236689650817613675_set1
+    ToStateId: state_4236689650817613675_set0
+    Priority: 65
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_7580c3cba0754df0bf0a99c39ff4b879
+    Name: 'Equip: 1->2'
+    FromStateId: state_4236689650817613675_set1
+    ToStateId: state_4236689650817613675_set2
+    Priority: 66
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_5c98f3f479cb4ff98b5c3d4a42709060
+    Name: 'Equip: 2->0'
+    FromStateId: state_4236689650817613675_set2
+    ToStateId: state_4236689650817613675_set0
+    Priority: 67
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_9440e3c65b144afe801925218acae928
+    Name: 'Equip: 2->1'
+    FromStateId: state_4236689650817613675_set2
+    ToStateId: state_4236689650817613675_set1
+    Priority: 68
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_861e667220464183ba5f65792c3cacb8
+    Name: 'Equip: 2->1'
+    FromStateId: state_4236689650817613675_set2
+    ToStateId: state_4236689650817613675_set1
+    Priority: 69
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ef59fbb41c4544d48cf71fac3a3aa351
+    Name: 'Unequip: 0->1'
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_113108333135228981_set1
+    Priority: 70
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_622931ee71664151b036db41b412bb7b
+    Name: 'Unequip: 0->1'
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_113108333135228981_set1
+    Priority: 71
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_f25e58c7ac5245608b04f21cbaa24b9c
+    Name: 'Unequip: 0->2'
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_113108333135228981_set2
+    Priority: 72
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ad3f4ed9952143f0b072a69511da1c80
+    Name: 'Unequip: 1->0'
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_113108333135228981_set0
+    Priority: 73
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_cb21b1c74a964cf0ac0bcec84f198fa6
+    Name: 'Unequip: 1->2'
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_113108333135228981_set2
+    Priority: 74
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_03660351ce9a4e85b72b670fb0626099
+    Name: 'Unequip: 2->0'
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_113108333135228981_set0
+    Priority: 75
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_52838362a2e54587a2a4cfbfd0eae00c
+    Name: 'Unequip: 2->1'
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_113108333135228981_set1
+    Priority: 76
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_0aaba9135b6c47689c5a1b43238a5101
+    Name: 'Unequip: 2->1'
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_113108333135228981_set1
+    Priority: 77
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_dc761a25ab0249279fd9390a3175fcb0
+    Name: 'Shoot: 0->1'
+    FromStateId: state_7171382913282681196_set0
+    ToStateId: state_7171382913282681196_set1
+    Priority: 78
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_8f09113a3739406684bc29736c46d492
+    Name: 'Shoot: 0->1'
+    FromStateId: state_7171382913282681196_set0
+    ToStateId: state_7171382913282681196_set1
+    Priority: 79
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_01fb958722ff4532b993c233a07ee209
+    Name: 'Shoot: 0->2'
+    FromStateId: state_7171382913282681196_set0
+    ToStateId: state_7171382913282681196_set2
+    Priority: 80
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_9afdba0a3af24ea29e62bd3d61af2d7e
+    Name: 'Shoot: 1->0'
+    FromStateId: state_7171382913282681196_set1
+    ToStateId: state_7171382913282681196_set0
+    Priority: 81
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c1584a5ce1284553b8af07660b2d8931
+    Name: 'Shoot: 1->2'
+    FromStateId: state_7171382913282681196_set1
+    ToStateId: state_7171382913282681196_set2
+    Priority: 82
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_252940c6fa6344a7bd8108cdf463f3e8
+    Name: 'Shoot: 2->0'
+    FromStateId: state_7171382913282681196_set2
+    ToStateId: state_7171382913282681196_set0
+    Priority: 83
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_ad93eecf8b1346b89f9f165065c55587
+    Name: 'Shoot: 2->1'
+    FromStateId: state_7171382913282681196_set2
+    ToStateId: state_7171382913282681196_set1
+    Priority: 84
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_cc6070bd38a04ae7a3218a4293429e5e
+    Name: 'Shoot: 2->1'
+    FromStateId: state_7171382913282681196_set2
+    ToStateId: state_7171382913282681196_set1
+    Priority: 85
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_72a738a60c7c42ffa8ffd94d1750d3dc
+    Name: 'LookState: 0->1'
+    FromStateId: state_5137903746742828731_set0
+    ToStateId: state_5137903746742828731_set1
+    Priority: 86
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_e42df68631f7445097f65bea80b7c364
+    Name: 'LookState: 0->1'
+    FromStateId: state_5137903746742828731_set0
+    ToStateId: state_5137903746742828731_set1
+    Priority: 87
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_83cf5fddd73a4dd88e7975d3a5ef22ee
+    Name: 'LookState: 0->2'
+    FromStateId: state_5137903746742828731_set0
+    ToStateId: state_5137903746742828731_set2
+    Priority: 88
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_a1716a8199e94b31bb1e7c0f0e1875fc
+    Name: 'LookState: 1->0'
+    FromStateId: state_5137903746742828731_set1
+    ToStateId: state_5137903746742828731_set0
+    Priority: 89
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c786c55752ce47ff8a56aecc5c7529ab
+    Name: 'LookState: 1->2'
+    FromStateId: state_5137903746742828731_set1
+    ToStateId: state_5137903746742828731_set2
+    Priority: 90
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ca0d83812f9a4ae09da5a9e55ec8d49b
+    Name: 'LookState: 2->0'
+    FromStateId: state_5137903746742828731_set2
+    ToStateId: state_5137903746742828731_set0
+    Priority: 91
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_afd6c9863d6d4a81ad986b2a3164150f
+    Name: 'LookState: 2->1'
+    FromStateId: state_5137903746742828731_set2
+    ToStateId: state_5137903746742828731_set1
+    Priority: 92
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_ed402c3d2d2744d591357f4c51c60359
+    Name: 'LookState: 2->1'
+    FromStateId: state_5137903746742828731_set2
+    ToStateId: state_5137903746742828731_set1
+    Priority: 93
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_d5a8484e18004ff0ab46f70d995dcbfe
+    Name: Any->state_4133555830263656256_set0
+    FromStateId: __any__
+    ToStateId: state_4133555830263656256_set0
+    Priority: 94
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d6456ecc93784286a33c3366e3659e81
+    Name: Any->state_4133555830263656256_set0
+    FromStateId: __any__
+    ToStateId: state_4133555830263656256_set0
+    Priority: 95
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_5d82a713a9c64aabb847764e6508529b
+    Name: Any->state_4133555830263656256_set1
+    FromStateId: __any__
+    ToStateId: state_4133555830263656256_set1
+    Priority: 96
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_88b4f6f85c044450b8de7130c4775c43
+    Name: Any->state_4133555830263656256_set2
+    FromStateId: __any__
+    ToStateId: state_4133555830263656256_set2
+    Priority: 97
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_421616bd550a429d803fc49c65c0eb73
+    Name: Any->state_74544910573468742_set0
+    FromStateId: __any__
+    ToStateId: state_74544910573468742_set0
+    Priority: 98
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3ac3074b52644ecb8d38aa1645f780a2
+    Name: Any->state_74544910573468742_set0
+    FromStateId: __any__
+    ToStateId: state_74544910573468742_set0
+    Priority: 99
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_1265ef58b6ef4b508d429f860e78ae8b
+    Name: Any->state_74544910573468742_set1
+    FromStateId: __any__
+    ToStateId: state_74544910573468742_set1
+    Priority: 100
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_ae6ff3c7f95a48eb97b94583d0785a04
+    Name: Any->state_74544910573468742_set2
+    FromStateId: __any__
+    ToStateId: state_74544910573468742_set2
+    Priority: 101
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_has_jumped
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_867cb66df34c420b9f95f2a16909b946
+    Name: Any->state_2498669070453154055_set0
+    FromStateId: __any__
+    ToStateId: state_2498669070453154055_set0
+    Priority: 102
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_648e891b42454349b8b93952bc0c8816
+    Name: state_4133555830263656256_set0->state_74544910573468742_set0
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_74544910573468742_set0
+    Priority: 103
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_485a0299c14b41108fd9b20ed5538fe9
+    Name: state_4133555830263656256_set0->state_74544910573468742_set0
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_74544910573468742_set0
+    Priority: 104
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_4ca65f54a8264224905735e81c1e0a48
+    Name: state_4133555830263656256_set1->state_74544910573468742_set1
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: state_74544910573468742_set1
+    Priority: 105
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_41f387bd607640d1a234328527e05dec
+    Name: state_4133555830263656256_set2->state_74544910573468742_set2
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: state_74544910573468742_set2
+    Priority: 106
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_c95b30d4d9fa44b186abdae058df770a
+    Name: state_4133555830263656256_set0->state_3566815674533241790_set0
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 107
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_9ba5c62b75c84767bbbbdbb162705440
+    Name: state_4133555830263656256_set0->state_3566815674533241790_set0
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 108
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_8704c99aaf5f49cdafb120b9faca04c2
+    Name: state_4133555830263656256_set1->state_3566815674533241790_set1
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: state_3566815674533241790_set1
+    Priority: 109
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_67296368eb1c4fc7a1cbae358de048ed
+    Name: state_4133555830263656256_set2->state_3566815674533241790_set2
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: state_3566815674533241790_set2
+    Priority: 110
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_a0072ada11304ee1a868a6382b48f985
+    Name: state_74544910573468742_set0->state_3566815674533241790_set0
+    FromStateId: state_74544910573468742_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 111
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_96d0b7115bb24d5dbda1c885afc5e9f8
+    Name: state_74544910573468742_set0->state_3566815674533241790_set0
+    FromStateId: state_74544910573468742_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 112
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_4f73593181484f9ea064fc89a28c7900
+    Name: state_74544910573468742_set1->state_3566815674533241790_set1
+    FromStateId: state_74544910573468742_set1
+    ToStateId: state_3566815674533241790_set1
+    Priority: 113
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_754dec5cd127401aa3970c698c8e10bd
+    Name: state_74544910573468742_set2->state_3566815674533241790_set2
+    FromStateId: state_74544910573468742_set2
+    ToStateId: state_3566815674533241790_set2
+    Priority: 114
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_7cbce5936c094f6c90fc3a0a36abc384
+    Name: state_2498669070453154055_set0->state_74544910573468742_set0
+    FromStateId: state_2498669070453154055_set0
+    ToStateId: state_74544910573468742_set0
+    Priority: 115
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_babb6b225da64d47bbe0d9ff30288860
+    Name: state_2498669070453154055_set0->state_74544910573468742_set0
+    FromStateId: state_2498669070453154055_set0
+    ToStateId: state_74544910573468742_set0
+    Priority: 116
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_bc00f8a22e23434b882019b031fb097f
+    Name: state_2498669070453154055_set0->state_3566815674533241790_set0
+    FromStateId: state_2498669070453154055_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 117
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_8eb7f22645ac4ac597eb2253fd4a251b
+    Name: state_2498669070453154055_set0->state_3566815674533241790_set0
+    FromStateId: state_2498669070453154055_set0
+    ToStateId: state_3566815674533241790_set0
+    Priority: 118
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_926cffe33f66411f9416383bab3f6b40
+    Name: state_113108333135228981_set0->state_4236689650817613675_set0
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_4236689650817613675_set0
+    Priority: 119
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_e0385ad4ee1b438bbf4a2fff77935725
+    Name: state_113108333135228981_set0->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_4236689650817613675_set1
+    Priority: 120
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_de627b775d564c118064193c17869df5
+    Name: state_113108333135228981_set0->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_4236689650817613675_set1
+    Priority: 121
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_9418abebadf340d889a72a05c7d20411
+    Name: state_113108333135228981_set0->state_4236689650817613675_set2
+    FromStateId: state_113108333135228981_set0
+    ToStateId: state_4236689650817613675_set2
+    Priority: 122
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_728009b413044aa4a5f7e1a803fda8e5
+    Name: state_113108333135228981_set1->state_4236689650817613675_set0
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_4236689650817613675_set0
+    Priority: 123
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3888ff8f9ef3424080e6186420b6f152
+    Name: state_113108333135228981_set1->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_4236689650817613675_set1
+    Priority: 124
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_fa5dcbb1f9084d68b688cd0b847fa363
+    Name: state_113108333135228981_set1->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_4236689650817613675_set1
+    Priority: 125
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_fa1e9ab3423f47e995192ca1d655e030
+    Name: state_113108333135228981_set1->state_4236689650817613675_set2
+    FromStateId: state_113108333135228981_set1
+    ToStateId: state_4236689650817613675_set2
+    Priority: 126
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_33069101780a480585b89920a2e83c74
+    Name: state_113108333135228981_set2->state_4236689650817613675_set0
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_4236689650817613675_set0
+    Priority: 127
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_da96575e0d744b4f96cca9a738b3b292
+    Name: state_113108333135228981_set2->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_4236689650817613675_set1
+    Priority: 128
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_987cef426e6d4220b6b6a89761870de9
+    Name: state_113108333135228981_set2->state_4236689650817613675_set1
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_4236689650817613675_set1
+    Priority: 129
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_5e1e1fd186de487fbd0b83ec91ba8846
+    Name: state_113108333135228981_set2->state_4236689650817613675_set2
+    FromStateId: state_113108333135228981_set2
+    ToStateId: state_4236689650817613675_set2
+    Priority: 130
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_2069768a7b37419cb2854e9ea32278a7
+    Name: Any->state_516784457197077775_set0
+    FromStateId: __any__
+    ToStateId: state_516784457197077775_set0
+    Priority: 131
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_adff099c65b24d2d82e0c1cfc124ff40
+    Name: Any->state_516784457197077775_set1
+    FromStateId: __any__
+    ToStateId: state_516784457197077775_set1
+    Priority: 132
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_e15a67d72a5e400281e4990c4792b021
+    Name: Any->state_516784457197077775_set1
+    FromStateId: __any__
+    ToStateId: state_516784457197077775_set1
+    Priority: 133
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_bd248979d15a47c789590766dc33ba1a
+    Name: Any->state_516784457197077775_set2
+    FromStateId: __any__
+    ToStateId: state_516784457197077775_set2
+    Priority: 134
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_63218476a6214842b6ae9bd1106d3c94
+    Name: Any->state_5592595534975978432_set0
+    FromStateId: __any__
+    ToStateId: state_5592595534975978432_set0
+    Priority: 135
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b078f2c883c446028dc51c1509619bcb
+    Name: Any->state_5592595534975978432_set1
+    FromStateId: __any__
+    ToStateId: state_5592595534975978432_set1
+    Priority: 136
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_7e1cbbf85eae4972b675ce897de198b0
+    Name: Any->state_5592595534975978432_set1
+    FromStateId: __any__
+    ToStateId: state_5592595534975978432_set1
+    Priority: 137
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_3d9e5fd5318147b78a0d4fca8fbdbe4a
+    Name: Any->state_5592595534975978432_set2
+    FromStateId: __any__
+    ToStateId: state_5592595534975978432_set2
+    Priority: 138
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_e2f3793aaac7416ab85226830524edd7
+    Name: Any->state_5137903746742828731_set0
+    FromStateId: __any__
+    ToStateId: state_5137903746742828731_set0
+    Priority: 139
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b771ba8f58fc44258a445e7bf5610204
+    Name: Any->state_5137903746742828731_set1
+    FromStateId: __any__
+    ToStateId: state_5137903746742828731_set1
+    Priority: 140
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_2b3ad921b7924de68105db35682a47a9
+    Name: Any->state_5137903746742828731_set1
+    FromStateId: __any__
+    ToStateId: state_5137903746742828731_set1
+    Priority: 141
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_6ca31496f3b74dc8bda0026824f2702a
+    Name: Any->state_5137903746742828731_set2
+    FromStateId: __any__
+    ToStateId: state_5137903746742828731_set2
+    Priority: 142
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ca2f7ad95bd9442f9553e507b0c5cc06
+    Name: Any->state_7171382913282681196_set0
+    FromStateId: __any__
+    ToStateId: state_7171382913282681196_set0
+    Priority: 143
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_shoot_trigger
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_equipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_unequipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_reloading
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_throwing
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_772af2dd26ec482e93a515531e442361
+    Name: Any->state_7171382913282681196_set1
+    FromStateId: __any__
+    ToStateId: state_7171382913282681196_set1
+    Priority: 144
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_shoot_trigger
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_equipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_unequipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_reloading
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_throwing
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_ec114d0cbf3841a38bbdd2c670d20371
+    Name: Any->state_7171382913282681196_set1
+    FromStateId: __any__
+    ToStateId: state_7171382913282681196_set1
+    Priority: 145
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_shoot_trigger
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_equipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_unequipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_reloading
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_throwing
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_75b63cbe759144248b37386d4a52bfd7
+    Name: Any->state_7171382913282681196_set2
+    FromStateId: __any__
+    ToStateId: state_7171382913282681196_set2
+    Priority: 146
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_shoot_trigger
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_equipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_unequipping
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_reloading
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_throwing
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_ae6705bbe27d4f578285f46599486458
+    Name: Any->state_1691477609762418934_set0
+    FromStateId: __any__
+    ToStateId: state_1691477609762418934_set0
+    Priority: 147
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_grenade_equip
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_f36ccfb3cb7b4d25ba7e9fd96a6db522
+    Name: Any->state_1691477609762418934_set0
+    FromStateId: __any__
+    ToStateId: state_1691477609762418934_set0
+    Priority: 148
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_hold
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_b7b5f49cfe3c497a8deeb1e649403895
+    Name: Any->state_1691477609762418934_set0
+    FromStateId: __any__
+    ToStateId: state_1691477609762418934_set0
+    Priority: 149
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_start
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_7a6c0515a1db43869cc868be2d7585ea
+    Name: state_1691477609762418934_set0->state_6616788816582484090_set0
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_6616788816582484090_set0
+    Priority: 150
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 0.8
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_37acca89849a4a15aafa7dd98a6a06f2
+    Name: state_9056165166600464805_set0->state_6616788816582484090_set0
+    FromStateId: state_9056165166600464805_set0
+    ToStateId: state_6616788816582484090_set0
+    Priority: 151
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 0.8
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_b2d1b700224848c48f86ce0c06be2334
+    Name: state_7158914682901740979_set0->state_6616788816582484090_set0
+    FromStateId: state_7158914682901740979_set0
+    ToStateId: state_6616788816582484090_set0
+    Priority: 152
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 0.95
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_df810cf356e5415ba1401aac2420e341
+    Name: state_6616788816582484090_set0->state_99371444555125045_set0
+    FromStateId: state_6616788816582484090_set0
+    ToStateId: state_99371444555125045_set0
+    Priority: 153
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_start
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_8da891574b8842418181b349010dcd71
+    Name: state_6616788816582484090_set0->state_99371444555125045_set0
+    FromStateId: state_6616788816582484090_set0
+    ToStateId: state_99371444555125045_set0
+    Priority: 154
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_hold
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_93442235c46f4a9cbb339b60a1d058e9
+    Name: state_9056165166600464805_set0->state_99371444555125045_set0
+    FromStateId: state_9056165166600464805_set0
+    ToStateId: state_99371444555125045_set0
+    Priority: 155
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_start
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_39ee05c0c1594df0a08fe1c860a9995f
+    Name: state_9056165166600464805_set0->state_99371444555125045_set0
+    FromStateId: state_9056165166600464805_set0
+    ToStateId: state_99371444555125045_set0
+    Priority: 156
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_hold
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_89df634fa12a48d7a682aa03683361b3
+    Name: state_99371444555125045_set0->state_7158914682901740979_set0
+    FromStateId: state_99371444555125045_set0
+    ToStateId: state_7158914682901740979_set0
+    Priority: 157
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_throw_hold
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_9a9eca0d5a7b4214a4e96a050e2e773e
+    Name: state_6616788816582484090_set0->state_9056165166600464805_set0
+    FromStateId: state_6616788816582484090_set0
+    ToStateId: state_9056165166600464805_set0
+    Priority: 158
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c57ef96f0c20497886c21bd76cdb127c
+    Name: state_99371444555125045_set0->state_9056165166600464805_set0
+    FromStateId: state_99371444555125045_set0
+    ToStateId: state_9056165166600464805_set0
+    Priority: 159
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3d41813cbf5e4bf98f163e73a69d653b
+    Name: state_1691477609762418934_set0->state_9056165166600464805_set0
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_9056165166600464805_set0
+    Priority: 160
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_reloading
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_f3e532c94314460ca2be350e64eb9126
+    Name: Any->state_4236689650817613675_set0
+    FromStateId: __any__
+    ToStateId: state_4236689650817613675_set0
+    Priority: 161
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_equipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d70cc5c8c82e4aa083763f5c51ca8493
+    Name: Any->state_4236689650817613675_set1
+    FromStateId: __any__
+    ToStateId: state_4236689650817613675_set1
+    Priority: 162
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_equipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_4f8f9b2ee8c9488bbd067d69e649c9ef
+    Name: Any->state_4236689650817613675_set1
+    FromStateId: __any__
+    ToStateId: state_4236689650817613675_set1
+    Priority: 163
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_equipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_8ef88fb33a37444c927232488083f4c8
+    Name: Any->state_4236689650817613675_set2
+    FromStateId: __any__
+    ToStateId: state_4236689650817613675_set2
+    Priority: 164
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_equipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_pending_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_717348f032674f7aa9014d937f12ffc7
+    Name: Any->state_113108333135228981_set0
+    FromStateId: __any__
+    ToStateId: state_113108333135228981_set0
+    Priority: 165
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3c90489f26a947ca92d378684845a06f
+    Name: Any->state_113108333135228981_set1
+    FromStateId: __any__
+    ToStateId: state_113108333135228981_set1
+    Priority: 166
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_232f6029e41b440ca470001d5ea74c78
+    Name: Any->state_113108333135228981_set1
+    FromStateId: __any__
+    ToStateId: state_113108333135228981_set1
+    Priority: 167
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_70d1dc93a7c54e829c3586051d5663c8
+    Name: Any->state_113108333135228981_set2
+    FromStateId: __any__
+    ToStateId: state_113108333135228981_set2
+    Priority: 168
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_dead
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_is_jetpack_active
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_70cb2498f9da4e048bcecd8270cfe01a
+    Name: state_1691477609762418934_set0->state_113108333135228981_set0
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_113108333135228981_set0
+    Priority: 169
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d7458b16bfd74a9cabb37413beee1cf5
+    Name: state_1691477609762418934_set0->state_113108333135228981_set1
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_113108333135228981_set1
+    Priority: 170
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 1, y: 0}
+  - Id: transition_2fbae6906308447ab6ab10e32bf2bc9c
+    Name: state_1691477609762418934_set0->state_113108333135228981_set1
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_113108333135228981_set1
+    Priority: 171
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 4
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_bef7fdb773e544d2a277a085dfec8ae9
+    Name: state_1691477609762418934_set0->state_113108333135228981_set2
+    FromStateId: state_1691477609762418934_set0
+    ToStateId: state_113108333135228981_set2
+    Priority: 172
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_unequipping
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_weapon_slot
+      Operator: 2
+      BoolValue: 1
+      IntValue: 2
+      FloatValue: 2
+      Vector2Value: {x: 2, y: 0}
+  - Id: transition_95cbfd3ded284c4d858a0d144e9afbbc
+    Name: state_4133555830263656256_set0->__exit__
+    FromStateId: state_4133555830263656256_set0
+    ToStateId: __exit__
+    Priority: 173
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_104c9600a9814ed7a214ce6f3112210b
+    Name: state_4133555830263656256_set1->__exit__
+    FromStateId: state_4133555830263656256_set1
+    ToStateId: __exit__
+    Priority: 174
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_c99e32b62eeb408a859edc147a2824d9
+    Name: state_4133555830263656256_set2->__exit__
+    FromStateId: state_4133555830263656256_set2
+    ToStateId: __exit__
+    Priority: 175
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_ff0426c89e98484a8ac2d3ef3273b295
+    Name: state_74544910573468742_set0->__exit__
+    FromStateId: state_74544910573468742_set0
+    ToStateId: __exit__
+    Priority: 176
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d7094e6a638f467bac697a59f09fe062
+    Name: state_74544910573468742_set1->__exit__
+    FromStateId: state_74544910573468742_set1
+    ToStateId: __exit__
+    Priority: 177
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_64d4a24a004f42bbb91899c2a01df7a7
+    Name: state_74544910573468742_set2->__exit__
+    FromStateId: state_74544910573468742_set2
+    ToStateId: __exit__
+    Priority: 178
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_grounded
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_d0219de5b1c14d38972fe9da1c6a0a0e
+    Name: state_3566815674533241790_set0->__exit__
+    FromStateId: state_3566815674533241790_set0
+    ToStateId: __exit__
+    Priority: 179
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_bba4058263c34b5593e3d33ae361a07b
+    Name: state_3566815674533241790_set1->__exit__
+    FromStateId: state_3566815674533241790_set1
+    ToStateId: __exit__
+    Priority: 180
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_dc8b25de4372405c8cbeabd934e14aba
+    Name: state_3566815674533241790_set2->__exit__
+    FromStateId: state_3566815674533241790_set2
+    ToStateId: __exit__
+    Priority: 181
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_54392fffd66b4c15bd567131e06e4587
+    Name: state_5592595534975978432_set0->__exit__
+    FromStateId: state_5592595534975978432_set0
+    ToStateId: __exit__
+    Priority: 182
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_bb01dd16f2c74c44b3561798f9b4e095
+    Name: state_5592595534975978432_set1->__exit__
+    FromStateId: state_5592595534975978432_set1
+    ToStateId: __exit__
+    Priority: 183
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_3e525f48de5f4828a8baca10bfcd1d08
+    Name: state_5592595534975978432_set2->__exit__
+    FromStateId: state_5592595534975978432_set2
+    ToStateId: __exit__
+    Priority: 184
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_turning
+      Operator: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_fb0b6e23d9b5480aad3b8281405c7fa1
+    Name: state_516784457197077775_set0->__exit__
+    FromStateId: state_516784457197077775_set0
+    ToStateId: __exit__
+    Priority: 185
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_85f3a0184bbb4431981ff141647bb3fe
+    Name: state_516784457197077775_set1->__exit__
+    FromStateId: state_516784457197077775_set1
+    ToStateId: __exit__
+    Priority: 186
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_dc145db423c04cab8e30c9ce0e552c20
+    Name: state_516784457197077775_set2->__exit__
+    FromStateId: state_516784457197077775_set2
+    ToStateId: __exit__
+    Priority: 187
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_c1e3358be3604dcb97e9db3181fb96b9
+    Name: state_4236689650817613675_set0->__exit__
+    FromStateId: state_4236689650817613675_set0
+    ToStateId: __exit__
+    Priority: 188
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_b021f86811f54255936a25a6b749d738
+    Name: state_4236689650817613675_set1->__exit__
+    FromStateId: state_4236689650817613675_set1
+    ToStateId: __exit__
+    Priority: 189
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_425a44f332d54ec0a5d7e62f96ed61de
+    Name: state_4236689650817613675_set2->__exit__
+    FromStateId: state_4236689650817613675_set2
+    ToStateId: __exit__
+    Priority: 190
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_d4b350eb2306456696d75cd833232c6a
+    Name: state_113108333135228981_set0->__exit__
+    FromStateId: state_113108333135228981_set0
+    ToStateId: __exit__
+    Priority: 191
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 7
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_bfc1c3701865443187a22066bbd3790d
+    Name: state_113108333135228981_set1->__exit__
+    FromStateId: state_113108333135228981_set1
+    ToStateId: __exit__
+    Priority: 192
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 7
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_0e54f777e2414c60a211d66f658922ee
+    Name: state_113108333135228981_set2->__exit__
+    FromStateId: state_113108333135228981_set2
+    ToStateId: __exit__
+    Priority: 193
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.2
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_pending_weapon_slot
+      Operator: 7
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_680a49f3c52b4f63802e4775a3b69fe3
+    Name: state_7171382913282681196_set0->__exit__
+    FromStateId: state_7171382913282681196_set0
+    ToStateId: __exit__
+    Priority: 194
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_e4618716c91f4aa3bf0d6cb73f2d53db
+    Name: state_7171382913282681196_set1->__exit__
+    FromStateId: state_7171382913282681196_set1
+    ToStateId: __exit__
+    Priority: 195
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_294440603f9c40a29e478ccb0ed0e895
+    Name: state_7171382913282681196_set2->__exit__
+    FromStateId: state_7171382913282681196_set2
+    ToStateId: __exit__
+    Priority: 196
+    Mute: 0
+    Solo: 0
+    HasExitTime: 1
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+  - Id: transition_5df3b089d0694e39936491adece530aa
+    Name: state_5137903746742828731_set0->state_5137903746742828731_set0
+    FromStateId: state_5137903746742828731_set0
+    ToStateId: state_5137903746742828731_set0
+    Priority: 197
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_7fbd2c2a22d74e5c9d7784ee7f4f6063
+    Name: state_5137903746742828731_set1->state_5137903746742828731_set0
+    FromStateId: state_5137903746742828731_set1
+    ToStateId: state_5137903746742828731_set0
+    Priority: 198
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}
+  - Id: transition_399a00cce7ab4ef59dc762479c01e371
+    Name: state_5137903746742828731_set2->state_5137903746742828731_set0
+    FromStateId: state_5137903746742828731_set2
+    ToStateId: state_5137903746742828731_set0
+    Priority: 199
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_is_jetpack_active
+      Operator: 0
+      BoolValue: 1
+      IntValue: 1
+      FloatValue: 1
+      Vector2Value: {x: 0, y: 0}

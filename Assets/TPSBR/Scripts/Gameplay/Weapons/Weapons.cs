@@ -76,7 +76,7 @@ namespace TPSBR
 
 			_currentWeaponSlot = 0;
 
-			CurrentWeapon             = _weapons[_currentWeaponSlot];
+			CurrentWeapon             = ResolveWeapon(_currentWeaponSlot);
 			CurrentWeaponHandle       = _slots[_currentWeaponSlot].Active;
 			CurrentWeaponBaseRotation = _slots[_currentWeaponSlot].BaseRotation;
 
@@ -92,7 +92,7 @@ namespace TPSBR
 				return;
 
 			_pendingWeaponSlot = (byte)slot;
-			PendingWeapon = _weapons[_pendingWeaponSlot];
+			PendingWeapon = ResolveWeapon(_pendingWeaponSlot);
 		}
 
 		public void ArmPendingWeapon()
@@ -112,7 +112,7 @@ namespace TPSBR
 
 			_currentWeaponSlot = _pendingWeaponSlot;
 
-			CurrentWeapon             = _weapons[_currentWeaponSlot];
+			CurrentWeapon             = ResolveWeapon(_currentWeaponSlot);
 			CurrentWeaponHandle       = _slots[_currentWeaponSlot].Active;
 			CurrentWeaponBaseRotation = _slots[_currentWeaponSlot].BaseRotation;
 
@@ -132,7 +132,7 @@ namespace TPSBR
 			if (HasStateAuthority == false)
 				return;
 
-			var ownedWeapon = _weapons[pickupWeapon.WeaponSlot];
+			var ownedWeapon = ResolveWeapon(pickupWeapon.WeaponSlot);
 			if (ownedWeapon != null && ownedWeapon.WeaponID == pickupWeapon.WeaponID)
 			{
 				// We already have this weapon, try add at least the ammo
@@ -160,7 +160,7 @@ namespace TPSBR
 			if (weaponPickup.Consumed == true || weaponPickup.IsDisabled == true)
 				return;
 
-			var ownedWeapon = _weapons[weaponPickup.WeaponPrefab.WeaponSlot];
+			var ownedWeapon = ResolveWeapon(weaponPickup.WeaponPrefab.WeaponSlot);
 			if (ownedWeapon != null && ownedWeapon.WeaponID == weaponPickup.WeaponPrefab.WeaponID)
 			{
 				// We already have this weapon, try add at least the ammo
@@ -185,6 +185,10 @@ namespace TPSBR
 		{
 			if (HasStateAuthority == false)
 			{
+				for (int i = 0; i < _localWeapons.Length; i++)
+				{
+					_localWeapons[i] = null;
+				}
 				RefreshWeapons();
 				return;
 			}
@@ -192,6 +196,14 @@ namespace TPSBR
 			_currentWeaponSlot  = 0;
 			_pendingWeaponSlot  = 0;
 			_previousWeaponSlot = 0;
+			PendingWeapon       = null;
+			CurrentWeapon       = null;
+
+			for (int i = 0; i < _weapons.Length; i++)
+			{
+				_weapons.Set(i, null);
+				_localWeapons[i] = null;
+			}
 
 			byte bestWeaponSlot = 0;
 
@@ -223,14 +235,19 @@ namespace TPSBR
 			// Cleanup weapons
 			for (int i = 0; i < _weapons.Length; i++)
 			{
-				Weapon weapon = _weapons[i];
+				Weapon weapon = ResolveWeapon(i);
 				if (weapon != null)
 				{
 					weapon.Deinitialize(Object);
 					Runner.Despawn(weapon.Object);
-					_weapons.Set(i, null);
-					_localWeapons[i] = null;
 				}
+
+				if (HasStateAuthority == true)
+				{
+					_weapons.Set(i, null);
+				}
+
+				_localWeapons[i] = null;
 			}
 
 			for (int i = 0; i < _localWeapons.Length; i++)
@@ -327,7 +344,7 @@ namespace TPSBR
 			if (weaponSlot == _pendingWeaponSlot)
 				return false;
 
-			var weapon = _weapons[weaponSlot];
+			var weapon = ResolveWeapon(weaponSlot);
 			if (weapon == null || (weapon.ValidOnlyWithAmmo == true && weapon.HasAmmo() == false))
 				return false;
 
@@ -340,13 +357,13 @@ namespace TPSBR
 			if (slot < 0 || slot >= _weapons.Length)
 				return false;
 
-			var weapon = _weapons[slot];
+			var weapon = ResolveWeapon(slot);
 			return weapon != null && (checkAmmo == false || (weapon.Object != null && weapon.HasAmmo() == true));
 		}
 
 		public Weapon GetWeapon(int slot)
 		{
-			return _weapons[slot];
+			return ResolveWeapon(slot);
 		}
 
 		public int GetNextWeaponSlot(int fromSlot, int minSlot = 0, bool checkAmmo = true)
@@ -360,7 +377,7 @@ namespace TPSBR
 				if (slot < minSlot)
 					continue;
 
-				var weapon = _weapons[slot];
+				var weapon = ResolveWeapon(slot);
 
 				if (weapon == null)
 					continue;
@@ -408,7 +425,7 @@ namespace TPSBR
 				return false;
 			}
 
-			var weapon = _weapons[weaponSlot];
+			var weapon = ResolveWeapon(weaponSlot);
 			if (weapon == null)
 			{
 				result = "No weapon with this type of ammo";
@@ -450,13 +467,13 @@ namespace TPSBR
 
 		private void RefreshWeapons()
 		{
-			PendingWeapon = _weapons[_pendingWeaponSlot];
+			PendingWeapon = ResolveWeapon(_pendingWeaponSlot);
 
 			Vector2 lastRecoil = Vector2.zero;
 
 			for (int i = 0; i < _weapons.Length; i++)
 			{
-				var weapon = _weapons[i];
+				var weapon = ResolveWeapon(i);
 				if (weapon == null)
 					continue;
 
@@ -481,7 +498,7 @@ namespace TPSBR
 				}
 			}
 
-			Weapon currentWeapon = _weapons[_currentWeaponSlot];
+			Weapon currentWeapon = ResolveWeapon(_currentWeaponSlot);
 			if (CurrentWeapon != currentWeapon)
 			{
 				if (currentWeapon == null)
@@ -518,9 +535,11 @@ namespace TPSBR
 
 		private void DropWeapon(int weaponSlot)
 		{
-			var weapon = _weapons[weaponSlot];
+			var weapon = ResolveWeapon(weaponSlot);
 			if (weapon == null)
 				return;
+
+			var droppedObjectId = weapon.Object.Id;
 
 			if (weapon.PickupPrefab == null)
 			{
@@ -561,7 +580,7 @@ namespace TPSBR
 			void BeforePickupSpawned(NetworkRunner runner, NetworkObject obj)
 			{
 				var dynamicPickup = obj.GetComponent<DynamicPickup>();
-				dynamicPickup.AssignObject(_weapons[weaponSlot].Object.Id);
+				dynamicPickup.AssignObject(droppedObjectId);
 			}
 		}
 
@@ -602,9 +621,19 @@ namespace TPSBR
 
 		private void RemoveWeapon(int slot)
 		{
-			var weapon = _weapons[slot];
-			if (weapon == null)
+			if (slot < 0 || slot >= _weapons.Length)
 				return;
+
+			var weapon = ResolveWeapon(slot);
+			if (weapon == null)
+			{
+				_localWeapons[slot] = null;
+				if (HasStateAuthority == true)
+				{
+					_weapons.Set(slot, null);
+				}
+				return;
+			}
 
 			weapon.Deinitialize(Object);
 			weapon.Object.RemoveInputAuthority();
@@ -624,7 +653,7 @@ namespace TPSBR
 
 			for (int i = 0; i < _weapons.Length; i++)
 			{
-				Weapon weapon = _weapons[i];
+				Weapon weapon = ResolveWeapon(i);
 				if (weapon != null)
 				{
 					if (weapon.WeaponSlot == ignoreSlot)
@@ -638,6 +667,54 @@ namespace TPSBR
 			}
 
 			return bestWeaponSlot;
+		}
+
+		private Weapon ResolveWeapon(int slot)
+		{
+			if (slot < 0 || slot >= _weapons.Length)
+				return null;
+
+			try
+			{
+				var weapon = _weapons[slot];
+				if (weapon == null)
+				{
+					_localWeapons[slot] = null;
+					if (HasStateAuthority == true)
+					{
+						_weapons.Set(slot, null);
+					}
+					return null;
+				}
+
+				_localWeapons[slot] = weapon;
+				return weapon;
+			}
+			catch (Exception ex) when (IsRecoverableWeaponReadException(ex))
+			{
+				var localWeapon = _localWeapons[slot];
+				if (localWeapon != null && (localWeapon.Object == null || localWeapon.Object.IsValid == false))
+				{
+					_localWeapons[slot] = null;
+					localWeapon = null;
+				}
+
+				if (HasStateAuthority == true)
+				{
+					_weapons.Set(slot, null);
+				}
+
+				return localWeapon;
+			}
+		}
+
+		private static bool IsRecoverableWeaponReadException(Exception ex)
+		{
+			if (ex is InvalidCastException)
+				return true;
+
+			// Fusion assert exceptions can surface as "AssertException" depending on runtime assembly.
+			return ex != null && ex.GetType().Name == "AssertException";
 		}
 	}
 }

@@ -4,7 +4,7 @@ namespace TPSBR
 	using Fusion.Addons.KCC;
 	using Fusion.Addons.AnimationController;
 
-	public sealed class MoveState : MultiBlendTreeState
+	public sealed class MoveState : MultiBlendTreeState, IMoveSpeedProvider
 	{
 		// PUBLIC MEMBERS
 

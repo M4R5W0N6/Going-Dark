@@ -6,7 +6,7 @@ namespace Fusion.Addons.KCC
 
 	public partial class KCC
 	{
-		public MoveState MoveState { get; set; }
+		public IMoveSpeedProvider MoveState { get; set; }
 
 		public void SetAim(bool aim)
 		{

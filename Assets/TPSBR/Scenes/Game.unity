@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 4
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -5250,13 +5250,13 @@ Transform:
   - {fileID: 1715618763}
   - {fileID: 250267015}
   - {fileID: 1204738951}
+  - {fileID: 75301068}
   - {fileID: 2096865846}
   - {fileID: 283939772}
   - {fileID: 2098404329}
   - {fileID: 1006270295}
   - {fileID: 66986936}
   - {fileID: 571397588}
-  - {fileID: 75301068}
   - {fileID: 1917533901}
   - {fileID: 1770138271}
   - {fileID: 1727781111}
@@ -5406,7 +5406,7 @@ PrefabInstance:
       objectReference: {fileID: 109962323}
     - target: {fileID: 6736140835031990505, guid: d0bee6367ed69cd479961ca6458d20ea, type: 3}
       propertyPath: m_VersionIndex
-      value: 1955
+      value: 1958
       objectReference: {fileID: 0}
     - target: {fileID: 7636522859939059922, guid: d0bee6367ed69cd479961ca6458d20ea, type: 3}
       propertyPath: m_Name
@@ -12284,7 +12284,7 @@ PrefabInstance:
       objectReference: {fileID: 792690110}
     - target: {fileID: 6736140835031990505, guid: d0bee6367ed69cd479961ca6458d20ea, type: 3}
       propertyPath: m_VersionIndex
-      value: 1955
+      value: 1958
       objectReference: {fileID: 0}
     - target: {fileID: 7636522859939059922, guid: d0bee6367ed69cd479961ca6458d20ea, type: 3}
       propertyPath: m_Name

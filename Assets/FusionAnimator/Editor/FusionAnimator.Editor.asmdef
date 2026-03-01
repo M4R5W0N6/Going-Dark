@@ -1,0 +1,18 @@
+{
+  "name": "FusionAnimator.Editor",
+  "rootNamespace": "FusionAnimator.Editor",
+  "references": [
+    "FusionAnimator.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

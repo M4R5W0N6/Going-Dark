@@ -424,10 +424,11 @@ namespace Fusion.Addons.AnimationController
 		protected virtual void OnFixedUpdate()  {}
 		protected virtual void OnInterpolate()  {}
 		protected virtual void OnEvaluate()     {}
+		protected virtual bool UseBuiltInLayerEvaluation => true;
 
 		// NetworkBehaviour INTERFACE
 
-		public override sealed int? DynamicWordCount => GetNetworkDataWordCount();
+		public override sealed int? DynamicWordCount => UseBuiltInLayerEvaluation == true ? GetNetworkDataWordCount() : 0;
 
 		public override sealed void Spawned()
 		{
@@ -442,16 +443,19 @@ namespace Fusion.Addons.AnimationController
 			_output = AnimationPlayableOutput.Create(_graph, name, _animator);
 			_output.SetSourcePlayable(_mixer);
 
-			if (Object.HasStateAuthority == false)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				ReadNetworkData();
-			}
+				if (Object.HasStateAuthority == false)
+				{
+					ReadNetworkData();
+				}
 
-			AnimationLayer[] layers = _layers;
-			for (int i = 0, count = layers.Length; i < count; ++i)
-			{
-				AnimationLayer layer = layers[i];
-				layer.Spawned();
+				AnimationLayer[] layers = _layers;
+				for (int i = 0, count = layers.Length; i < count; ++i)
+				{
+					AnimationLayer layer = layers[i];
+					layer.Spawned();
+				}
 			}
 
 			OnSpawned();
@@ -463,13 +467,16 @@ namespace Fusion.Addons.AnimationController
 
 			OnDespawned();
 
-			AnimationLayer[] layers = _layers;
-			for (int i = 0, count = layers != null ? layers.Length : 0; i < count; ++i)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				AnimationLayer layer = layers[i];
-				if (layer != null)
+				AnimationLayer[] layers = _layers;
+				for (int i = 0, count = layers != null ? layers.Length : 0; i < count; ++i)
 				{
-					layer.Despawned();
+					AnimationLayer layer = layers[i];
+					if (layer != null)
+					{
+						layer.Despawned();
+					}
 				}
 			}
 
@@ -509,6 +516,9 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterSpawned.AfterSpawned()
 		{
+			if (UseBuiltInLayerEvaluation == false)
+				return;
+
 			if (Object.IsInSimulation == true)
 			{
 				WriteNetworkData();
@@ -519,6 +529,9 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterClientPredictionReset.AfterClientPredictionReset()
 		{
+			if (UseBuiltInLayerEvaluation == false)
+				return;
+
 			_restoreStateMarker.Begin();
 			ReadNetworkData();
 			_restoreStateMarker.End();
@@ -528,6 +541,9 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterTick.AfterTick()
 		{
+			if (UseBuiltInLayerEvaluation == false)
+				return;
+
 			_afterTickMarker.Begin();
 			WriteNetworkData();
 			_afterTickMarker.End();
@@ -610,10 +626,13 @@ namespace Fusion.Addons.AnimationController
 			_deltaTime = Runner.DeltaTime;
 
 			AnimationLayer[] layers = _layers;
-			for (int i = 0, count = layers.Length; i < count; ++i)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				AnimationLayer layer = layers[i];
-				layer.ManualFixedUpdate();
+				for (int i = 0, count = layers.Length; i < count; ++i)
+				{
+					AnimationLayer layer = layers[i];
+					layer.ManualFixedUpdate();
+				}
 			}
 
 			OnFixedUpdate();
@@ -695,10 +714,13 @@ namespace Fusion.Addons.AnimationController
 			InterpolateNetworkData();
 
 			AnimationLayer[] layers = _layers;
-			for (int i = 0, count = layers.Length; i < count; ++i)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				AnimationLayer layer = layers[i];
-				layer.Interpolate();
+				for (int i = 0, count = layers.Length; i < count; ++i)
+				{
+					AnimationLayer layer = layers[i];
+					layer.Interpolate();
+				}
 			}
 
 			OnInterpolate();
@@ -709,10 +731,13 @@ namespace Fusion.Addons.AnimationController
 		{
 			_evaluateMarker.Begin();
 			AnimationLayer[] layers = _layers;
-			for (int i = 0, count = layers.Length; i < count; ++i)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				AnimationLayer layer = layers[i];
-				layer.SetPlayableInputWeights(interpolated);
+				for (int i = 0, count = layers.Length; i < count; ++i)
+				{
+					AnimationLayer layer = layers[i];
+					layer.SetPlayableInputWeights(interpolated);
+				}
 			}
 
 			_evaluateGraphMarker.Begin();
