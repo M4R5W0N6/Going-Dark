@@ -76,7 +76,6 @@ namespace FusionAnimator.Editor
             public Vector2 DefaultVector2;
             public string PreviewInputBinding;
             public float PreviewInputScale = 1.0f;
-            public FusionAnimatorPreviewBoolInputSource PreviewBoolInputSource = FusionAnimatorPreviewBoolInputSource.Float;
             public FusionAnimatorConditionOperator PreviewBoolInputOperator = FusionAnimatorConditionOperator.Greater;
             public float PreviewBoolInputCompareValue = 0.5f;
         }
@@ -98,6 +97,7 @@ namespace FusionAnimator.Editor
             public FusionAnimatorInterruptionSource InterruptionSource;
             public bool CanInterrupt;
             public List<FusionAnimatorConditionDefinition> Conditions = new List<FusionAnimatorConditionDefinition>();
+            public List<FusionAnimatorTransitionResultDefinition> PreviewResults = new List<FusionAnimatorTransitionResultDefinition>();
         }
 
         [Serializable]
@@ -3487,9 +3487,11 @@ namespace FusionAnimator.Editor
                     InterruptionSource = transition.InterruptionSource,
                     CanInterrupt = transition.CanInterrupt,
                     Conditions = CloneConditions(transition.Conditions),
+                    PreviewResults = CloneTransitionResults(transition.PreviewResults),
                 };
                 payload.Transitions.Add(clipboardTransition);
                 CollectConditionParameterIds(transition.Conditions, referencedParameterIds);
+                CollectTransitionResultParameterIds(transition.PreviewResults, referencedParameterIds);
             }
 
             if (copiedScopePaths.Count > 0 && string.IsNullOrWhiteSpace(_activeLayerId) == false)
@@ -3572,7 +3574,6 @@ namespace FusionAnimator.Editor
                         DefaultVector2 = parameter.DefaultVector2,
                         PreviewInputBinding = parameter.PreviewInputBinding,
                         PreviewInputScale = parameter.PreviewInputScale,
-                        PreviewBoolInputSource = parameter.PreviewBoolInputSource,
                         PreviewBoolInputOperator = parameter.PreviewBoolInputOperator,
                         PreviewBoolInputCompareValue = parameter.PreviewBoolInputCompareValue,
                     });
@@ -3725,6 +3726,7 @@ namespace FusionAnimator.Editor
                         InterruptionSource = sourceTransition.InterruptionSource,
                         CanInterrupt = sourceTransition.CanInterrupt,
                         Conditions = CloneConditionsWithParameterRemap(sourceTransition.Conditions, parameterRemap),
+                        PreviewResults = CloneTransitionResultsWithParameterRemap(sourceTransition.PreviewResults, parameterRemap),
                     };
 
                     _graph.Transitions.Add(pastedTransition);
@@ -3868,6 +3870,73 @@ namespace FusionAnimator.Editor
                     string.IsNullOrWhiteSpace(remappedBaseId) == false)
                 {
                     condition.ParameterId = FusionAnimatorParameterReferenceUtility.Build(remappedBaseId, component);
+                }
+            }
+
+            return clone;
+        }
+
+        private static List<FusionAnimatorTransitionResultDefinition> CloneTransitionResults(
+            List<FusionAnimatorTransitionResultDefinition> source)
+        {
+            List<FusionAnimatorTransitionResultDefinition> clone = new List<FusionAnimatorTransitionResultDefinition>();
+            if (source == null)
+            {
+                return clone;
+            }
+
+            for (int i = 0; i < source.Count; ++i)
+            {
+                FusionAnimatorTransitionResultDefinition result = source[i];
+                if (result == null)
+                {
+                    continue;
+                }
+
+                clone.Add(new FusionAnimatorTransitionResultDefinition
+                {
+                    ParameterId = result.ParameterId,
+                    Operation = result.Operation,
+                    BoolValue = result.BoolValue,
+                    IntValue = result.IntValue,
+                    FloatValue = result.FloatValue,
+                    Vector2Value = result.Vector2Value,
+                    CycleMinValue = result.CycleMinValue,
+                    CycleMaxValue = result.CycleMaxValue,
+                });
+            }
+
+            return clone;
+        }
+
+        private static List<FusionAnimatorTransitionResultDefinition> CloneTransitionResultsWithParameterRemap(
+            List<FusionAnimatorTransitionResultDefinition> source,
+            Dictionary<string, string> parameterIdRemap)
+        {
+            List<FusionAnimatorTransitionResultDefinition> clone = CloneTransitionResults(source);
+            if (clone == null || clone.Count == 0 || parameterIdRemap == null || parameterIdRemap.Count == 0)
+            {
+                return clone;
+            }
+
+            for (int i = 0; i < clone.Count; ++i)
+            {
+                FusionAnimatorTransitionResultDefinition result = clone[i];
+                if (result == null || string.IsNullOrWhiteSpace(result.ParameterId))
+                {
+                    continue;
+                }
+
+                if (FusionAnimatorParameterReferenceUtility.TryParse(result.ParameterId, out string baseParameterId, out FusionAnimatorParameterComponent component) == false ||
+                    component != FusionAnimatorParameterComponent.None)
+                {
+                    continue;
+                }
+
+                if (parameterIdRemap.TryGetValue(baseParameterId, out string mappedId) &&
+                    string.IsNullOrWhiteSpace(mappedId) == false)
+                {
+                    result.ParameterId = mappedId;
                 }
             }
 
@@ -4044,6 +4113,25 @@ namespace FusionAnimator.Editor
             }
         }
 
+        private static void CollectTransitionResultParameterIds(List<FusionAnimatorTransitionResultDefinition> results, HashSet<string> ids)
+        {
+            if (results == null || ids == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < results.Count; ++i)
+            {
+                FusionAnimatorTransitionResultDefinition result = results[i];
+                if (result == null)
+                {
+                    continue;
+                }
+
+                AddParameterId(ids, result.ParameterId);
+            }
+        }
+
         private static void AddParameterId(HashSet<string> ids, string parameterId)
         {
             if (ids == null || string.IsNullOrWhiteSpace(parameterId))
@@ -4182,6 +4270,7 @@ namespace FusionAnimator.Editor
                     }
 
                     CollectConditionParameterIds(transition.Conditions, referencedParameterIds);
+                    CollectTransitionResultParameterIds(transition.PreviewResults, referencedParameterIds);
                 }
             }
 
@@ -4232,7 +4321,6 @@ namespace FusionAnimator.Editor
                     DefaultVector2 = sourceParameter.DefaultVector2,
                     PreviewInputBinding = sourceParameter.PreviewInputBinding,
                     PreviewInputScale = sourceParameter.PreviewInputScale,
-                    PreviewBoolInputSource = sourceParameter.PreviewBoolInputSource,
                     PreviewBoolInputOperator = sourceParameter.PreviewBoolInputOperator,
                     PreviewBoolInputCompareValue = sourceParameter.PreviewBoolInputCompareValue,
                 };
@@ -5215,12 +5303,89 @@ namespace FusionAnimator.Editor
                 }
 
                 bool isLayerNode = _layerNodeLayerIdById.TryGetValue(nodeId, out string layerId);
-                bool isActive = isLayerNode
-                    ? string.IsNullOrWhiteSpace(layerId) == false && _previewActiveLayerIds.Contains(layerId)
-                    : _previewActiveStateIds.Contains(nodeId);
-                bool isBlend = isLayerNode == false && _previewBlendStateIds.Contains(nodeId) && isActive == false;
+                bool isScopeNode = IsScopeNodeId(nodeId);
+                bool isActive;
+                bool isBlend;
+
+                if (isLayerNode)
+                {
+                    isActive = string.IsNullOrWhiteSpace(layerId) == false && _previewActiveLayerIds.Contains(layerId);
+                    isBlend = false;
+                }
+                else if (isScopeNode)
+                {
+                    ResolveScopeNodeRuntimeBadgeState(nodeId, out isActive, out isBlend);
+                }
+                else
+                {
+                    isActive = _previewActiveStateIds.Contains(nodeId);
+                    isBlend = _previewBlendStateIds.Contains(nodeId) && isActive == false;
+                }
+
                 SetRuntimeBadgeState(view.RuntimeBadge, isActive, isBlend);
             }
+        }
+
+        private void ResolveScopeNodeRuntimeBadgeState(string scopeNodeId, out bool isActive, out bool isBlend)
+        {
+            isActive = false;
+            isBlend = false;
+            if (string.IsNullOrWhiteSpace(scopeNodeId) || IsScopeNodeId(scopeNodeId) == false)
+            {
+                return;
+            }
+
+            string scopePath = null;
+            if (_scopeNodePathById.TryGetValue(scopeNodeId, out string resolvedScopePath))
+            {
+                scopePath = resolvedScopePath;
+            }
+            else if (scopeNodeId.StartsWith("__scope__:", StringComparison.Ordinal))
+            {
+                scopePath = scopeNodeId.Substring("__scope__:".Length);
+            }
+
+            string normalizedScopePath = NormalizeScopePath(scopePath);
+            string scopeLayerId = _activeLayerId;
+            if (string.IsNullOrWhiteSpace(normalizedScopePath) || string.IsNullOrWhiteSpace(scopeLayerId))
+            {
+                return;
+            }
+
+            isActive = HasRuntimeStateMarkerInScope(_previewActiveStateIds, scopeLayerId, normalizedScopePath);
+            if (isActive == false)
+            {
+                isBlend = HasRuntimeStateMarkerInScope(_previewBlendStateIds, scopeLayerId, normalizedScopePath);
+            }
+        }
+
+        private bool HasRuntimeStateMarkerInScope(HashSet<string> markerStateIds, string layerId, string scopePath)
+        {
+            if (markerStateIds == null ||
+                markerStateIds.Count == 0 ||
+                string.IsNullOrWhiteSpace(layerId) ||
+                string.IsNullOrWhiteSpace(scopePath))
+            {
+                return false;
+            }
+
+            foreach (string stateId in markerStateIds)
+            {
+                FusionAnimatorStateDefinition state = FindState(stateId);
+                if (state == null || string.Equals(state.LayerId, layerId, StringComparison.Ordinal) == false)
+                {
+                    continue;
+                }
+
+                string stateScope = NormalizeScopePath(GetStateScopePath(state.Name));
+                if (string.Equals(stateScope, scopePath, StringComparison.OrdinalIgnoreCase) ||
+                    stateScope.StartsWith(scopePath + "/", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void SetRuntimeBadgeState(Label badge, bool isActive, bool isBlend)

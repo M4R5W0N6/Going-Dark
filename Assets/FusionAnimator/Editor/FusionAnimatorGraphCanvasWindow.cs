@@ -993,6 +993,7 @@ namespace FusionAnimator.Editor
             {
                 _previewTargetField.SetValueWithoutNotify(_previewTarget);
             }
+
         }
 
         private void AddStateAtCenter()
@@ -1125,6 +1126,7 @@ namespace FusionAnimator.Editor
             bool changed = false;
             int reassignedStateLayerCount = 0;
             int removedTransitionConditionCount = 0;
+            int removedTransitionPreviewResultCount = 0;
             int removedBindingConditionCount = 0;
             int removedBindingSlotConditionCount = 0;
             int resetInvalidBindingIndexParameterCount = 0;
@@ -1215,6 +1217,22 @@ namespace FusionAnimator.Editor
                         }
 
                         removedTransitionConditionCount += removedCount;
+                        changed = true;
+                    }
+
+                    if (CleanInvalidTransitionResultReferences(
+                        transition.PreviewResults,
+                        parameterIds,
+                        intParameterIds,
+                        out int removedPreviewResultCount))
+                    {
+                        if (undoRecorded == false)
+                        {
+                            RecordUndo("Repair FusionAnimator Graph");
+                            undoRecorded = true;
+                        }
+
+                        removedTransitionPreviewResultCount += removedPreviewResultCount;
                         changed = true;
                     }
                 }
@@ -1365,6 +1383,11 @@ namespace FusionAnimator.Editor
             if (removedTransitionConditionCount > 0)
             {
                 summary.AppendLine(string.Format("- Removed {0} invalid transition condition(s).", removedTransitionConditionCount));
+            }
+
+            if (removedTransitionPreviewResultCount > 0)
+            {
+                summary.AppendLine(string.Format("- Removed {0} invalid transition preview result(s).", removedTransitionPreviewResultCount));
             }
 
             if (removedBindingConditionCount > 0)
@@ -1632,6 +1655,52 @@ namespace FusionAnimator.Editor
                 }
 
                 conditions.RemoveAt(conditionIndex);
+                removedCount++;
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        private static bool CleanInvalidTransitionResultReferences(
+            List<FusionAnimatorTransitionResultDefinition> results,
+            HashSet<string> validParameterIds,
+            HashSet<string> validIntParameterIds,
+            out int removedCount)
+        {
+            removedCount = 0;
+            if (results == null || results.Count == 0)
+            {
+                return false;
+            }
+
+            bool changed = false;
+            for (int resultIndex = results.Count - 1; resultIndex >= 0; --resultIndex)
+            {
+                FusionAnimatorTransitionResultDefinition result = results[resultIndex];
+                bool removeResult = false;
+                if (result == null || string.IsNullOrWhiteSpace(result.ParameterId))
+                {
+                    removeResult = true;
+                }
+                else if (FusionAnimatorParameterReferenceUtility.TryParse(result.ParameterId, out string baseParameterId, out FusionAnimatorParameterComponent component) == false ||
+                         component != FusionAnimatorParameterComponent.None ||
+                         validParameterIds.Contains(baseParameterId) == false)
+                {
+                    removeResult = true;
+                }
+                else if (result.Operation == FusionAnimatorTransitionResultOperation.Cycle &&
+                         validIntParameterIds.Contains(baseParameterId) == false)
+                {
+                    removeResult = true;
+                }
+
+                if (removeResult == false)
+                {
+                    continue;
+                }
+
+                results.RemoveAt(resultIndex);
                 removedCount++;
                 changed = true;
             }
@@ -1955,15 +2024,21 @@ namespace FusionAnimator.Editor
 
         private void ClearGraphSelectionForLibraryInteraction()
         {
-            if (_graphView == null)
+            if (_graphView != null)
             {
-                return;
+                WithSuppressedGraphSelectionChanged(() =>
+                {
+                    _graphView.ClearSelection();
+                });
             }
 
-            WithSuppressedGraphSelectionChanged(() =>
-            {
-                _graphView.ClearSelection();
-            });
+            // Library-driven selection should not retain prior graph-selection context.
+            _selectedStateIds.Clear();
+            _selectedScopeKeys.Clear();
+            _selectedState = null;
+            _selectedTransition = null;
+            _selectedEntryLinkTargetStateId = string.Empty;
+            _selectedLayerScopePath = string.Empty;
         }
 
         private void OnGraphLayerNodeSelected(string layerId)

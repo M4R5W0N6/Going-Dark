@@ -432,7 +432,11 @@ namespace FusionAnimator.Editor
             state.Id = EditorGUILayout.TextField("Id", state.Id);
             state.Name = EditorGUILayout.TextField("Name", state.Name);
             DrawLayerIdField("Layer Id", value => state.LayerId = value, state.LayerId);
-            state.MinDurationSeconds = EditorGUILayout.FloatField("Min Duration", state.MinDurationSeconds);
+            state.MinDurationSeconds = EditorGUILayout.FloatField(
+                new GUIContent(
+                    "Min Duration (Normalized)",
+                    "Minimum normalized state time before exit transitions are eligible. Runtime seconds are resolved as (min duration * current clip/reference length)."),
+                state.MinDurationSeconds);
             state.CanTransitionOut = EditorGUILayout.Toggle("Can Transition Out", state.CanTransitionOut);
             state.WriteDefaults = EditorGUILayout.Toggle("Write Defaults", state.WriteDefaults);
 

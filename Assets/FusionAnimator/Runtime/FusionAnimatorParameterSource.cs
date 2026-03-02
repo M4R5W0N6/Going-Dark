@@ -29,6 +29,7 @@ namespace FusionAnimator
         private readonly Dictionary<string, ParameterValue> _values = new Dictionary<string, ParameterValue>(StringComparer.Ordinal);
         private readonly Dictionary<string, bool> _triggerPending = new Dictionary<string, bool>(StringComparer.Ordinal);
         private readonly Dictionary<string, bool> _triggerInputState = new Dictionary<string, bool>(StringComparer.Ordinal);
+        private readonly List<string> _triggerSweepKeys = new List<string>(16);
 
         public void Clear()
         {
@@ -209,6 +210,34 @@ namespace FusionAnimator
             return false;
         }
 
+        /// <summary>
+        /// Expires trigger pulses that were not consumed during the current runtime step.
+        /// This prevents triggers from carrying over into later, unrelated scope contexts.
+        /// </summary>
+        public void ExpireUnconsumedTriggers()
+        {
+            if (_triggerPending.Count == 0)
+            {
+                return;
+            }
+
+            _triggerSweepKeys.Clear();
+            foreach (KeyValuePair<string, bool> pair in _triggerPending)
+            {
+                if (pair.Value)
+                {
+                    _triggerSweepKeys.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < _triggerSweepKeys.Count; ++i)
+            {
+                _triggerPending[_triggerSweepKeys[i]] = false;
+            }
+
+            _triggerSweepKeys.Clear();
+        }
+
         private ParameterValue GetOrCreate(string parameterId)
         {
             if (_values.TryGetValue(parameterId, out ParameterValue existing))
@@ -227,6 +256,12 @@ namespace FusionAnimator
             if (isPressed && previousPressed == false)
             {
                 _triggerPending[parameterId] = true;
+            }
+            else if (isPressed == false)
+            {
+                // Triggers are edge-driven by input. If the driving input is no longer pressed,
+                // drop any unconsumed pending pulse so it cannot fire later in a different context/scope.
+                _triggerPending[parameterId] = false;
             }
             else if (_triggerPending.ContainsKey(parameterId) == false)
             {

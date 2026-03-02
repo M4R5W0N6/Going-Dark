@@ -556,14 +556,6 @@ PrefabInstance:
       propertyPath: _fusionAnimatorGraph
       value: 
       objectReference: {fileID: 11400000, guid: 86888537270ac474c853a6c57d80b550, type: 2}
-    - target: {fileID: 6522195430194241608, guid: e727cb85183d43029284b88ba97aba4c, type: 3}
-      propertyPath: _useFusionAnimatorGraph
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6522195430194241608, guid: e727cb85183d43029284b88ba97aba4c, type: 3}
-      propertyPath: _fusionControlShootLayer
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6749243822846010147, guid: e727cb85183d43029284b88ba97aba4c, type: 3}
       propertyPath: m_IsActive
       value: 1

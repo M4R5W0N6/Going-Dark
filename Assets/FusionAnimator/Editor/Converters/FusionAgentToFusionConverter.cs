@@ -31,6 +31,8 @@ namespace FusionAnimator.Editor
         private const string ParamIsReloadingId = "param_is_reloading";
         private const string ParamIsEquippingId = "param_is_equipping";
         private const string ParamIsUnequippingId = "param_is_unequipping";
+        private const string ParamEquipTriggerId = "param_equip_trigger";
+        private const string ParamUnequipTriggerId = "param_unequip_trigger";
         private const string ParamIsThrowingId = "param_is_throwing";
         private const string ParamIsTurningId = "param_is_turning";
         private const string ParamShootTriggerId = "param_shoot_trigger";
@@ -286,6 +288,8 @@ namespace FusionAnimator.Editor
             AddParameter(parameters, ParamIsReloadingId, "Is Reloading", FusionAnimatorParameterType.Bool, defaultBool: false);
             AddParameter(parameters, ParamIsEquippingId, "Is Equipping", FusionAnimatorParameterType.Bool, defaultBool: false);
             AddParameter(parameters, ParamIsUnequippingId, "Is Unequipping", FusionAnimatorParameterType.Bool, defaultBool: false);
+            AddParameter(parameters, ParamEquipTriggerId, "Equip Trigger", FusionAnimatorParameterType.Trigger, defaultBool: false);
+            AddParameter(parameters, ParamUnequipTriggerId, "Unequip Trigger", FusionAnimatorParameterType.Trigger, defaultBool: false);
             AddParameter(parameters, ParamIsThrowingId, "Is Throwing", FusionAnimatorParameterType.Bool, defaultBool: false);
             AddParameter(parameters, ParamIsTurningId, "Is Turning", FusionAnimatorParameterType.Bool, defaultBool: false);
             AddParameter(parameters, ParamShootTriggerId, "Shoot Trigger", FusionAnimatorParameterType.Trigger, defaultBool: false);
@@ -1960,7 +1964,7 @@ namespace FusionAnimator.Editor
                     equip,
                     transitions,
                     ref priority,
-                    BuildBoolCondition(ParamIsEquippingId, true),
+                    BuildBoolCondition(ParamEquipTriggerId, true),
                     BuildBoolCondition(ParamIsDeadId, false),
                     BuildBoolCondition(ParamIsJetpackActiveId, false));
             }
@@ -1971,7 +1975,7 @@ namespace FusionAnimator.Editor
                     unequip,
                     transitions,
                     ref priority,
-                    BuildBoolCondition(ParamIsUnequippingId, true),
+                    BuildBoolCondition(ParamUnequipTriggerId, true),
                     BuildBoolCondition(ParamIsDeadId, false),
                     BuildBoolCondition(ParamIsJetpackActiveId, false));
             }
@@ -1986,7 +1990,7 @@ namespace FusionAnimator.Editor
                     false,
                     1.0f,
                     false,
-                    BuildBoolCondition(ParamIsUnequippingId, true));
+                    BuildBoolCondition(ParamUnequipTriggerId, true));
             }
         }
 

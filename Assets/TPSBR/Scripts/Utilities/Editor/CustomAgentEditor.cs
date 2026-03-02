@@ -1241,18 +1241,11 @@ namespace TPSBR
 				animationRootProperty.objectReferenceValue = fusionAnimatorRoot;
 			}
 
-			SerializedProperty useFusionAnimatorGraph = animationSO.FindProperty("_useFusionAnimatorGraph");
 			SerializedProperty fusionAnimatorGraph = animationSO.FindProperty("_fusionAnimatorGraph");
-			SerializedProperty fusionControlShootLayer = animationSO.FindProperty("_fusionControlShootLayer");
-			if (useFusionAnimatorGraph != null && fusionAnimatorGraph != null)
+			if (fusionAnimatorGraph != null)
 			{
 				UnityEngine.Object fusionGraphAsset = AssetDatabase.LoadMainAssetAtPath(FUSION_ANIMATOR_GRAPH_PATH);
 				fusionAnimatorGraph.objectReferenceValue = fusionGraphAsset;
-				useFusionAnimatorGraph.boolValue = fusionGraphAsset != null;
-				if (fusionControlShootLayer != null)
-				{
-					fusionControlShootLayer.boolValue = fusionGraphAsset != null;
-				}
 			}
 
 			animationSO.ApplyModifiedPropertiesWithoutUndo();

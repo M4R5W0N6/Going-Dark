@@ -1664,6 +1664,18 @@ namespace FusionAnimator.Editor
                                 _selectedBindingIndex = bindingIndex;
                             }
 
+                            CancelReorderDrag();
+                            ClearGraphSelectionForLibraryInteraction();
+                            _selectedParameterIndex = -1;
+                            _selectedLayerIndex = -1;
+                            _selectedState = null;
+                            _selectedTransition = null;
+                            _selectedLayerScopePath = string.Empty;
+                            _selectedEntryLinkTargetStateId = string.Empty;
+                            _graphView?.SetHoveredLayer(null);
+                            _graphView?.SetHoveredParameter(null);
+                            _inspector?.MarkDirtyRepaint();
+
                             _dragBindingIndex = bindingIndex;
                             _dragBindingTargetIndex = bindingIndex;
                             _dragBindingTargetGroupId = groupId ?? string.Empty;
@@ -2598,6 +2610,18 @@ namespace FusionAnimator.Editor
                 bool hasMultiSelection = HasAnyMultiSelectionContext();
                 if (hasMultiSelection == false)
                 {
+                    if (_leftLibraryTab == LeftLibraryTab.Bindings &&
+                        _selectedBindingIndex >= 0 &&
+                        _selectedBindingIndex < _graph.ClipBindings.Count)
+                    {
+                        FusionAnimatorClipBindingDefinition selectedBinding = _graph.ClipBindings[_selectedBindingIndex];
+                        if (selectedBinding != null)
+                        {
+                            DrawClipBindingInspector(selectedBinding);
+                            return;
+                        }
+                    }
+
                     if (_selectedState != null)
                     {
                         DrawStateInspector(_selectedState);
@@ -3358,7 +3382,7 @@ namespace FusionAnimator.Editor
                 for (int transitionIndex = 0; transitionIndex < _graph.Transitions.Count; ++transitionIndex)
                 {
                     FusionAnimatorTransitionDefinition transition = _graph.Transitions[transitionIndex];
-                    if (transition?.Conditions == null || transition.Conditions.Count == 0)
+                    if (transition == null)
                     {
                         continue;
                     }
@@ -3368,30 +3392,61 @@ namespace FusionAnimator.Editor
                     string transitionLayerId = fromState != null ? fromState.LayerId : (toState != null ? toState.LayerId : string.Empty);
                     string transitionScope = ResolveTransitionUsageScopePath(fromState, toState);
 
-                    for (int conditionIndex = 0; conditionIndex < transition.Conditions.Count; ++conditionIndex)
+                    if (transition.Conditions != null)
                     {
-                        FusionAnimatorConditionDefinition condition = transition.Conditions[conditionIndex];
-                        if (condition == null ||
-                            ParameterReferenceMatches(condition.ParameterId) == false)
+                        for (int conditionIndex = 0; conditionIndex < transition.Conditions.Count; ++conditionIndex)
                         {
-                            continue;
-                        }
+                            FusionAnimatorConditionDefinition condition = transition.Conditions[conditionIndex];
+                            if (condition == null ||
+                                ParameterReferenceMatches(condition.ParameterId) == false)
+                            {
+                                continue;
+                            }
 
-                        string fromName = ResolveTransitionEndpointUsageDisplay(transition.FromStateId);
-                        string toName = ResolveTransitionEndpointUsageDisplay(transition.ToStateId);
-                        string label = string.Format("{0} -> {1}", fromName, toName);
-                        if (transition.Conditions.Count > 1)
-                        {
-                            label = string.Format("{0} (Condition {1})", label, conditionIndex + 1);
-                        }
+                            string fromName = ResolveTransitionEndpointUsageDisplay(transition.FromStateId);
+                            string toName = ResolveTransitionEndpointUsageDisplay(transition.ToStateId);
+                            string label = string.Format("{0} -> {1}", fromName, toName);
+                            if (transition.Conditions.Count > 1)
+                            {
+                                label = string.Format("{0} (Condition {1})", label, conditionIndex + 1);
+                            }
 
-                        usages.Add(new ParameterUsageLocation
+                            usages.Add(new ParameterUsageLocation
+                            {
+                                Label = label,
+                                LayerId = transitionLayerId,
+                                ScopePath = transitionScope,
+                                TransitionId = transition.Id,
+                            });
+                        }
+                    }
+
+                    if (transition.PreviewResults != null)
+                    {
+                        for (int resultIndex = 0; resultIndex < transition.PreviewResults.Count; ++resultIndex)
                         {
-                            Label = label,
-                            LayerId = transitionLayerId,
-                            ScopePath = transitionScope,
-                            TransitionId = transition.Id,
-                        });
+                            FusionAnimatorTransitionResultDefinition result = transition.PreviewResults[resultIndex];
+                            if (result == null ||
+                                ParameterReferenceMatches(result.ParameterId) == false)
+                            {
+                                continue;
+                            }
+
+                            string fromName = ResolveTransitionEndpointUsageDisplay(transition.FromStateId);
+                            string toName = ResolveTransitionEndpointUsageDisplay(transition.ToStateId);
+                            string label = string.Format("{0} -> {1}", fromName, toName);
+                            label = transition.PreviewResults.Count > 1
+                                ? string.Format("{0} (Preview Result {1})", label, resultIndex + 1)
+                                : string.Format("{0} (Preview Result)", label);
+
+                            usages.Add(new ParameterUsageLocation
+                            {
+                                Label = label,
+                                LayerId = transitionLayerId,
+                                ScopePath = transitionScope,
+                                TransitionId = transition.Id,
+                            });
+                        }
                     }
                 }
             }
@@ -4221,7 +4276,7 @@ namespace FusionAnimator.Editor
                 }
             }
 
-            float minDuration = Mathf.Max(0.0f, EditorGUILayout.FloatField(new GUIContent("Min Duration", "Minimum time in seconds the state must remain active before eligible transitions can exit."), state.MinDurationSeconds));
+            float minDuration = Mathf.Max(0.0f, EditorGUILayout.FloatField(new GUIContent("Min Duration (Normalized)", "Minimum normalized state time before exit transitions are eligible. Runtime seconds are resolved as (min duration * current clip/reference length)."), state.MinDurationSeconds));
             if (Mathf.Approximately(minDuration, state.MinDurationSeconds) == false)
             {
                 EnsureUndo();
@@ -4379,6 +4434,10 @@ namespace FusionAnimator.Editor
         {
             EditorGUILayout.LabelField("Transition", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Id", transition.Id);
+            if (transition.PreviewResults == null)
+            {
+                transition.PreviewResults = new List<FusionAnimatorTransitionResultDefinition>();
+            }
             bool changed = false;
             bool rebuildGraph = false;
             bool undoRecorded = false;
@@ -4676,6 +4735,162 @@ namespace FusionAnimator.Editor
                         }
                     }
                 }
+                EditorGUILayout.EndVertical();
+            }
+
+            GUILayout.Space(8.0f);
+            EditorGUILayout.LabelField("Results (Preview-only)", EditorStyles.boldLabel);
+            if (GUILayout.Button(new GUIContent("Add Result", "Add a preview-only transition result that mutates a parameter when this transition executes in preview simulation.")))
+            {
+                EnsureUndo();
+                transition.PreviewResults.Add(new FusionAnimatorTransitionResultDefinition());
+                changed = true;
+            }
+
+            for (int i = 0; i < transition.PreviewResults.Count; ++i)
+            {
+                FusionAnimatorTransitionResultDefinition result = transition.PreviewResults[i];
+                if (result == null)
+                {
+                    continue;
+                }
+
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(string.Format("Result {0}", i), EditorStyles.miniBoldLabel);
+                if (GUILayout.Button(new GUIContent("Remove", "Remove this preview-only transition result."), GUILayout.Width(80.0f)))
+                {
+                    EnsureUndo();
+                    transition.PreviewResults.RemoveAt(i);
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.EndVertical();
+                    changed = true;
+                    break;
+                }
+
+                EditorGUILayout.EndHorizontal();
+                string resultParameterId = result.ParameterId;
+                DrawParameterPicker("Parameter", "Parameter id mutated by this transition result (preview-only).", value =>
+                {
+                    EnsureUndo();
+                    result.ParameterId = value;
+                }, result.ParameterId);
+                if (result.ParameterId != resultParameterId)
+                {
+                    changed = true;
+                }
+
+                FusionAnimatorParameterDefinition resultParameter = FindParameterById(result.ParameterId);
+                FusionAnimatorTransitionResultOperation[] operations =
+                    resultParameter != null && resultParameter.Type == FusionAnimatorParameterType.Int
+                        ? new[] { FusionAnimatorTransitionResultOperation.Set, FusionAnimatorTransitionResultOperation.Cycle }
+                        : new[] { FusionAnimatorTransitionResultOperation.Set };
+
+                FusionAnimatorTransitionResultOperation selectedOperation = result.Operation;
+                bool operationSupported = false;
+                for (int opIndex = 0; opIndex < operations.Length; ++opIndex)
+                {
+                    if (operations[opIndex] == selectedOperation)
+                    {
+                        operationSupported = true;
+                        break;
+                    }
+                }
+
+                if (operationSupported == false)
+                {
+                    selectedOperation = FusionAnimatorTransitionResultOperation.Set;
+                }
+
+                FusionAnimatorTransitionResultOperation operation = (FusionAnimatorTransitionResultOperation)EditorGUILayout.EnumPopup(
+                    new GUIContent("Operation", "Preview-only operation applied when the transition executes."),
+                    selectedOperation);
+                if (operationSupported == false)
+                {
+                    operation = FusionAnimatorTransitionResultOperation.Set;
+                }
+
+                if (operation != result.Operation)
+                {
+                    EnsureUndo();
+                    result.Operation = operation;
+                    changed = true;
+                }
+
+                if (result.Operation == FusionAnimatorTransitionResultOperation.Cycle)
+                {
+                    int cycleMinValue = EditorGUILayout.IntField(new GUIContent("Cycle Min", "Inclusive minimum value for cycle operation."), result.CycleMinValue);
+                    if (cycleMinValue != result.CycleMinValue)
+                    {
+                        EnsureUndo();
+                        result.CycleMinValue = cycleMinValue;
+                        changed = true;
+                    }
+
+                    int cycleMaxValue = EditorGUILayout.IntField(new GUIContent("Cycle Max", "Inclusive maximum value for cycle operation."), result.CycleMaxValue);
+                    if (cycleMaxValue != result.CycleMaxValue)
+                    {
+                        EnsureUndo();
+                        result.CycleMaxValue = cycleMaxValue;
+                        changed = true;
+                    }
+                }
+                else if (resultParameter != null)
+                {
+                    switch (resultParameter.Type)
+                    {
+                        case FusionAnimatorParameterType.Bool:
+                        case FusionAnimatorParameterType.Trigger:
+                        {
+                            bool boolValue = EditorGUILayout.Toggle(new GUIContent("Bool Value", "Preview value written to this parameter when transition executes."), result.BoolValue);
+                            if (boolValue != result.BoolValue)
+                            {
+                                EnsureUndo();
+                                result.BoolValue = boolValue;
+                                changed = true;
+                            }
+
+                            break;
+                        }
+                        case FusionAnimatorParameterType.Int:
+                        {
+                            int intValue = EditorGUILayout.IntField(new GUIContent("Int Value", "Preview value written to this parameter when transition executes."), result.IntValue);
+                            if (intValue != result.IntValue)
+                            {
+                                EnsureUndo();
+                                result.IntValue = intValue;
+                                changed = true;
+                            }
+
+                            break;
+                        }
+                        case FusionAnimatorParameterType.Float:
+                        {
+                            float floatValue = EditorGUILayout.FloatField(new GUIContent("Float Value", "Preview value written to this parameter when transition executes."), result.FloatValue);
+                            if (Mathf.Approximately(floatValue, result.FloatValue) == false)
+                            {
+                                EnsureUndo();
+                                result.FloatValue = floatValue;
+                                changed = true;
+                            }
+
+                            break;
+                        }
+                        case FusionAnimatorParameterType.Vector2:
+                        {
+                            Vector2 vector2Value = EditorGUILayout.Vector2Field(new GUIContent("Vector2 Value", "Preview value written to this parameter when transition executes."), result.Vector2Value);
+                            if (vector2Value != result.Vector2Value)
+                            {
+                                EnsureUndo();
+                                result.Vector2Value = vector2Value;
+                                changed = true;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
                 EditorGUILayout.EndVertical();
             }
 
@@ -5915,25 +6130,46 @@ namespace FusionAnimator.Editor
                     for (int transitionIndex = 0; transitionIndex < _graph.Transitions.Count; ++transitionIndex)
                     {
                         FusionAnimatorTransitionDefinition transition = _graph.Transitions[transitionIndex];
-                        if (transition?.Conditions == null)
+                        if (transition == null)
                         {
                             continue;
                         }
 
-                        transition.Conditions.RemoveAll(condition =>
+                        if (transition.Conditions != null)
                         {
-                            if (condition == null || string.IsNullOrWhiteSpace(condition.ParameterId))
+                            transition.Conditions.RemoveAll(condition =>
                             {
-                                return false;
-                            }
+                                if (condition == null || string.IsNullOrWhiteSpace(condition.ParameterId))
+                                {
+                                    return false;
+                                }
 
-                            if (FusionAnimatorParameterReferenceUtility.TryParse(condition.ParameterId, out string baseParameterId, out _) == false)
+                                if (FusionAnimatorParameterReferenceUtility.TryParse(condition.ParameterId, out string baseParameterId, out _) == false)
+                                {
+                                    baseParameterId = condition.ParameterId;
+                                }
+
+                                return string.Equals(baseParameterId, removedParameterId, StringComparison.Ordinal);
+                            });
+                        }
+
+                        if (transition.PreviewResults != null)
+                        {
+                            transition.PreviewResults.RemoveAll(result =>
                             {
-                                baseParameterId = condition.ParameterId;
-                            }
+                                if (result == null || string.IsNullOrWhiteSpace(result.ParameterId))
+                                {
+                                    return false;
+                                }
 
-                            return string.Equals(baseParameterId, removedParameterId, StringComparison.Ordinal);
-                        });
+                                if (FusionAnimatorParameterReferenceUtility.TryParse(result.ParameterId, out string baseParameterId, out _) == false)
+                                {
+                                    baseParameterId = result.ParameterId;
+                                }
+
+                                return string.Equals(baseParameterId, removedParameterId, StringComparison.Ordinal);
+                            });
+                        }
                     }
                 }
 
@@ -6844,7 +7080,6 @@ namespace FusionAnimator.Editor
                 DefaultVector2 = source.DefaultVector2,
                 PreviewInputBinding = source.PreviewInputBinding,
                 PreviewInputScale = source.PreviewInputScale,
-                PreviewBoolInputSource = source.PreviewBoolInputSource,
                 PreviewBoolInputOperator = source.PreviewBoolInputOperator,
                 PreviewBoolInputCompareValue = source.PreviewBoolInputCompareValue,
             };

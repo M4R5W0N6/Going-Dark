@@ -35,6 +35,7 @@ namespace FusionAnimator
         private readonly Dictionary<string, List<FusionAnimatorTransitionDefinition>> _transitionsByFromStateId = new Dictionary<string, List<FusionAnimatorTransitionDefinition>>(StringComparer.Ordinal);
         private string _defaultStateId;
         private bool _explicitDefaultStateProvided;
+        private bool _applyPreviewOnlyResultsThisStep;
 
         public string CurrentStateId { get; private set; }
         public float CurrentStateElapsed { get; private set; }
@@ -74,8 +75,13 @@ namespace FusionAnimator
             ClearBlend();
         }
 
-        public void Step(float deltaTime, IFusionAnimatorParameterSource parameters, IFusionAnimatorStateLogic logic = null)
+        public void Step(
+            float deltaTime,
+            IFusionAnimatorParameterSource parameters,
+            IFusionAnimatorStateLogic logic = null,
+            bool applyPreviewOnlyResults = false)
         {
+            _applyPreviewOnlyResultsThisStep = applyPreviewOnlyResults;
             float dt = Mathf.Max(0.0f, deltaTime);
 
             if (string.IsNullOrWhiteSpace(CurrentStateId))
@@ -145,7 +151,8 @@ namespace FusionAnimator
                 }
             }
 
-            if (currentState.CanTransitionOut == false || CurrentStateElapsed < Mathf.Max(0.0f, currentState.MinDurationSeconds))
+            if (currentState.CanTransitionOut == false ||
+                CurrentStateElapsed < ResolveStateMinDurationSeconds(currentState, parameters))
             {
                 return;
             }
@@ -226,6 +233,7 @@ namespace FusionAnimator
                     if (string.Equals(transition.ToStateId, FusionAnimatorGraphAsset.SpecialNodeExitId, StringComparison.Ordinal))
                     {
                         ConsumeTriggerConditions(transition, parameters);
+                        ApplyTransitionPreviewResults(transition, parameters, _applyPreviewOnlyResultsThisStep);
 
                         if (logic != null)
                         {
@@ -233,6 +241,33 @@ namespace FusionAnimator
                         }
 
                         ActiveTransitionId = transition.Id;
+                        if (TryResolveExitContinuationState(currentState, parameters, out FusionAnimatorStateDefinition continuationState, out float continuationStartTime))
+                        {
+                            if (transitionBlendDuration > 0.0001f)
+                            {
+                                BlendFromStateId = currentState.Id;
+                                BlendFromStateTime = CurrentStateTime;
+                                BlendToStateId = continuationState.Id;
+                                BlendElapsedSeconds = 0.0f;
+                                BlendDurationSeconds = transitionBlendDuration;
+                            }
+                            else
+                            {
+                                ClearBlend();
+                            }
+
+                            CurrentStateId = continuationState.Id;
+                            CurrentStateElapsed = 0.0f;
+                            CurrentStateTime = continuationStartTime;
+
+                            if (logic != null)
+                            {
+                                logic.OnStateEntered(this, continuationState, transition);
+                            }
+
+                            return;
+                        }
+
                         if (transitionBlendDuration > 0.0001f)
                         {
                             BlendFromStateId = currentState.Id;
@@ -266,6 +301,7 @@ namespace FusionAnimator
                 }
 
                 ConsumeTriggerConditions(transition, parameters);
+                ApplyTransitionPreviewResults(transition, parameters, _applyPreviewOnlyResultsThisStep);
 
                 float nextReferenceLength = ResolveReferenceLengthSeconds(nextState, parameters);
                 float nextStartTime = Mathf.Clamp01(transition.StartOffsetNormalized) * Mathf.Max(0.0f, nextReferenceLength);
@@ -351,6 +387,7 @@ namespace FusionAnimator
                 }
 
                 ConsumeTriggerConditions(transition, parameters);
+                ApplyTransitionPreviewResults(transition, parameters, _applyPreviewOnlyResultsThisStep);
 
                 float nextReferenceLength = ResolveReferenceLengthSeconds(nextState, parameters);
                 float nextStartTime = Mathf.Clamp01(transition.StartOffsetNormalized) * Mathf.Max(0.0f, nextReferenceLength);
@@ -366,6 +403,120 @@ namespace FusionAnimator
                     logic.OnStateEntered(this, nextState, transition);
                 }
 
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryResolveExitContinuationState(
+            FusionAnimatorStateDefinition exitedState,
+            IFusionAnimatorParameterSource parameters,
+            out FusionAnimatorStateDefinition continuationState,
+            out float continuationStartTime)
+        {
+            continuationState = null;
+            continuationStartTime = 0.0f;
+            if (exitedState == null)
+            {
+                return false;
+            }
+
+            string currentScope = NormalizeScopePath(GetStateScopePath(exitedState.Name));
+            string parentScope = GetParentScopePath(currentScope);
+
+            if (TryResolveAnyTransitionTargetStateForScope(parentScope, parameters, out FusionAnimatorTransitionDefinition anyTransition, out continuationState))
+            {
+                ConsumeTriggerConditions(anyTransition, parameters);
+                ApplyTransitionPreviewResults(anyTransition, parameters, _applyPreviewOnlyResultsThisStep);
+
+                float referenceLength = ResolveReferenceLengthSeconds(continuationState, parameters);
+                continuationStartTime = Mathf.Clamp01(anyTransition.StartOffsetNormalized) * Mathf.Max(0.0f, referenceLength);
+                return true;
+            }
+
+            if (TryResolveEntryTransitionTargetStateIdForScope(
+                    parentScope,
+                    parameters,
+                    out string entryStateId,
+                    out _,
+                    out _) &&
+                _statesById.TryGetValue(entryStateId, out continuationState) &&
+                continuationState != null)
+            {
+                continuationStartTime = 0.0f;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryResolveAnyTransitionTargetStateForScope(
+            string scopePath,
+            IFusionAnimatorParameterSource parameters,
+            out FusionAnimatorTransitionDefinition matchedTransition,
+            out FusionAnimatorStateDefinition targetState)
+        {
+            matchedTransition = null;
+            targetState = null;
+            if (_anyTransitions == null || _anyTransitions.Count == 0)
+            {
+                return false;
+            }
+
+            string normalizedScope = NormalizeScopePath(scopePath);
+            bool hasSolo = false;
+            for (int i = 0; i < _anyTransitions.Count; ++i)
+            {
+                FusionAnimatorTransitionDefinition transition = _anyTransitions[i];
+                if (transition == null || transition.Mute)
+                {
+                    continue;
+                }
+
+                if (IsAnyTransitionActiveForScope(transition, normalizedScope) == false)
+                {
+                    continue;
+                }
+
+                if (transition.Solo)
+                {
+                    hasSolo = true;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < _anyTransitions.Count; ++i)
+            {
+                FusionAnimatorTransitionDefinition transition = _anyTransitions[i];
+                if (transition == null || transition.Mute)
+                {
+                    continue;
+                }
+
+                if (IsAnyTransitionActiveForScope(transition, normalizedScope) == false)
+                {
+                    continue;
+                }
+
+                if (hasSolo && transition.Solo == false)
+                {
+                    continue;
+                }
+
+                if (TransitionConditionsPass(transition, parameters) == false)
+                {
+                    continue;
+                }
+
+                FusionAnimatorStateDefinition nextState = ResolveTransitionTargetState(transition.ToStateId, parameters);
+                if (nextState == null)
+                {
+                    continue;
+                }
+
+                matchedTransition = transition;
+                targetState = nextState;
                 return true;
             }
 
@@ -779,6 +930,7 @@ namespace FusionAnimator
             }
 
             ConsumeTriggerConditions(bestEntry, parameters);
+            ApplyTransitionPreviewResults(bestEntry, parameters, _applyPreviewOnlyResultsThisStep);
             stateId = bestEntryTargetStateId;
             return true;
         }
@@ -904,15 +1056,13 @@ namespace FusionAnimator
             string normalizedCurrentScope = NormalizeScopePath(currentScopePath);
             if (string.IsNullOrWhiteSpace(transitionScopePath))
             {
-                return true;
+                // Root-scope AnyState transitions apply only at root scope.
+                return string.IsNullOrWhiteSpace(normalizedCurrentScope);
             }
 
-            if (string.Equals(normalizedCurrentScope, transitionScopePath, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            return normalizedCurrentScope.StartsWith(transitionScopePath + "/", StringComparison.OrdinalIgnoreCase);
+            // Scoped AnyState transitions are local to their exact scope.
+            // This prevents parent-scope AnyState transitions from stealing control while a child sub-state machine is active.
+            return string.Equals(normalizedCurrentScope, transitionScopePath, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryGetAnyTransitionScopePath(FusionAnimatorTransitionDefinition transition, out string scopePath)
@@ -1094,6 +1244,117 @@ namespace FusionAnimator
             }
 
             return true;
+        }
+
+        private void ApplyTransitionPreviewResults(
+            FusionAnimatorTransitionDefinition transition,
+            IFusionAnimatorParameterSource parameters,
+            bool applyPreviewOnlyResults)
+        {
+            if (applyPreviewOnlyResults == false ||
+                transition?.PreviewResults == null ||
+                transition.PreviewResults.Count == 0 ||
+                parameters is FusionAnimatorParameterStore store == false)
+            {
+                return;
+            }
+
+            for (int i = 0; i < transition.PreviewResults.Count; ++i)
+            {
+                FusionAnimatorTransitionResultDefinition result = transition.PreviewResults[i];
+                if (result == null || string.IsNullOrWhiteSpace(result.ParameterId))
+                {
+                    continue;
+                }
+
+                if (TryResolveConditionParameter(result.ParameterId, out FusionAnimatorParameterDefinition parameter, out FusionAnimatorParameterComponent component) == false ||
+                    parameter == null ||
+                    component != FusionAnimatorParameterComponent.None)
+                {
+                    continue;
+                }
+
+                switch (result.Operation)
+                {
+                    case FusionAnimatorTransitionResultOperation.Cycle:
+                        ApplyCycleResult(store, parameter, result);
+                        break;
+                    case FusionAnimatorTransitionResultOperation.Set:
+                    default:
+                        ApplySetResult(store, parameter, result);
+                        break;
+                }
+            }
+        }
+
+        private static void ApplySetResult(
+            FusionAnimatorParameterStore store,
+            FusionAnimatorParameterDefinition parameter,
+            FusionAnimatorTransitionResultDefinition result)
+        {
+            if (store == null || parameter == null || result == null)
+            {
+                return;
+            }
+
+            switch (parameter.Type)
+            {
+                case FusionAnimatorParameterType.Bool:
+                case FusionAnimatorParameterType.Trigger:
+                    store.SetBool(parameter.Id, result.BoolValue);
+                    break;
+                case FusionAnimatorParameterType.Int:
+                    store.SetInt(parameter.Id, result.IntValue);
+                    break;
+                case FusionAnimatorParameterType.Float:
+                    store.SetFloat(parameter.Id, result.FloatValue);
+                    break;
+                case FusionAnimatorParameterType.Vector2:
+                    store.SetVector2(parameter.Id, result.Vector2Value);
+                    break;
+            }
+        }
+
+        private static void ApplyCycleResult(
+            FusionAnimatorParameterStore store,
+            FusionAnimatorParameterDefinition parameter,
+            FusionAnimatorTransitionResultDefinition result)
+        {
+            if (store == null || parameter == null || result == null || parameter.Type != FusionAnimatorParameterType.Int)
+            {
+                return;
+            }
+
+            int min = result.CycleMinValue;
+            int max = result.CycleMaxValue;
+            if (max < min)
+            {
+                int tmp = min;
+                min = max;
+                max = tmp;
+            }
+
+            int current = parameter.DefaultInt;
+            if (store.TryGetInt(parameter.Id, out int sampled))
+            {
+                current = sampled;
+            }
+
+            int next;
+            if (current < min || current > max)
+            {
+                next = min;
+            }
+            else
+            {
+                next = current + 1;
+                if (next > max)
+                {
+                    next = min;
+                }
+            }
+
+            store.SetInt(parameter.Id, next);
         }
 
         private static int CompareTransitionPriority(FusionAnimatorTransitionDefinition a, FusionAnimatorTransitionDefinition b)
@@ -1322,6 +1583,116 @@ namespace FusionAnimator
             }
 
             return duration;
+        }
+
+        private float ResolveStateMinDurationSeconds(
+            FusionAnimatorStateDefinition state,
+            IFusionAnimatorParameterSource parameters)
+        {
+            if (state == null)
+            {
+                return 0.0f;
+            }
+
+            float normalizedDuration = Mathf.Max(0.0f, state.MinDurationSeconds);
+            if (normalizedDuration <= 0.0f)
+            {
+                return 0.0f;
+            }
+
+            float referenceLength = ResolveReferenceLengthSeconds(state, parameters);
+            if (referenceLength <= 0.0001f)
+            {
+                referenceLength = ResolveConfiguredReferenceLengthSeconds(state);
+                if (referenceLength <= 0.0001f)
+                {
+                    return 0.0f;
+                }
+            }
+
+            return normalizedDuration * referenceLength;
+        }
+
+        private float ResolveConfiguredReferenceLengthSeconds(FusionAnimatorStateDefinition state)
+        {
+            if (state == null)
+            {
+                return 0.0f;
+            }
+
+            float maxLength = 0.0f;
+            if (state.MotionType == FusionAnimatorMotionType.BlendTree &&
+                state.BlendTree != null &&
+                state.BlendTree.Children != null)
+            {
+                for (int i = 0; i < state.BlendTree.Children.Count; ++i)
+                {
+                    FusionAnimatorBlendTreeChild child = state.BlendTree.Children[i];
+                    if (child == null)
+                    {
+                        continue;
+                    }
+
+                    if (child.ReferenceMode == FusionAnimatorClipReferenceMode.Binding)
+                    {
+                        FusionAnimatorClipBindingDefinition binding = FusionAnimatorClipBindingUtility.FindBinding(_graph, child.BindingId);
+                        maxLength = Mathf.Max(maxLength, ResolveConfiguredBindingLengthSeconds(binding));
+                        continue;
+                    }
+
+                    if (child.Clip != null)
+                    {
+                        maxLength = Mathf.Max(maxLength, Mathf.Max(0.0f, child.Clip.length));
+                    }
+                }
+            }
+            else if (state.Clips != null)
+            {
+                for (int i = 0; i < state.Clips.Count; ++i)
+                {
+                    FusionAnimatorClipSlot slot = state.Clips[i];
+                    if (slot == null)
+                    {
+                        continue;
+                    }
+
+                    if (slot.ReferenceMode == FusionAnimatorClipReferenceMode.Binding)
+                    {
+                        FusionAnimatorClipBindingDefinition binding = FusionAnimatorClipBindingUtility.FindBinding(_graph, slot.BindingId);
+                        maxLength = Mathf.Max(maxLength, ResolveConfiguredBindingLengthSeconds(binding));
+                        continue;
+                    }
+
+                    if (slot.Clip != null)
+                    {
+                        maxLength = Mathf.Max(maxLength, Mathf.Max(0.0f, slot.Clip.length));
+                    }
+                }
+            }
+
+            return maxLength;
+        }
+
+        private static float ResolveConfiguredBindingLengthSeconds(FusionAnimatorClipBindingDefinition binding)
+        {
+            if (binding == null || binding.Clips == null || binding.Clips.Count == 0)
+            {
+                return 0.0f;
+            }
+
+            float maxLength = 0.0f;
+            for (int i = 0; i < binding.Clips.Count; ++i)
+            {
+                FusionAnimatorClipBindingSlot clipSlot = binding.Clips[i];
+                if (clipSlot == null || clipSlot.Clip == null)
+                {
+                    continue;
+                }
+
+                maxLength = Mathf.Max(maxLength, Mathf.Max(0.0f, clipSlot.Clip.length));
+            }
+
+            return maxLength;
         }
 
         private void ClearBlend()

@@ -61,6 +61,7 @@ namespace TPSBR
 		private SortedUpdateInvoker _sortedUpdateInvoker;
 		private Quaternion          _cachedLookRotation;
 		private Quaternion          _cachedPitchRotation;
+		private float               _fallDamageSuppressionTimer;
 
 		// NetworkBehaviour INTERFACE
 
@@ -451,6 +452,18 @@ namespace TPSBR
 
 			if (_health.IsAlive == false)
 				return;
+
+			if (_jetpack != null && _jetpack.IsActive == true)
+			{
+				_fallDamageSuppressionTimer = 0.35f;
+				return;
+			}
+
+			if (_fallDamageSuppressionTimer > 0.0f)
+			{
+				_fallDamageSuppressionTimer = Mathf.Max(0.0f, _fallDamageSuppressionTimer - Runner.DeltaTime);
+				return;
+			}
 
 			var kccData = _character.CharacterController.Data;
 

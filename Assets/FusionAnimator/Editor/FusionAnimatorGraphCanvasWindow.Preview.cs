@@ -55,7 +55,6 @@ namespace FusionAnimator.Editor
             public PreviewGamepadScalarBinding ScalarBinding;
             public PreviewGamepadVector2Binding Vector2Binding;
             public float BindingScale = 1.0f;
-            public FusionAnimatorPreviewBoolInputSource BoolInputSource = FusionAnimatorPreviewBoolInputSource.Float;
             public FusionAnimatorConditionOperator BoolInputOperator = FusionAnimatorConditionOperator.Greater;
             public float BoolInputCompareValue = 0.5f;
         }
@@ -437,7 +436,8 @@ namespace FusionAnimator.Editor
             }
 
             SyncPreviewRuntimeParameters();
-            _previewRuntimeGraphInstance.Step(_previewStepDeltaTime, _previewRuntimeParameters);
+            _previewRuntimeGraphInstance.Step(_previewStepDeltaTime, _previewRuntimeParameters, null, true);
+            SyncPreviewEntriesFromRuntimeParameters();
 
             List<FusionAnimatorLayerDefinition> orderedLayers = new List<FusionAnimatorLayerDefinition>(_graph.Layers.Count);
             Dictionary<string, int> layerOrderById = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -1080,38 +1080,18 @@ namespace FusionAnimator.Editor
                 case FusionAnimatorParameterType.Bool:
                 case FusionAnimatorParameterType.Trigger:
                     entry.BoolValue = EditorGUILayout.Toggle(new GUIContent("Temp Value", "Temporary preview value used in edit-mode transition simulation."), entry.BoolValue);
-                    entry.BoolInputSource = (FusionAnimatorPreviewBoolInputSource)EditorGUILayout.EnumPopup(
-                        new GUIContent("Input Source", "How bound input is interpreted before converting to a bool/trigger value."),
-                        entry.BoolInputSource);
-
-                    if (entry.BoolInputSource == FusionAnimatorPreviewBoolInputSource.Vector2Magnitude)
-                    {
-                        entry.Vector2Binding = (PreviewGamepadVector2Binding)EditorGUILayout.EnumPopup(
-                            new GUIContent("Gamepad Binding", "Vector2 binding sampled for magnitude-based comparison."),
-                            entry.Vector2Binding);
-                        entry.BindingScale = EditorGUILayout.FloatField(new GUIContent("Binding Scale", "Scale multiplier applied to bound vector input before magnitude comparison."), entry.BindingScale);
-                    }
-                    else
-                    {
-                        entry.ScalarBinding = (PreviewGamepadScalarBinding)EditorGUILayout.EnumPopup(
-                            new GUIContent("Gamepad Binding", "Scalar binding sampled before bool/trigger conversion."),
-                            entry.ScalarBinding);
-                        entry.BindingScale = EditorGUILayout.FloatField(new GUIContent("Binding Scale", "Scale multiplier applied to bound scalar input before conversion."), entry.BindingScale);
-                    }
+                    entry.ScalarBinding = (PreviewGamepadScalarBinding)EditorGUILayout.EnumPopup(
+                        new GUIContent("Scalar Binding", "Scalar binding sampled for bool/trigger conversion when no Vector2 Binding is selected."),
+                        entry.ScalarBinding);
+                    entry.Vector2Binding = (PreviewGamepadVector2Binding)EditorGUILayout.EnumPopup(
+                        new GUIContent("Vector2 Binding", "Optional Vector2 binding sampled for magnitude-based conversion (takes precedence over Scalar Binding)."),
+                        entry.Vector2Binding);
+                    entry.BindingScale = EditorGUILayout.FloatField(new GUIContent("Binding Scale", "Scale multiplier applied to bound input before conversion."), entry.BindingScale);
 
                     entry.BoolInputOperator = DrawPreviewBoolInputOperatorField(entry.BoolInputOperator);
                     if (UsesPreviewBoolInputCompareValue(entry.BoolInputOperator))
                     {
-                        if (entry.BoolInputSource == FusionAnimatorPreviewBoolInputSource.Int)
-                        {
-                            int compareInt = Mathf.RoundToInt(entry.BoolInputCompareValue);
-                            compareInt = EditorGUILayout.IntField(new GUIContent("Compare Value", "Comparison target value used by the selected operator."), compareInt);
-                            entry.BoolInputCompareValue = compareInt;
-                        }
-                        else
-                        {
-                            entry.BoolInputCompareValue = EditorGUILayout.FloatField(new GUIContent("Compare Value", "Comparison target value used by the selected operator."), entry.BoolInputCompareValue);
-                        }
+                        entry.BoolInputCompareValue = EditorGUILayout.FloatField(new GUIContent("Compare Value", "Comparison target value used by the selected operator."), entry.BoolInputCompareValue);
                     }
                     break;
                 case FusionAnimatorParameterType.Int:
@@ -1252,7 +1232,6 @@ namespace FusionAnimator.Editor
             entry.BindingScale = parameter.PreviewInputScale <= 0.0001f ? 1.0f : parameter.PreviewInputScale;
             entry.ScalarBinding = PreviewGamepadScalarBinding.None;
             entry.Vector2Binding = PreviewGamepadVector2Binding.None;
-            entry.BoolInputSource = parameter.PreviewBoolInputSource;
             entry.BoolInputOperator = NormalizePreviewBoolInputOperator(parameter.PreviewBoolInputOperator);
             entry.BoolInputCompareValue = parameter.PreviewBoolInputCompareValue;
 
@@ -1288,10 +1267,11 @@ namespace FusionAnimator.Editor
             }
 
             string bindingValue;
-            bool boolUsesVector2Binding =
-                (parameter.Type == FusionAnimatorParameterType.Bool || parameter.Type == FusionAnimatorParameterType.Trigger) &&
-                entry.BoolInputSource == FusionAnimatorPreviewBoolInputSource.Vector2Magnitude;
-            if (parameter.Type == FusionAnimatorParameterType.Vector2 || boolUsesVector2Binding)
+            bool usesVector2Binding =
+                parameter.Type == FusionAnimatorParameterType.Vector2 ||
+                ((parameter.Type == FusionAnimatorParameterType.Bool || parameter.Type == FusionAnimatorParameterType.Trigger) &&
+                 entry.Vector2Binding != PreviewGamepadVector2Binding.None);
+            if (usesVector2Binding)
             {
                 bindingValue = entry.Vector2Binding == PreviewGamepadVector2Binding.None
                     ? string.Empty
@@ -1306,11 +1286,9 @@ namespace FusionAnimator.Editor
 
             float bindingScale = entry.BindingScale <= 0.0001f ? 1.0f : entry.BindingScale;
             FusionAnimatorConditionOperator boolInputOperator = NormalizePreviewBoolInputOperator(entry.BoolInputOperator);
-            FusionAnimatorPreviewBoolInputSource boolInputSource = entry.BoolInputSource;
             float boolInputCompareValue = entry.BoolInputCompareValue;
             if (string.Equals(parameter.PreviewInputBinding, bindingValue, StringComparison.Ordinal) &&
                 Mathf.Approximately(parameter.PreviewInputScale, bindingScale) &&
-                parameter.PreviewBoolInputSource == boolInputSource &&
                 parameter.PreviewBoolInputOperator == boolInputOperator &&
                 Mathf.Approximately(parameter.PreviewBoolInputCompareValue, boolInputCompareValue))
             {
@@ -1324,7 +1302,6 @@ namespace FusionAnimator.Editor
 
             parameter.PreviewInputBinding = bindingValue;
             parameter.PreviewInputScale = bindingScale;
-            parameter.PreviewBoolInputSource = boolInputSource;
             parameter.PreviewBoolInputOperator = boolInputOperator;
             parameter.PreviewBoolInputCompareValue = boolInputCompareValue;
             if (_graph != null)
@@ -1455,42 +1432,19 @@ namespace FusionAnimator.Editor
 
             float lhs;
             float rhs = entry.BoolInputCompareValue;
-            switch (entry.BoolInputSource)
+            if (entry.Vector2Binding != PreviewGamepadVector2Binding.None)
             {
-                case FusionAnimatorPreviewBoolInputSource.Float:
+                Vector2 sampled = ReadVector2Binding(snapshot, entry.Vector2Binding) * entry.BindingScale;
+                lhs = sampled.magnitude;
+            }
+            else
+            {
+                if (entry.ScalarBinding == PreviewGamepadScalarBinding.None)
                 {
-                    if (entry.ScalarBinding == PreviewGamepadScalarBinding.None)
-                    {
-                        return false;
-                    }
-
-                    lhs = ReadScalarBinding(snapshot, entry.ScalarBinding) * entry.BindingScale;
-                    break;
-                }
-                case FusionAnimatorPreviewBoolInputSource.Int:
-                {
-                    if (entry.ScalarBinding == PreviewGamepadScalarBinding.None)
-                    {
-                        return false;
-                    }
-
-                    lhs = Mathf.RoundToInt(ReadScalarBinding(snapshot, entry.ScalarBinding) * entry.BindingScale);
-                    rhs = Mathf.Round(rhs);
-                    break;
-                }
-                case FusionAnimatorPreviewBoolInputSource.Vector2Magnitude:
-                {
-                    if (entry.Vector2Binding == PreviewGamepadVector2Binding.None)
-                    {
-                        return false;
-                    }
-
-                    Vector2 sampled = ReadVector2Binding(snapshot, entry.Vector2Binding) * entry.BindingScale;
-                    lhs = sampled.magnitude;
-                    break;
-                }
-                default:
                     return false;
+                }
+
+                lhs = ReadScalarBinding(snapshot, entry.ScalarBinding) * entry.BindingScale;
             }
 
             FusionAnimatorConditionOperator op = NormalizePreviewBoolInputOperator(entry.BoolInputOperator);
@@ -1951,7 +1905,9 @@ namespace FusionAnimator.Editor
             }
 
             SyncPreviewRuntimeParameters();
-            _previewRuntimeEvaluator.Step(_previewStepDeltaTime, _previewRuntimeParameters);
+            _previewRuntimeEvaluator.Step(_previewStepDeltaTime, _previewRuntimeParameters, null, true);
+            _previewRuntimeParameters.ExpireUnconsumedTriggers();
+            SyncPreviewEntriesFromRuntimeParameters();
 
             FusionAnimatorStateDefinition currentState = FindStateById(_previewRuntimeEvaluator.CurrentStateId);
             if (currentState == null)
@@ -2213,6 +2169,80 @@ namespace FusionAnimator.Editor
                         _previewRuntimeParameters.SetVector2(parameter.Id, entry.Vector2Value);
                         break;
                 }
+            }
+        }
+
+        private void SyncPreviewEntriesFromRuntimeParameters()
+        {
+            if (_graph == null || _graph.Parameters == null)
+            {
+                return;
+            }
+
+            bool changed = false;
+            for (int i = 0; i < _graph.Parameters.Count; ++i)
+            {
+                FusionAnimatorParameterDefinition parameter = _graph.Parameters[i];
+                if (parameter == null || string.IsNullOrWhiteSpace(parameter.Id))
+                {
+                    continue;
+                }
+
+                PreviewParameterEntry entry = FindPreviewEntry(parameter.Id);
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                switch (parameter.Type)
+                {
+                    case FusionAnimatorParameterType.Bool:
+                    case FusionAnimatorParameterType.Trigger:
+                    {
+                        if (_previewRuntimeParameters.TryGetBool(parameter.Id, out bool boolValue) &&
+                            entry.BoolValue != boolValue)
+                        {
+                            entry.BoolValue = boolValue;
+                            changed = true;
+                        }
+                        break;
+                    }
+                    case FusionAnimatorParameterType.Int:
+                    {
+                        if (_previewRuntimeParameters.TryGetInt(parameter.Id, out int intValue) &&
+                            entry.IntValue != intValue)
+                        {
+                            entry.IntValue = intValue;
+                            changed = true;
+                        }
+                        break;
+                    }
+                    case FusionAnimatorParameterType.Float:
+                    {
+                        if (_previewRuntimeParameters.TryGetFloat(parameter.Id, out float floatValue) &&
+                            Mathf.Abs(entry.FloatValue - floatValue) > 0.0001f)
+                        {
+                            entry.FloatValue = floatValue;
+                            changed = true;
+                        }
+                        break;
+                    }
+                    case FusionAnimatorParameterType.Vector2:
+                    {
+                        if (_previewRuntimeParameters.TryGetVector2(parameter.Id, out Vector2 vector2Value) &&
+                            (entry.Vector2Value - vector2Value).sqrMagnitude > 0.00000001f)
+                        {
+                            entry.Vector2Value = vector2Value;
+                            changed = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (changed)
+            {
+                _inspector?.MarkDirtyRepaint();
             }
         }
 

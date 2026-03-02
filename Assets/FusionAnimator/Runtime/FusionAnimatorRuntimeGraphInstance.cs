@@ -33,7 +33,11 @@ namespace FusionAnimator
             }
         }
 
-        public void Step(float deltaTime, IFusionAnimatorParameterSource parameters, IFusionAnimatorStateLogic logic = null)
+        public void Step(
+            float deltaTime,
+            IFusionAnimatorParameterSource parameters,
+            IFusionAnimatorStateLogic logic = null,
+            bool applyPreviewOnlyResults = false)
         {
             for (int i = 0; i < _orderedLayers.Count; ++i)
             {
@@ -45,8 +49,15 @@ namespace FusionAnimator
 
                 if (_evaluatorsByLayerId.TryGetValue(layer.Id, out FusionAnimatorRuntimeEvaluator evaluator))
                 {
-                    evaluator.Step(deltaTime, parameters, logic);
+                    evaluator.Step(deltaTime, parameters, logic, applyPreviewOnlyResults);
                 }
+            }
+
+            // Triggers are one-shot pulses; if no transition consumed them this frame,
+            // expire them so they cannot fire later after context/scope changes.
+            if (parameters is FusionAnimatorParameterStore store)
+            {
+                store.ExpireUnconsumedTriggers();
             }
         }
 

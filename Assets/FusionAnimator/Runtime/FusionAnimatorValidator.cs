@@ -422,6 +422,60 @@ namespace FusionAnimator
                         }
                     }
                 }
+
+                if (transition.PreviewResults != null)
+                {
+                    for (int resultIndex = 0; resultIndex < transition.PreviewResults.Count; ++resultIndex)
+                    {
+                        FusionAnimatorTransitionResultDefinition result = transition.PreviewResults[resultIndex];
+                        if (result == null)
+                        {
+                            issues.Add(new FusionAnimatorValidationIssue(
+                                FusionAnimatorValidationSeverity.Error,
+                                transition.Name,
+                                string.Format("Preview result index {0} is null.", resultIndex)));
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(result.ParameterId))
+                        {
+                            issues.Add(new FusionAnimatorValidationIssue(
+                                FusionAnimatorValidationSeverity.Error,
+                                transition.Name,
+                                string.Format("Preview result index {0} has no parameter.", resultIndex)));
+                            continue;
+                        }
+
+                        if (FusionAnimatorParameterReferenceUtility.TryParse(result.ParameterId, out string baseParameterId, out FusionAnimatorParameterComponent component) == false ||
+                            parameterIds.Contains(baseParameterId) == false)
+                        {
+                            issues.Add(new FusionAnimatorValidationIssue(
+                                FusionAnimatorValidationSeverity.Error,
+                                transition.Name,
+                                string.Format("Preview result parameter '{0}' does not exist.", result.ParameterId)));
+                            continue;
+                        }
+
+                        if (component != FusionAnimatorParameterComponent.None)
+                        {
+                            issues.Add(new FusionAnimatorValidationIssue(
+                                FusionAnimatorValidationSeverity.Error,
+                                transition.Name,
+                                string.Format("Preview result parameter '{0}' cannot target Vector2 components.", result.ParameterId)));
+                            continue;
+                        }
+
+                        FusionAnimatorParameterDefinition resultParameter = FindParameterById(graph, baseParameterId);
+                        if (result.Operation == FusionAnimatorTransitionResultOperation.Cycle &&
+                            (resultParameter == null || resultParameter.Type != FusionAnimatorParameterType.Int))
+                        {
+                            issues.Add(new FusionAnimatorValidationIssue(
+                                FusionAnimatorValidationSeverity.Error,
+                                transition.Name,
+                                string.Format("Preview result '{0}' uses Cycle, but parameter '{1}' is not Int.", resultIndex, result.ParameterId)));
+                        }
+                    }
+                }
             }
 
             if (issues.Count == 0)

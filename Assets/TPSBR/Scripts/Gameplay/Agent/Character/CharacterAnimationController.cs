@@ -14,6 +14,17 @@ namespace TPSBR
 	[DefaultExecutionOrder(3)]
 	public sealed class CharacterAnimationController : AnimationController
 	{
+		private enum FusionLayerRole
+		{
+			Base,
+			LowerBody,
+			UpperBody,
+			Shoot,
+			FullBody,
+			Look,
+			Top,
+		}
+
 		private const float UPPER_BODY_EQUIP_ARM_TIME = 0.4f;
 		private const float UPPER_BODY_UNEQUIP_DISARM_TIME = 0.5f;
 		private const float UPPER_BODY_UNEQUIP_SWITCH_TIME = 1.0f;
@@ -39,11 +50,7 @@ namespace TPSBR
 		[SerializeField][Range(0.0f, 1.0f)]
 		private float           _aimSnapPower = 0.5f;
 		[SerializeField]
-		private bool            _useFusionAnimatorGraph = false;
-		[SerializeField]
 		private FusionAnimatorGraphAsset _fusionAnimatorGraph;
-		[SerializeField]
-		private bool            _fusionControlShootLayer = false;
 
 		private KCC             _kcc;
 		private Agent           _agent;
@@ -63,6 +70,8 @@ namespace TPSBR
 		private readonly FusionAnimatorParameterStore _fusionParameters = new FusionAnimatorParameterStore();
 		private readonly Dictionary<string, FusionAnimatorStateDefinition> _fusionStatesById = new Dictionary<string, FusionAnimatorStateDefinition>(StringComparer.Ordinal);
 		private readonly Dictionary<string, string> _fusionLayerIdsByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+		private readonly Dictionary<string, string> _fusionLayerIdsByAlias = new Dictionary<string, string>(StringComparer.Ordinal);
+		private readonly Dictionary<FusionLayerRole, string> _fusionLayerIdsByRole = new Dictionary<FusionLayerRole, string>();
 		private readonly Dictionary<string, FusionAnimatorParameterDefinition> _fusionParameterDefinitionsById = new Dictionary<string, FusionAnimatorParameterDefinition>(StringComparer.Ordinal);
 		private readonly Dictionary<string, string> _fusionBoundRuntimeParameterIds = new Dictionary<string, string>(StringComparer.Ordinal);
 		private readonly Dictionary<string, FusionPlayableLayerBinding> _fusionPlayableLayersById = new Dictionary<string, FusionPlayableLayerBinding>(StringComparer.Ordinal);
@@ -102,6 +111,12 @@ namespace TPSBR
 		[Networked]
 		private byte _fusionJetpackResumeWeaponSlot { get; set; }
 		[Networked]
+		private byte _fusionLastArmedWeaponSlot { get; set; }
+		[Networked]
+		private byte _fusionWeaponCycleTargetSlot { get; set; }
+		[Networked]
+		private NetworkBool _fusionWeaponCycleActive { get; set; }
+		[Networked]
 		private float _fusionTurnDirection { get; set; }
 		[Networked]
 		private float _fusionTurnRemainingTime { get; set; }
@@ -139,6 +154,8 @@ namespace TPSBR
 
 		private sealed class FusionMoveSpeedProvider : IMoveSpeedProvider
 		{
+			private const float BaseSpeedScale = 2.0f;
+
 			private Weapons _weapons;
 			private readonly Dictionary<int, DirectionalSpeedTable> _tablesBySlot = new Dictionary<int, DirectionalSpeedTable>(4);
 			private float _fallbackMaxMagnitude = 1.0f;
@@ -178,7 +195,7 @@ namespace TPSBR
 						continue;
 					}
 
-					if (string.Equals(GetCanonicalFusionStateName(state.Name), "Move", StringComparison.OrdinalIgnoreCase) == false)
+					if (IsLocomotionSpeedState(state.Name) == false)
 					{
 						continue;
 					}
@@ -190,7 +207,15 @@ namespace TPSBR
 						continue;
 					}
 
-					_tablesBySlot[slotIndex] = table;
+					if (_tablesBySlot.TryGetValue(slotIndex, out DirectionalSpeedTable existingTable) == true && existingTable != null)
+					{
+						MergeDirectionalSpeedTable(existingTable, table);
+					}
+					else
+					{
+						_tablesBySlot[slotIndex] = table;
+					}
+
 					_fallbackMaxMagnitude = Mathf.Max(_fallbackMaxMagnitude, table.MaxMagnitude);
 				}
 			}
@@ -208,7 +233,7 @@ namespace TPSBR
 				}
 
 				float maxBaseSpeed = ResolveMaxBaseSpeed(localNormalizedDirection.normalized);
-				return maxBaseSpeed * Mathf.Max(0.0f, multiplier);
+				return maxBaseSpeed * Mathf.Max(0.0f, multiplier) * BaseSpeedScale;
 			}
 
 			private float ResolveMaxBaseSpeed(Vector2 localNormalizedDirection)
@@ -322,6 +347,38 @@ namespace TPSBR
 				return 0;
 			}
 
+			private static bool IsLocomotionSpeedState(string stateName)
+			{
+				if (string.IsNullOrWhiteSpace(stateName))
+				{
+					return false;
+				}
+
+				string canonicalName = GetCanonicalFusionStateName(stateName);
+				if (string.IsNullOrWhiteSpace(canonicalName))
+				{
+					return false;
+				}
+
+				if (canonicalName.IndexOf("Look", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Turn", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Jump", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Fall", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Land", StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					return false;
+				}
+
+				if (canonicalName.IndexOf("Move", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Walk", StringComparison.OrdinalIgnoreCase) >= 0 ||
+					canonicalName.IndexOf("Run", StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					return true;
+				}
+
+				return stateName.StartsWith("Move/", StringComparison.OrdinalIgnoreCase);
+			}
+
 			private static DirectionalSpeedTable BuildDirectionalSpeedTable(List<FusionAnimatorBlendTreeChild> children)
 			{
 				if (children == null || children.Count == 0)
@@ -380,6 +437,50 @@ namespace TPSBR
 				}
 
 				return table;
+			}
+
+			private static void MergeDirectionalSpeedTable(DirectionalSpeedTable target, DirectionalSpeedTable source)
+			{
+				if (target == null || source == null)
+				{
+					return;
+				}
+
+				var angleToMagnitude = new Dictionary<int, float>(32);
+
+				for (int i = 0; i < target.Angles.Length && i < target.Magnitudes.Length; ++i)
+				{
+					int key = Mathf.RoundToInt(target.Angles[i] * 1000.0f);
+					angleToMagnitude[key] = Mathf.Max(0.0f, target.Magnitudes[i]);
+				}
+
+				for (int i = 0; i < source.Angles.Length && i < source.Magnitudes.Length; ++i)
+				{
+					int key = Mathf.RoundToInt(source.Angles[i] * 1000.0f);
+					float sourceMagnitude = Mathf.Max(0.0f, source.Magnitudes[i]);
+					if (angleToMagnitude.TryGetValue(key, out float existingMagnitude) == false || sourceMagnitude > existingMagnitude)
+					{
+						angleToMagnitude[key] = sourceMagnitude;
+					}
+				}
+
+				if (angleToMagnitude.Count == 0)
+				{
+					return;
+				}
+
+				var entries = new List<KeyValuePair<int, float>>(angleToMagnitude);
+				entries.Sort((a, b) => a.Key.CompareTo(b.Key));
+
+				target.Angles = new float[entries.Count];
+				target.Magnitudes = new float[entries.Count];
+				for (int i = 0; i < entries.Count; ++i)
+				{
+					target.Angles[i] = entries[i].Key / 1000.0f;
+					target.Magnitudes[i] = entries[i].Value;
+				}
+
+				target.MaxMagnitude = Mathf.Max(Mathf.Max(0.0f, target.MaxMagnitude), Mathf.Max(0.0f, source.MaxMagnitude));
 			}
 
 			private float GetMultiplier()
@@ -579,14 +680,9 @@ namespace TPSBR
 			_fusionMoveSpeedProvider.Initialize(_weapons, _fusionAnimatorGraph);
 			if (_kcc != null)
 			{
-				if (_locomotion != null)
-				{
-					_kcc.MoveState = _locomotion.FindState<MoveState>();
-				}
-				else if (UseFusionAnimatorRuntime == true)
-				{
-					_kcc.MoveState = _fusionMoveSpeedProvider;
-				}
+				_kcc.MoveState = UseFusionAnimatorRuntime == true
+					? _fusionMoveSpeedProvider
+					: _locomotion != null ? _locomotion.FindState<MoveState>() : null;
 			}
 
 			_stateMachine.Initialize(this, _kcc, _weapons, _jetpack, _locomotion, _fullBody, _upperBody, _lowerBody, _shoot, _look);
@@ -600,7 +696,7 @@ namespace TPSBR
 		{
 			get
 			{
-				return _useFusionAnimatorGraph == true && _fusionAnimatorGraph != null;
+				return _fusionAnimatorGraph != null;
 			}
 		}
 
@@ -608,9 +704,9 @@ namespace TPSBR
 		{
 			if (UseFusionAnimatorRuntime == false)
 			{
-				if (_kcc != null && _locomotion != null)
+				if (_kcc != null)
 				{
-					_kcc.MoveState = _locomotion.FindState<MoveState>();
+					_kcc.MoveState = _locomotion != null ? _locomotion.FindState<MoveState>() : null;
 				}
 
 				ClearFusionPlayableGraphBindings();
@@ -618,6 +714,8 @@ namespace TPSBR
 				_fusionRuntimeGraphAsset = null;
 				_fusionStatesById.Clear();
 				_fusionLayerIdsByName.Clear();
+				_fusionLayerIdsByAlias.Clear();
+				_fusionLayerIdsByRole.Clear();
 				_fusionParameterDefinitionsById.Clear();
 				_fusionBoundRuntimeParameterIds.Clear();
 				_fusionTurnDirection = 0.0f;
@@ -628,14 +726,7 @@ namespace TPSBR
 
 			if (_kcc != null)
 			{
-				if (_locomotion != null)
-				{
-					_kcc.MoveState = _locomotion.FindState<MoveState>();
-				}
-				else
-				{
-					_kcc.MoveState = _fusionMoveSpeedProvider;
-				}
+				_kcc.MoveState = _fusionMoveSpeedProvider;
 			}
 
 			if (ReferenceEquals(_fusionRuntimeGraphAsset, _fusionAnimatorGraph) == true &&
@@ -658,6 +749,8 @@ namespace TPSBR
 		{
 			_fusionStatesById.Clear();
 			_fusionLayerIdsByName.Clear();
+			_fusionLayerIdsByAlias.Clear();
+			_fusionLayerIdsByRole.Clear();
 			_fusionParameterDefinitionsById.Clear();
 			_fusionBoundRuntimeParameterIds.Clear();
 
@@ -699,6 +792,7 @@ namespace TPSBR
 
 			if (_fusionAnimatorGraph.States == null)
 			{
+				RebuildFusionLayerRoleBindings();
 				RebuildFusionRuntimeParameterBindings();
 				return;
 			}
@@ -714,7 +808,528 @@ namespace TPSBR
 				_fusionStatesById[state.Id] = state;
 			}
 
+			RebuildFusionLayerRoleBindings();
 			RebuildFusionRuntimeParameterBindings();
+		}
+
+		private void RebuildFusionLayerRoleBindings()
+		{
+			_fusionLayerIdsByAlias.Clear();
+			_fusionLayerIdsByRole.Clear();
+
+			if (_fusionAnimatorGraph == null || _fusionAnimatorGraph.Layers == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < _fusionAnimatorGraph.Layers.Count; ++i)
+			{
+				FusionAnimatorLayerDefinition layer = _fusionAnimatorGraph.Layers[i];
+				if (layer == null || string.IsNullOrWhiteSpace(layer.Id))
+				{
+					continue;
+				}
+
+				AddFusionLayerAlias(layer.Name, layer.Id);
+			}
+
+			string baseLayerId = ResolveFusionLayerIdByAliases("base", "default", "locomotion");
+			if (string.IsNullOrWhiteSpace(baseLayerId))
+			{
+				baseLayerId = ResolveFusionFirstLayerIdByPriority();
+			}
+			if (string.IsNullOrWhiteSpace(baseLayerId))
+			{
+				baseLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.Base);
+			}
+
+			string lowerBodyLayerId = ResolveFusionLayerIdByAliases("lowerbody", "lower", "locomotion");
+			if (string.IsNullOrWhiteSpace(lowerBodyLayerId))
+			{
+				lowerBodyLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.LowerBody);
+			}
+			if (string.IsNullOrWhiteSpace(lowerBodyLayerId))
+			{
+				lowerBodyLayerId = baseLayerId;
+			}
+
+			string upperBodyLayerId = ResolveFusionLayerIdByAliases("upperbody", "upper", "weapon");
+			if (string.IsNullOrWhiteSpace(upperBodyLayerId))
+			{
+				upperBodyLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.UpperBody);
+			}
+
+			string shootLayerId = ResolveFusionLayerIdByAliases("shoot", "shootlayer");
+			if (string.IsNullOrWhiteSpace(shootLayerId))
+			{
+				shootLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.Shoot);
+			}
+			if (string.IsNullOrWhiteSpace(shootLayerId))
+			{
+				shootLayerId = upperBodyLayerId;
+			}
+
+			string lookLayerId = ResolveFusionLayerIdByAliases("look", "looklayer");
+			if (string.IsNullOrWhiteSpace(lookLayerId))
+			{
+				lookLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.Look);
+			}
+
+			string topLayerId = ResolveFusionLayerIdByAliases("top");
+			if (string.IsNullOrWhiteSpace(topLayerId))
+			{
+				topLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.Top);
+			}
+
+			string fullBodyLayerId = ResolveFusionLayerIdByAliases("fullbody", "full");
+			if (string.IsNullOrWhiteSpace(fullBodyLayerId))
+			{
+				fullBodyLayerId = ResolveFusionLayerIdByRoleScore(FusionLayerRole.FullBody);
+			}
+			if (string.IsNullOrWhiteSpace(fullBodyLayerId))
+			{
+				fullBodyLayerId = string.IsNullOrWhiteSpace(topLayerId) == false ? topLayerId : baseLayerId;
+			}
+
+			SetFusionLayerRole(FusionLayerRole.Base, baseLayerId, "base");
+			SetFusionLayerRole(FusionLayerRole.LowerBody, lowerBodyLayerId, "lowerbody", "lower");
+			SetFusionLayerRole(FusionLayerRole.UpperBody, upperBodyLayerId, "upperbody", "upper");
+			SetFusionLayerRole(FusionLayerRole.Shoot, shootLayerId, "shoot");
+			SetFusionLayerRole(FusionLayerRole.Look, lookLayerId, "look");
+			SetFusionLayerRole(FusionLayerRole.Top, topLayerId, "top");
+			SetFusionLayerRole(FusionLayerRole.FullBody, fullBodyLayerId, "fullbody", "full");
+		}
+
+		private string ResolveFusionFirstLayerIdByPriority()
+		{
+			if (_fusionAnimatorGraph == null || _fusionAnimatorGraph.Layers == null || _fusionAnimatorGraph.Layers.Count == 0)
+			{
+				return string.Empty;
+			}
+
+			string firstLayerId = string.Empty;
+			int firstPriority = int.MaxValue;
+			int firstOrder = int.MaxValue;
+
+			for (int i = 0; i < _fusionAnimatorGraph.Layers.Count; ++i)
+			{
+				FusionAnimatorLayerDefinition layer = _fusionAnimatorGraph.Layers[i];
+				if (layer == null || string.IsNullOrWhiteSpace(layer.Id))
+				{
+					continue;
+				}
+
+				int priority = layer.Priority;
+				if (string.IsNullOrWhiteSpace(firstLayerId) ||
+					priority < firstPriority ||
+					(priority == firstPriority && i < firstOrder))
+				{
+					firstLayerId = layer.Id;
+					firstPriority = priority;
+					firstOrder = i;
+				}
+			}
+
+			return firstLayerId;
+		}
+
+		private string ResolveFusionLayerIdByAliases(params string[] aliases)
+		{
+			if (aliases == null || aliases.Length == 0)
+			{
+				return string.Empty;
+			}
+
+			for (int i = 0; i < aliases.Length; ++i)
+			{
+				string alias = aliases[i];
+				if (string.IsNullOrWhiteSpace(alias))
+				{
+					continue;
+				}
+
+				if (_fusionLayerIdsByName.TryGetValue(alias, out string exactLayerId) == true &&
+					string.IsNullOrWhiteSpace(exactLayerId) == false)
+				{
+					return exactLayerId;
+				}
+
+				string normalizedAlias = NormalizeFusionParameterToken(alias);
+				if (string.IsNullOrWhiteSpace(normalizedAlias) == false &&
+					_fusionLayerIdsByAlias.TryGetValue(normalizedAlias, out string normalizedLayerId) == true &&
+					string.IsNullOrWhiteSpace(normalizedLayerId) == false)
+				{
+					return normalizedLayerId;
+				}
+			}
+
+			return string.Empty;
+		}
+
+		private string ResolveFusionLayerIdByRoleScore(FusionLayerRole role)
+		{
+			if (_fusionStatesById == null || _fusionStatesById.Count == 0)
+			{
+				return string.Empty;
+			}
+
+			var scoresByLayerId = new Dictionary<string, int>(StringComparer.Ordinal);
+
+			foreach (KeyValuePair<string, FusionAnimatorStateDefinition> pair in _fusionStatesById)
+			{
+				FusionAnimatorStateDefinition state = pair.Value;
+				if (state == null || string.IsNullOrWhiteSpace(state.LayerId))
+				{
+					continue;
+				}
+
+				int score = GetFusionLayerRoleScore(role, state);
+				if (score <= 0)
+				{
+					continue;
+				}
+
+				if (scoresByLayerId.TryGetValue(state.LayerId, out int currentScore) == true)
+				{
+					scoresByLayerId[state.LayerId] = currentScore + score;
+				}
+				else
+				{
+					scoresByLayerId[state.LayerId] = score;
+				}
+			}
+
+			string bestLayerId = string.Empty;
+			int bestScore = int.MinValue;
+			int bestPriority = int.MaxValue;
+			int bestOrder = int.MaxValue;
+
+			foreach (KeyValuePair<string, int> pair in scoresByLayerId)
+			{
+				if (pair.Value <= 0)
+				{
+					continue;
+				}
+
+				if (TryGetFusionLayerSortKey(pair.Key, out int priority, out int order) == false)
+				{
+					priority = int.MaxValue;
+					order = int.MaxValue;
+				}
+
+				if (pair.Value > bestScore ||
+					(pair.Value == bestScore && priority < bestPriority) ||
+					(pair.Value == bestScore && priority == bestPriority && order < bestOrder))
+				{
+					bestLayerId = pair.Key;
+					bestScore = pair.Value;
+					bestPriority = priority;
+					bestOrder = order;
+				}
+			}
+
+			return bestLayerId;
+		}
+
+		private int GetFusionLayerRoleScore(FusionLayerRole role, FusionAnimatorStateDefinition state)
+		{
+			if (state == null)
+			{
+				return 0;
+			}
+
+			string canonicalName = GetCanonicalFusionStateName(state.Name);
+			string fullName = state.Name ?? string.Empty;
+
+			switch (role)
+			{
+				case FusionLayerRole.Base:
+				{
+					if (string.Equals(canonicalName, "Idle", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Move", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Turn", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 2;
+					}
+
+					if (canonicalName.IndexOf("Walk", StringComparison.OrdinalIgnoreCase) >= 0 ||
+						canonicalName.IndexOf("Run", StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						return 2;
+					}
+
+					return 0;
+				}
+				case FusionLayerRole.LowerBody:
+				{
+					if (string.Equals(canonicalName, "Turn", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 6;
+					}
+
+					if (canonicalName.IndexOf("Walk", StringComparison.OrdinalIgnoreCase) >= 0 ||
+						canonicalName.IndexOf("Run", StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						return 4;
+					}
+
+					if (fullName.StartsWith("Move/", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 4;
+					}
+
+					return 0;
+				}
+				case FusionLayerRole.UpperBody:
+				{
+					if (fullName.StartsWith("Grenade/", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 8;
+					}
+
+					if (string.Equals(canonicalName, "Equip", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Unequip", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Reload", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Aim", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Shoot", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 5;
+					}
+
+					return 0;
+				}
+				case FusionLayerRole.Shoot:
+				{
+					if (state.Presentation != null && state.Presentation.Semantic == FusionAnimatorStateSemantic.ShootOverlay)
+					{
+						return 10;
+					}
+
+					if (string.Equals(canonicalName, "Shoot", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "ShootState", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 7;
+					}
+
+					return 0;
+				}
+				case FusionLayerRole.Look:
+				{
+					if (state.Presentation != null && state.Presentation.Semantic == FusionAnimatorStateSemantic.LookPose)
+					{
+						return 10;
+					}
+
+					if (string.Equals(canonicalName, "Look", StringComparison.OrdinalIgnoreCase) == true ||
+						fullName.IndexOf("Look", StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						return 6;
+					}
+
+					return 0;
+				}
+				case FusionLayerRole.Top:
+				case FusionLayerRole.FullBody:
+				{
+					if (string.Equals(canonicalName, "Death", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Dead", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Jetpack", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return 8;
+					}
+
+					if (string.Equals(canonicalName, "Jump", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Fall", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Land", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Start_Jump", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "Loop_Jump", StringComparison.OrdinalIgnoreCase) == true ||
+						string.Equals(canonicalName, "End_Jump", StringComparison.OrdinalIgnoreCase) == true)
+					{
+						return role == FusionLayerRole.FullBody ? 5 : 2;
+					}
+
+					return 0;
+				}
+				default:
+				{
+					return 0;
+				}
+			}
+		}
+
+		private bool TryGetFusionLayerSortKey(string layerId, out int priority, out int order)
+		{
+			priority = int.MaxValue;
+			order = int.MaxValue;
+
+			if (_fusionAnimatorGraph == null || _fusionAnimatorGraph.Layers == null || string.IsNullOrWhiteSpace(layerId))
+			{
+				return false;
+			}
+
+			for (int i = 0; i < _fusionAnimatorGraph.Layers.Count; ++i)
+			{
+				FusionAnimatorLayerDefinition layer = _fusionAnimatorGraph.Layers[i];
+				if (layer == null || string.IsNullOrWhiteSpace(layer.Id))
+				{
+					continue;
+				}
+
+				if (string.Equals(layer.Id, layerId, StringComparison.Ordinal) == false)
+				{
+					continue;
+				}
+
+				priority = layer.Priority;
+				order = i;
+				return true;
+			}
+
+			return false;
+		}
+
+		private void SetFusionLayerRole(FusionLayerRole role, string layerId, params string[] aliases)
+		{
+			if (string.IsNullOrWhiteSpace(layerId))
+			{
+				return;
+			}
+
+			_fusionLayerIdsByRole[role] = layerId;
+
+			if (aliases == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < aliases.Length; ++i)
+			{
+				AddFusionLayerAlias(aliases[i], layerId);
+			}
+		}
+
+		private void AddFusionLayerAlias(string alias, string layerId)
+		{
+			if (string.IsNullOrWhiteSpace(alias) || string.IsNullOrWhiteSpace(layerId))
+			{
+				return;
+			}
+
+			string normalizedAlias = NormalizeFusionParameterToken(alias);
+			if (string.IsNullOrWhiteSpace(normalizedAlias))
+			{
+				return;
+			}
+
+			_fusionLayerIdsByAlias[normalizedAlias] = layerId;
+		}
+
+		private bool TryResolveFusionLayerId(string layerNameOrAlias, out string layerId)
+		{
+			layerId = string.Empty;
+			if (string.IsNullOrWhiteSpace(layerNameOrAlias))
+			{
+				return false;
+			}
+
+			if (_fusionLayerIdsByName.TryGetValue(layerNameOrAlias, out string exactLayerId) == true &&
+				string.IsNullOrWhiteSpace(exactLayerId) == false)
+			{
+				layerId = exactLayerId;
+				return true;
+			}
+
+			string normalized = NormalizeFusionParameterToken(layerNameOrAlias);
+			if (string.IsNullOrWhiteSpace(normalized) == false &&
+				_fusionLayerIdsByAlias.TryGetValue(normalized, out string aliasLayerId) == true &&
+				string.IsNullOrWhiteSpace(aliasLayerId) == false)
+			{
+				layerId = aliasLayerId;
+				return true;
+			}
+
+			if (TryGetFusionLayerRoleFromToken(normalized, out FusionLayerRole role) == true &&
+				_fusionLayerIdsByRole.TryGetValue(role, out string roleLayerId) == true &&
+				string.IsNullOrWhiteSpace(roleLayerId) == false)
+			{
+				layerId = roleLayerId;
+				return true;
+			}
+
+			if (_fusionAnimatorGraph != null && _fusionAnimatorGraph.Layers != null)
+			{
+				for (int i = 0; i < _fusionAnimatorGraph.Layers.Count; ++i)
+				{
+					FusionAnimatorLayerDefinition layer = _fusionAnimatorGraph.Layers[i];
+					if (layer == null || string.IsNullOrWhiteSpace(layer.Id))
+					{
+						continue;
+					}
+
+					if (string.Equals(layer.Id, layerNameOrAlias, StringComparison.Ordinal) == true)
+					{
+						layerId = layer.Id;
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private static bool TryGetFusionLayerRoleFromToken(string token, out FusionLayerRole role)
+		{
+			role = default;
+			if (string.IsNullOrWhiteSpace(token))
+			{
+				return false;
+			}
+
+			switch (token)
+			{
+				case "base":
+				{
+					role = FusionLayerRole.Base;
+					return true;
+				}
+				case "lower":
+				case "lowerbody":
+				{
+					role = FusionLayerRole.LowerBody;
+					return true;
+				}
+				case "upper":
+				case "upperbody":
+				{
+					role = FusionLayerRole.UpperBody;
+					return true;
+				}
+				case "shoot":
+				{
+					role = FusionLayerRole.Shoot;
+					return true;
+				}
+				case "full":
+				case "fullbody":
+				{
+					role = FusionLayerRole.FullBody;
+					return true;
+				}
+				case "look":
+				{
+					role = FusionLayerRole.Look;
+					return true;
+				}
+				case "top":
+				{
+					role = FusionLayerRole.Top;
+					return true;
+				}
+				default:
+				{
+					return false;
+				}
+			}
 		}
 
 		private void RebuildFusionRuntimeParameterBindings()
@@ -723,21 +1338,33 @@ namespace TPSBR
 
 			BindFusionRuntimeParameter("param_weapon_slot", FusionAnimatorParameterType.Int, "param_weapon_slot", "weaponslot", "currentweaponslot");
 			BindFusionRuntimeParameter("param_pending_weapon_slot", FusionAnimatorParameterType.Int, "param_pending_weapon_slot", "pendingweaponslot", "pendingweapon");
+			BindFusionRuntimeParameter("param_state_weapon", FusionAnimatorParameterType.Int, "state_weapon", "weaponstate");
 
 			BindFusionRuntimeParameter("param_move_x", FusionAnimatorParameterType.Float, "param_move_x", "input_move_x", "movex", "horizontal");
 			BindFusionRuntimeParameter("param_move_y", FusionAnimatorParameterType.Float, "param_move_y", "input_move_y", "movey", "vertical");
-			BindFusionRuntimeParameter("param_move_vector2", FusionAnimatorParameterType.Vector2, "param_move", "input_move", "movevector", "movement", "move");
+			BindFusionRuntimeParameter("param_move_vector2", FusionAnimatorParameterType.Vector2, "param_move", "movevector", "movement", "move");
+			BindFusionRuntimeParameter("param_input_move_vector2", FusionAnimatorParameterType.Vector2, "input_move", "inputmove");
+			BindFusionRuntimeParameter("param_input_look_vector2", FusionAnimatorParameterType.Vector2, "input_look", "inputlook");
+			BindFusionRuntimeParameter("param_input_aim", FusionAnimatorParameterType.Bool, "input_aim", "inputaim");
+			BindFusionRuntimeParameter("param_input_shoot", FusionAnimatorParameterType.Trigger, "input_shoot", "inputshoot");
+			BindFusionRuntimeParameter("param_input_reload", FusionAnimatorParameterType.Trigger, "input_reload", "inputreload");
+			BindFusionRuntimeParameter("param_input_jump", FusionAnimatorParameterType.Trigger, "input_jump", "inputjump");
+			BindFusionRuntimeParameter("param_input_throw", FusionAnimatorParameterType.Trigger, "input_throw", "inputthrow");
 			BindFusionRuntimeParameter("param_look_pitch", FusionAnimatorParameterType.Float, "param_look_pitch", "lookpitch", "pitch");
 			BindFusionRuntimeParameter("param_turn_direction", FusionAnimatorParameterType.Float, "param_turn_direction", "turndirection", "turn");
 
 			BindFusionRuntimeParameter("param_is_dead", FusionAnimatorParameterType.Bool, "param_is_dead", "state_isdead", "isdead", "dead");
-			BindFusionRuntimeParameter("param_is_jetpack_active", FusionAnimatorParameterType.Bool, "param_is_jetpack_active", "isjetpackactive", "jetpackactive");
-			BindFusionRuntimeParameter("param_is_grounded", FusionAnimatorParameterType.Bool, "param_is_grounded", "isgrounded", "grounded");
+			BindFusionRuntimeParameter("param_is_jetpack_active", FusionAnimatorParameterType.Bool, "param_is_jetpack_active", "state_jetpack", "isjetpackactive", "jetpackactive");
+			BindFusionRuntimeParameter("param_is_grounded", FusionAnimatorParameterType.Bool, "param_is_grounded", "state_isgrounded", "isgrounded", "grounded");
 			BindFusionRuntimeParameter("param_has_jumped", FusionAnimatorParameterType.Bool, "param_has_jumped", "hasjumped", "jumped");
-			BindFusionRuntimeParameter("param_is_reloading", FusionAnimatorParameterType.Bool, "param_is_reloading", "isreloading", "reloading");
+			BindFusionRuntimeParameter("param_is_reloading", FusionAnimatorParameterType.Bool, "param_is_reloading", "state_isreloading", "isreloading", "reloading");
 			BindFusionRuntimeParameter("param_is_equipping", FusionAnimatorParameterType.Bool, "param_is_equipping", "isequipping", "equipping");
 			BindFusionRuntimeParameter("param_is_unequipping", FusionAnimatorParameterType.Bool, "param_is_unequipping", "isunequipping", "unequipping");
-			BindFusionRuntimeParameter("param_is_throwing", FusionAnimatorParameterType.Bool, "param_is_throwing", "isthrowing", "throwing");
+			BindFusionRuntimeParameter("param_equip_trigger", FusionAnimatorParameterType.Trigger, "param_equip_trigger", "equiptrigger", "triggerequip");
+			BindFusionRuntimeParameter("param_unequip_trigger", FusionAnimatorParameterType.Trigger, "param_unequip_trigger", "unequiptrigger", "triggerunequip");
+			BindFusionRuntimeParameter("param_is_throwing", FusionAnimatorParameterType.Bool, "param_is_throwing", "state_isthrowing", "isthrowing", "throwing");
+			BindFusionRuntimeParameter("param_state_is_shooting", FusionAnimatorParameterType.Bool, "state_isshooting", "isshooting");
+			BindFusionRuntimeParameter("param_state_is_sprinting", FusionAnimatorParameterType.Bool, "state_issprinting", "issprinting");
 			BindFusionRuntimeParameter("param_is_turning", FusionAnimatorParameterType.Bool, "param_is_turning", "isturning", "turning");
 			BindFusionRuntimeParameter("param_shoot_trigger", FusionAnimatorParameterType.Trigger, "param_shoot_trigger", "shoottrigger", "shoot");
 			BindFusionRuntimeParameter("param_throw_start", FusionAnimatorParameterType.Trigger, "param_throw_start", "throwstart");
@@ -974,20 +1601,13 @@ namespace TPSBR
 			}
 
 			HashSet<Transform> trackedTransforms = new HashSet<Transform>();
-			TryAddFusionRootMotionBinding(this.transform, trackedTransforms);
-			TryAddFusionRootMotionBinding(Animator.transform, trackedTransforms);
 
 			Transform hips = Animator.GetBoneTransform(HumanBodyBones.Hips);
 			TryAddFusionRootMotionBinding(hips, trackedTransforms);
 			Transform cursor = hips != null ? hips.parent : null;
-			while (cursor != null)
+			while (cursor != null && cursor != Animator.transform)
 			{
 				TryAddFusionRootMotionBinding(cursor, trackedTransforms);
-				if (cursor == Animator.transform)
-				{
-					break;
-				}
-
 				cursor = cursor.parent;
 			}
 
@@ -1016,6 +1636,12 @@ namespace TPSBR
 		private void TryAddFusionRootMotionBinding(Transform transform, ISet<Transform> trackedTransforms)
 		{
 			if (transform == null || trackedTransforms == null || trackedTransforms.Add(transform) == false)
+			{
+				return;
+			}
+
+			// Never pin the networked character root when suppressing clip root motion.
+			if (transform == this.transform || transform == Animator.transform)
 			{
 				return;
 			}
@@ -1282,18 +1908,7 @@ namespace TPSBR
 
 		private bool IsFusionLayerRuntimeEnabled(FusionAnimatorLayerDefinition layerDefinition)
 		{
-			if (layerDefinition == null)
-			{
-				return false;
-			}
-
-			if (_fusionControlShootLayer == false &&
-				string.Equals(layerDefinition.Name, "Shoot", StringComparison.OrdinalIgnoreCase) == true)
-			{
-				return false;
-			}
-
-			return true;
+			return layerDefinition != null;
 		}
 
 		private void ApplyFusionRuntimeToPlayables()
@@ -2916,6 +3531,9 @@ namespace TPSBR
 			_fusionJetpackSwitchQueued = false;
 			_fusionJetpackDisarmApplied = false;
 			_fusionJetpackResumeWeaponSlot = 0;
+			_fusionLastArmedWeaponSlot = 0;
+			_fusionWeaponCycleTargetSlot = 0;
+			_fusionWeaponCycleActive = false;
 		}
 
 		private void ResetFusionUpperBodySideEffectFlags()
@@ -2952,6 +3570,11 @@ namespace TPSBR
 			if (force == true)
 				return true;
 
+			if (_fusionWeaponCycleActive == true)
+			{
+				return false;
+			}
+
 			string currentUpperBodyState = GetFusionCurrentStateCanonical("UpperBody");
 			if (string.Equals(currentUpperBodyState, "Equip", StringComparison.OrdinalIgnoreCase) == true ||
 				string.Equals(currentUpperBodyState, "Unequip", StringComparison.OrdinalIgnoreCase) == true)
@@ -2987,6 +3610,9 @@ namespace TPSBR
 			_fusionJetpackSwitchQueued = false;
 			_fusionJetpackDisarmApplied = false;
 			_fusionJetpackResumeWeaponSlot = 0;
+			_fusionLastArmedWeaponSlot = 0;
+			_fusionWeaponCycleTargetSlot = 0;
+			_fusionWeaponCycleActive = false;
 			ResetFusionUpperBodySideEffectFlags();
 
 			if (isDead == true)
@@ -3013,11 +3639,46 @@ namespace TPSBR
 
 			if (_fusionIsDead == true)
 				return false;
-			if (IsFusionUpperBodyAnyActive() == true)
+			if (IsFusionUpperBodyBlockingFire() == true)
 				return false;
 
 			_fusionShootPending = true;
 			_fusionShootTimer = Mathf.Max(_fusionShootTimer, SHOOT_TRIGGER_DURATION);
+			return true;
+		}
+
+		private bool IsFusionUpperBodyBlockingFire()
+		{
+			if (_fusionReloadPending == true ||
+				_fusionUnequipPending == true ||
+				_fusionEquipPending == true ||
+				_fusionGrenadeEquipPending == true ||
+				_fusionThrowStartPending == true ||
+				_fusionThrowHold == true)
+			{
+				return true;
+			}
+
+			if (TryGetFusionCurrentState("UpperBody", out _, out FusionAnimatorStateDefinition upperBodyState, out _) == false ||
+				upperBodyState == null ||
+				string.IsNullOrWhiteSpace(upperBodyState.Name) == true)
+			{
+				return false;
+			}
+
+			if (upperBodyState.Name.StartsWith("Grenade/", StringComparison.OrdinalIgnoreCase) == true)
+			{
+				return true;
+			}
+
+			string canonicalState = GetCanonicalFusionStateName(upperBodyState.Name);
+			if (string.Equals(canonicalState, "Idle", StringComparison.OrdinalIgnoreCase) == true ||
+				string.Equals(canonicalState, "Aim", StringComparison.OrdinalIgnoreCase) == true ||
+				canonicalState.IndexOf("Aim", StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				return false;
+			}
+
 			return true;
 		}
 
@@ -3164,6 +3825,8 @@ namespace TPSBR
 			_fusionThrowStartTimer = 0.0f;
 			_fusionShootPending = false;
 			_fusionShootTimer = 0.0f;
+			_fusionWeaponCycleTargetSlot = 0;
+			_fusionWeaponCycleActive = false;
 			ResetFusionUpperBodySideEffectFlags();
 
 			if (IsPendingThrowableWeapon() == true)
@@ -3172,15 +3835,25 @@ namespace TPSBR
 				return;
 			}
 
-			if (_weapons != null && _weapons.PendingWeaponSlot > 0)
+			if (_weapons == null)
 			{
-				_weapons.DisarmCurrentWeapon();
-				_fusionEquipPending = true;
+				return;
 			}
-			else
+
+			int requestedSlot = Mathf.Clamp(_weapons.PendingWeaponSlot, 0, 255);
+			int currentSlot = Mathf.Clamp(_weapons.CurrentWeaponSlot, 0, 255);
+			if (requestedSlot == currentSlot)
 			{
-				_fusionUnequipPending = true;
+				return;
 			}
+
+			_fusionWeaponCycleTargetSlot = (byte)requestedSlot;
+			_fusionWeaponCycleActive = true;
+
+			// Hold the outgoing slot while unequip plays; swap to target slot at switch-time.
+			_weapons.SetPendingWeapon(currentSlot);
+			_fusionUnequipPending = true;
+			_fusionEquipPending = false;
 		}
 
 		private void TurnFusion(float angle)
@@ -3317,15 +3990,14 @@ namespace TPSBR
 				if (string.Equals(upperBodyStateCanonical, "Unequip", StringComparison.Ordinal))
 				{
 					bool hasPendingWeapon = _weapons != null && _weapons.PendingWeaponSlot > 0;
-					if (hasPendingWeapon == false && upperBodyNormalizedTime >= UPPER_BODY_UNEQUIP_DISARM_TIME)
+					if (hasPendingWeapon == false &&
+						upperBodyNormalizedTime >= UPPER_BODY_UNEQUIP_DISARM_TIME &&
+						_fusionWeaponCycleActive == false)
 					{
 						_fusionUnequipPending = false;
+						_fusionWeaponCycleTargetSlot = 0;
+						_fusionWeaponCycleActive = false;
 					}
-				}
-				if (string.Equals(upperBodyStateCanonical, "Equip", StringComparison.Ordinal) && upperBodyNormalizedTime >= UPPER_BODY_RELOAD_RETURN_TIME)
-				{
-					_fusionEquipPending = false;
-					_fusionGrenadeEquipPending = false;
 				}
 				if (string.Equals(upperBodyStateCanonical, "Throw", StringComparison.Ordinal) && upperBodyNormalizedTime >= UPPER_BODY_THROW_START_TIME)
 				{
@@ -3334,10 +4006,14 @@ namespace TPSBR
 			}
 			else if (HasStateAuthority == true &&
 			         _fusionEquipPending == false &&
+			         _fusionUnequipPending == false &&
+			         _fusionWeaponCycleActive == false &&
 			         _weapons != null &&
 			         _weapons.PendingWeaponSlot > 0 &&
 			         _weapons.CurrentWeaponSlot == 0 &&
-			         IsFusionUpperBodyGrenadeActive() == false)
+			         IsFusionUpperBodyGrenadeActive() == false &&
+			         string.Equals(upperBodyStateCanonical, "Unequip", StringComparison.OrdinalIgnoreCase) == false &&
+			         string.Equals(upperBodyStateCanonical, "Equip", StringComparison.OrdinalIgnoreCase) == false)
 			{
 				if (IsPendingThrowableWeapon() == true)
 				{
@@ -3396,7 +4072,6 @@ namespace TPSBR
 			int pendingWeaponSlot = _weapons != null ? _weapons.PendingWeaponSlot : -1;
 			string currentUpperBodyState = GetFusionCurrentStateCanonical("UpperBody");
 			string currentLowerBodyState = GetFusionCurrentStateCanonical("LowerBody");
-			string currentFullBodyState = GetFusionCurrentStateCanonical("FullBody");
 
 			Vector3 moveDirection = Vector3.forward;
 			float moveMagnitude = 0.0f;
@@ -3453,15 +4128,45 @@ namespace TPSBR
 
 			float moveX = localMove.x * moveMagnitude;
 			float moveY = localMove.z * moveMagnitude;
+			Vector2 velocityMoveVector2 = new Vector2(moveX, moveY);
+			Vector2 inputMoveVector2 = Vector2.zero;
+			Vector2 inputLookVector2 = GetFusionLookInputVector2();
+			bool inputAim = _kcc != null && _kcc.FixedData.Aim;
+			if (_agent != null && _agent.AgentInput != null)
+			{
+				GameplayInput fixedInput = _agent.AgentInput.FixedInput;
+				inputMoveVector2 = fixedInput.MoveDirection;
+				inputAim = fixedInput.Aim;
+			}
+
+			if (_kcc != null)
+			{
+				inputAim = _kcc.FixedData.Aim;
+			}
+
+			if (_agent != null && _agent.Runner != null && _agent.LeftSide == true)
+			{
+				inputMoveVector2.x = -inputMoveVector2.x;
+			}
+
+			// Proxies do not own input history, fallback to velocity to keep remote motion responsive.
+			if (HasInputAuthority == false && HasStateAuthority == false && inputMoveVector2.sqrMagnitude <= 0.000001f)
+			{
+				inputMoveVector2 = velocityMoveVector2;
+			}
+
+			inputLookVector2.x = Mathf.Clamp(inputLookVector2.x, -1.0f, 1.0f);
+			inputLookVector2.y = Mathf.Clamp(inputLookVector2.y, -1.0f, 1.0f);
+
 			float lookPitch = _kcc != null ? _kcc.FixedData.LookPitch : 0.0f;
 			float realSpeed = _kcc != null ? _kcc.FixedData.RealSpeed : 0.0f;
 			bool canTurnPose = realSpeed < 0.1f;
 			float turnDirection = canTurnPose == true ? _fusionTurnDirection : 0.0f;
+			bool isJetpackActive = IsFusionJetpackStateActive();
 			bool isGrounded = _kcc != null && _kcc.FixedData.IsGrounded;
 			bool hasJumped = (_kcc != null && _kcc.FixedData.HasJumped) ||
 				(_kcc != null && _kcc.FixedData.IsGrounded == false && _kcc.FixedData.RealVelocity.y > 0.1f) ||
-				string.Equals(currentFullBodyState, "Jump", StringComparison.OrdinalIgnoreCase) == true;
-			bool isJetpackActive = IsFusionJetpackStateActive();
+				IsFusionJumpingStateActive() == true;
 			bool isTurning = (Mathf.Abs(_fusionTurnDirection) > 0.001f && canTurnPose == true) ||
 				string.Equals(currentLowerBodyState, "Turn", StringComparison.OrdinalIgnoreCase) == true;
 			bool isThrowing = IsFusionUpperBodyGrenadeActive() || _fusionGrenadeEquipPending == true;
@@ -3471,46 +4176,139 @@ namespace TPSBR
 				string.Equals(currentUpperBodyState, "Equip", StringComparison.OrdinalIgnoreCase) == true;
 			bool isReloading = _fusionReloadPending == true ||
 				string.Equals(currentUpperBodyState, "Reload", StringComparison.OrdinalIgnoreCase) == true;
+			bool shootTrigger = _fusionShootPending == true || _fusionShootTimer > 0.0f;
+			bool throwTrigger = _fusionThrowStartPending == true || _fusionThrowStartTimer > 0.0f;
+			bool reloadTrigger = _fusionReloadPending == true;
+			bool jumpTrigger = _kcc != null && _kcc.FixedData.HasJumped;
+			bool isShooting = shootTrigger == true ||
+				string.Equals(currentUpperBodyState, "Shoot", StringComparison.OrdinalIgnoreCase) == true ||
+				string.Equals(GetFusionCurrentStateCanonical("Shoot"), "Shoot", StringComparison.OrdinalIgnoreCase) == true;
+			bool isSprinting = inputMoveVector2.sqrMagnitude >= 0.5625f && inputAim == false;
+			int stateWeaponSlot = currentWeaponSlot;
+			int graphWeaponSlot = currentWeaponSlot;
+			int graphPendingWeaponSlot = pendingWeaponSlot;
+			if (isUnequipping == true)
+			{
+				if (stateWeaponSlot <= 0 && _weapons != null)
+				{
+					stateWeaponSlot = _weapons.PreviousWeaponSlot;
+				}
+			}
+			else if (isEquipping == true)
+			{
+				if (pendingWeaponSlot > 0)
+				{
+					stateWeaponSlot = pendingWeaponSlot;
+				}
+				else if (stateWeaponSlot <= 0 && _weapons != null)
+				{
+					stateWeaponSlot = _weapons.PreviousWeaponSlot;
+				}
+			}
 
-			_fusionParameters.SetInt("param_weapon_slot", currentWeaponSlot);
-			_fusionParameters.SetInt("param_pending_weapon_slot", pendingWeaponSlot);
+			stateWeaponSlot = Mathf.Max(0, stateWeaponSlot);
+			if (isUnequipping == true)
+			{
+				// Keep all weapon-id driven graph params locked to the outgoing weapon while Unequip plays.
+				graphWeaponSlot = stateWeaponSlot;
+				graphPendingWeaponSlot = stateWeaponSlot;
+			}
+			else if (isEquipping == true)
+			{
+				// Keep all weapon-id driven graph params locked to the incoming weapon while Equip plays.
+				int lockedEquipSlot = stateWeaponSlot;
+				if (lockedEquipSlot <= 0)
+				{
+					lockedEquipSlot = graphPendingWeaponSlot > 0 ? graphPendingWeaponSlot : graphWeaponSlot;
+				}
+
+				lockedEquipSlot = Mathf.Max(0, lockedEquipSlot);
+				graphWeaponSlot = lockedEquipSlot;
+				graphPendingWeaponSlot = lockedEquipSlot;
+				stateWeaponSlot = lockedEquipSlot;
+			}
+
+			if (HasStateAuthority == true && isJetpackActive == false)
+			{
+				int slotForHistory = currentWeaponSlot > 0 ? currentWeaponSlot : pendingWeaponSlot;
+				if (slotForHistory > 0)
+				{
+					_fusionLastArmedWeaponSlot = (byte)Mathf.Clamp(slotForHistory, 1, 255);
+				}
+			}
+
+			if (isJetpackActive == true)
+			{
+				// Jetpack owns full-body presentation and suppresses jump/fall branches.
+				isGrounded = true;
+				hasJumped = false;
+				jumpTrigger = false;
+				isSprinting = false;
+			}
+
+			_fusionParameters.SetInt("param_weapon_slot", graphWeaponSlot);
+			_fusionParameters.SetInt("param_pending_weapon_slot", graphPendingWeaponSlot);
+			_fusionParameters.SetInt("param_state_weapon", stateWeaponSlot);
 			_fusionParameters.SetFloat("param_move_x", moveX);
 			_fusionParameters.SetFloat("param_move_y", moveY);
+			_fusionParameters.SetVector2("param_move_vector2", velocityMoveVector2);
+			_fusionParameters.SetVector2("param_input_move_vector2", inputMoveVector2);
+			_fusionParameters.SetVector2("param_input_look_vector2", inputLookVector2);
+			_fusionParameters.SetBool("param_input_aim", inputAim);
 			_fusionParameters.SetFloat("param_look_pitch", lookPitch);
 			_fusionParameters.SetFloat("param_turn_direction", turnDirection);
 			_fusionParameters.SetBool("param_is_dead", _fusionIsDead);
 			_fusionParameters.SetBool("param_is_jetpack_active", isJetpackActive);
 			_fusionParameters.SetBool("param_is_grounded", isGrounded);
 			_fusionParameters.SetBool("param_has_jumped", hasJumped);
+			_fusionParameters.SetBool("param_state_is_shooting", isShooting);
+			_fusionParameters.SetBool("param_state_is_sprinting", isSprinting);
 			_fusionParameters.SetBool("param_is_reloading", isReloading);
 			_fusionParameters.SetBool("param_is_equipping", isEquipping);
 			_fusionParameters.SetBool("param_is_unequipping", isUnequipping);
+			_fusionParameters.SetBool("param_equip_trigger", _fusionEquipPending);
+			_fusionParameters.SetBool("param_unequip_trigger", _fusionUnequipPending);
 			_fusionParameters.SetBool("param_is_throwing", isThrowing);
 			_fusionParameters.SetBool("param_is_turning", isTurning);
-			_fusionParameters.SetBool("param_shoot_trigger", _fusionShootPending == true || _fusionShootTimer > 0.0f);
-			_fusionParameters.SetBool("param_throw_start", _fusionThrowStartPending == true || _fusionThrowStartTimer > 0.0f);
+			_fusionParameters.SetBool("param_input_shoot", shootTrigger);
+			_fusionParameters.SetBool("param_input_reload", reloadTrigger);
+			_fusionParameters.SetBool("param_input_jump", jumpTrigger);
+			_fusionParameters.SetBool("param_input_throw", throwTrigger);
+			_fusionParameters.SetBool("param_shoot_trigger", shootTrigger);
+			_fusionParameters.SetBool("param_throw_start", throwTrigger);
 			_fusionParameters.SetBool("param_throw_hold", _fusionThrowHold);
 			_fusionParameters.SetBool("param_grenade_equip", _fusionGrenadeEquipPending);
 
-			Vector2 moveVector2 = new Vector2(moveX, moveY);
-			SetFusionRuntimeInt("param_weapon_slot", currentWeaponSlot);
-			SetFusionRuntimeInt("param_pending_weapon_slot", pendingWeaponSlot);
+			SetFusionRuntimeInt("param_weapon_slot", graphWeaponSlot);
+			SetFusionRuntimeInt("param_pending_weapon_slot", graphPendingWeaponSlot);
+			SetFusionRuntimeInt("param_state_weapon", stateWeaponSlot);
 			SetFusionRuntimeFloat("param_move_x", moveX);
 			SetFusionRuntimeFloat("param_move_y", moveY);
-			SetFusionRuntimeVector2("param_move_vector2", moveVector2);
+			SetFusionRuntimeVector2("param_move_vector2", velocityMoveVector2);
+			SetFusionRuntimeVector2("param_input_move_vector2", inputMoveVector2);
+			SetFusionRuntimeVector2("param_input_look_vector2", inputLookVector2);
+			SetFusionRuntimeBool("param_input_aim", inputAim);
 			SetFusionRuntimeFloat("param_look_pitch", lookPitch);
 			SetFusionRuntimeFloat("param_turn_direction", turnDirection);
 			SetFusionRuntimeBool("param_is_dead", _fusionIsDead);
 			SetFusionRuntimeBool("param_is_jetpack_active", isJetpackActive);
 			SetFusionRuntimeBool("param_is_grounded", isGrounded);
 			SetFusionRuntimeBool("param_has_jumped", hasJumped);
+			SetFusionRuntimeBool("param_state_is_shooting", isShooting);
+			SetFusionRuntimeBool("param_state_is_sprinting", isSprinting);
 			SetFusionRuntimeBool("param_is_reloading", isReloading);
 			SetFusionRuntimeBool("param_is_equipping", isEquipping);
 			SetFusionRuntimeBool("param_is_unequipping", isUnequipping);
+			SetFusionRuntimeBool("param_equip_trigger", _fusionEquipPending);
+			SetFusionRuntimeBool("param_unequip_trigger", _fusionUnequipPending);
 			SetFusionRuntimeBool("param_is_throwing", isThrowing);
 			SetFusionRuntimeBool("param_is_turning", isTurning);
-			SetFusionRuntimeBool("param_shoot_trigger", _fusionShootPending == true || _fusionShootTimer > 0.0f);
-			SetFusionRuntimeBool("param_throw_start", _fusionThrowStartPending == true || _fusionThrowStartTimer > 0.0f);
+			SetFusionRuntimeBool("param_input_shoot", shootTrigger);
+			SetFusionRuntimeBool("param_input_reload", reloadTrigger);
+			SetFusionRuntimeBool("param_input_jump", jumpTrigger);
+			SetFusionRuntimeBool("param_input_throw", throwTrigger);
+			SetFusionRuntimeBool("param_shoot_trigger", shootTrigger);
+			SetFusionRuntimeBool("param_throw_start", throwTrigger);
 			SetFusionRuntimeBool("param_throw_hold", _fusionThrowHold);
 			SetFusionRuntimeBool("param_grenade_equip", _fusionGrenadeEquipPending);
 		}
@@ -3555,9 +4353,23 @@ namespace TPSBR
 					_fusionUnequipDisarmApplied = true;
 				}
 
-				if (_weapons.PendingWeaponSlot > 0 && normalizedTime >= UPPER_BODY_UNEQUIP_SWITCH_TIME)
+				if (normalizedTime >= UPPER_BODY_UNEQUIP_SWITCH_TIME)
 				{
-					_fusionEquipPending = true;
+					if (_fusionWeaponCycleActive == true)
+					{
+						int cycleTargetSlot = _fusionWeaponCycleTargetSlot;
+						if (cycleTargetSlot != _weapons.PendingWeaponSlot)
+						{
+							_weapons.SetPendingWeapon(cycleTargetSlot);
+						}
+
+						_fusionEquipPending = true;
+					}
+					else
+					{
+						_fusionEquipPending = false;
+					}
+
 					_fusionUnequipPending = false;
 				}
 
@@ -3570,6 +4382,8 @@ namespace TPSBR
 				{
 					_weapons.ArmPendingWeapon();
 					_fusionEquipPending = false;
+					_fusionWeaponCycleTargetSlot = 0;
+					_fusionWeaponCycleActive = false;
 					_fusionEquipArmApplied = true;
 				}
 
@@ -3633,6 +4447,14 @@ namespace TPSBR
 				if (_fusionJetpackSwitchQueued == false)
 				{
 					int resumeSlot = _weapons.CurrentWeaponSlot;
+					if (resumeSlot <= 0)
+					{
+						resumeSlot = _weapons.PendingWeaponSlot;
+					}
+					if (resumeSlot <= 0)
+					{
+						resumeSlot = _fusionLastArmedWeaponSlot;
+					}
 					if (resumeSlot < 0)
 					{
 						resumeSlot = 0;
@@ -3664,12 +4486,18 @@ namespace TPSBR
 				_fusionTurnDirection = 0.0f;
 				_fusionTurnRemainingTime = 0.0f;
 				_fusionTurnAnimationTime = 0.0f;
+				_fusionWeaponCycleTargetSlot = 0;
+				_fusionWeaponCycleActive = false;
 				return;
 			}
 
 			if (_fusionJetpackSwitchQueued == true)
 			{
 				int slotToRestore = _fusionJetpackResumeWeaponSlot;
+				if (slotToRestore <= 0)
+				{
+					slotToRestore = _fusionLastArmedWeaponSlot;
+				}
 
 				_fusionJetpackSwitchQueued = false;
 				_fusionJetpackDisarmApplied = false;
@@ -3677,6 +4505,7 @@ namespace TPSBR
 
 				if (slotToRestore > 0 && _weapons.HasWeapon(slotToRestore, false) == true)
 				{
+					_fusionLastArmedWeaponSlot = (byte)Mathf.Clamp(slotToRestore, 1, 255);
 					_weapons.SetPendingWeapon(slotToRestore);
 					_fusionReloadPending = false;
 					_fusionUnequipPending = false;
@@ -3690,6 +4519,8 @@ namespace TPSBR
 					_fusionTurnDirection = 0.0f;
 					_fusionTurnRemainingTime = 0.0f;
 					_fusionTurnAnimationTime = 0.0f;
+					_fusionWeaponCycleTargetSlot = 0;
+					_fusionWeaponCycleActive = false;
 
 					if (IsPendingThrowableWeapon() == true)
 					{
@@ -3708,7 +4539,12 @@ namespace TPSBR
 
 		private bool IsFusionJetpackStateActive()
 		{
-			return (_jetpack != null && _jetpack.IsActive == true) || string.Equals(GetFusionCurrentStateCanonical("FullBody"), "Jetpack", StringComparison.OrdinalIgnoreCase);
+			if (_jetpack != null && _jetpack.IsActive == true)
+			{
+				return true;
+			}
+
+			return IsFusionStateCanonicalActive("Jetpack");
 		}
 
 		private bool CanSwitchWeaponsFromGrenadeState()
@@ -3753,7 +4589,7 @@ namespace TPSBR
 				return false;
 			}
 
-			_fusionLayerIdsByName.TryGetValue("LowerBody", out string lowerBodyLayerId);
+			TryResolveFusionLayerId("LowerBody", out string lowerBodyLayerId);
 
 			int targetSlot = _weapons != null ? _weapons.CurrentWeaponSlot : 0;
 			if (targetSlot > 2)
@@ -3920,15 +4756,68 @@ namespace TPSBR
 
 		private bool IsFusionJumpingStateActive()
 		{
-			if (_fullBody != null && (_fullBody.Jump.IsActive() == true || _fullBody.Fall.IsActive() == true || _fullBody.Land.IsActive() == true))
+			return IsFusionStateCanonicalActive(
+				"Jump",
+				"Fall",
+				"Land",
+				"Start_Jump",
+				"Loop_Jump",
+				"End_Jump");
+		}
+
+		private bool IsFusionStateCanonicalActive(params string[] canonicalStateNames)
+		{
+			if (_fusionRuntimeGraphInstance == null ||
+				_fusionAnimatorGraph == null ||
+				_fusionAnimatorGraph.Layers == null ||
+				canonicalStateNames == null ||
+				canonicalStateNames.Length == 0)
 			{
-				return true;
+				return false;
 			}
 
-			string fullBodyState = GetFusionCurrentStateCanonical("FullBody");
-			return string.Equals(fullBodyState, "Jump", StringComparison.Ordinal) ||
-				string.Equals(fullBodyState, "Fall", StringComparison.Ordinal) ||
-				string.Equals(fullBodyState, "Land", StringComparison.Ordinal);
+			for (int i = 0; i < _fusionAnimatorGraph.Layers.Count; ++i)
+			{
+				FusionAnimatorLayerDefinition layer = _fusionAnimatorGraph.Layers[i];
+				if (layer == null || string.IsNullOrWhiteSpace(layer.Id))
+				{
+					continue;
+				}
+
+				FusionAnimatorRuntimeEvaluator evaluator = _fusionRuntimeGraphInstance.GetLayerEvaluator(layer.Id);
+				if (evaluator == null)
+				{
+					continue;
+				}
+
+				if (TryGetGraphStateDefinition(evaluator.CurrentStateId, out FusionAnimatorStateDefinition stateDefinition) == false ||
+					stateDefinition == null)
+				{
+					continue;
+				}
+
+				string canonical = GetCanonicalFusionStateName(stateDefinition.Name);
+				if (string.IsNullOrWhiteSpace(canonical))
+				{
+					continue;
+				}
+
+				for (int canonicalIndex = 0; canonicalIndex < canonicalStateNames.Length; ++canonicalIndex)
+				{
+					string targetCanonical = canonicalStateNames[canonicalIndex];
+					if (string.IsNullOrWhiteSpace(targetCanonical))
+					{
+						continue;
+					}
+
+					if (string.Equals(canonical, targetCanonical, StringComparison.OrdinalIgnoreCase))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
 		private bool IsFusionUpperBodyAnyActive()
@@ -3942,7 +4831,9 @@ namespace TPSBR
 
 			string canonicalState = GetCanonicalFusionStateName(stateDefinition.Name);
 			if (string.IsNullOrWhiteSpace(canonicalState) == true ||
-				string.Equals(canonicalState, "Idle", StringComparison.OrdinalIgnoreCase) == true)
+				string.Equals(canonicalState, "Idle", StringComparison.OrdinalIgnoreCase) == true ||
+				string.Equals(canonicalState, "Aim", StringComparison.OrdinalIgnoreCase) == true ||
+				canonicalState.IndexOf("Aim", StringComparison.OrdinalIgnoreCase) >= 0)
 			{
 				return false;
 			}
@@ -3998,7 +4889,7 @@ namespace TPSBR
 				return false;
 			}
 
-			if (_fusionLayerIdsByName.TryGetValue(layerName, out string layerId) == false ||
+			if (TryResolveFusionLayerId(layerName, out string layerId) == false ||
 				string.IsNullOrWhiteSpace(layerId))
 			{
 				return false;
@@ -4160,6 +5051,59 @@ namespace TPSBR
 			}
 
 			return direction.OnlyXZ();
+		}
+
+		private Vector2 GetFusionLookInputVector2()
+		{
+			Vector3 aimDirection = Vector3.zero;
+
+			if (_agent != null && _agent.Aiming != null)
+			{
+				if (_agent.Aiming.TryGetCrosshairAndHitPoints(true, out Vector3 fireOrigin, out _, out Vector3 characterHitPoint, out _) == true)
+				{
+					Vector3 origin = fireOrigin;
+					if (origin.sqrMagnitude <= 0.0001f)
+					{
+						origin = transform.position;
+					}
+
+					aimDirection = characterHitPoint - origin;
+				}
+
+				if (aimDirection.sqrMagnitude <= 0.0001f)
+				{
+					_agent.Aiming.GetAimPose(true, out Vector3 origin, out Vector3 targetPoint);
+					aimDirection = targetPoint - origin;
+				}
+			}
+
+			if (aimDirection.sqrMagnitude <= 0.0001f && _weapons != null && _weapons.CurrentWeaponHandle != null)
+			{
+				aimDirection = _weapons.CurrentWeaponHandle.forward;
+			}
+
+			if (aimDirection.sqrMagnitude <= 0.0001f && _kcc != null)
+			{
+				Quaternion lookRotation = _kcc.FixedData.LookRotation;
+				if (float.IsNaN(lookRotation.x) == false &&
+					float.IsNaN(lookRotation.y) == false &&
+					float.IsNaN(lookRotation.z) == false &&
+					float.IsNaN(lookRotation.w) == false)
+				{
+					aimDirection = lookRotation * Vector3.forward;
+				}
+			}
+
+			if (aimDirection.sqrMagnitude <= 0.0001f)
+			{
+				aimDirection = transform.forward;
+			}
+
+			aimDirection.Normalize();
+			Vector3 localAimDirection = transform.InverseTransformDirection(aimDirection);
+			return new Vector2(
+				Mathf.Clamp(localAimDirection.x, -1.0f, 1.0f),
+				Mathf.Clamp(localAimDirection.y, -1.0f, 1.0f));
 		}
 
 		private void SnapWeapon()

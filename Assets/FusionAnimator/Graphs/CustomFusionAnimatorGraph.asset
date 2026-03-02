@@ -33,7 +33,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: vector2:LeftStick
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_23bddf65568349caacf214092d4b8d03
@@ -46,7 +45,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: vector2:RightStick
     PreviewInputScale: 0.6
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
@@ -59,7 +57,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:LeftTrigger
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_bf3d1959c1624ba2911b621128b706c2
@@ -72,7 +69,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:RightTrigger
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_7e2055831edd487ba53f13730dce064d
@@ -85,7 +81,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:ButtonWest
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_11e0ad9ba84a4768b2cdcba9acad05ec
@@ -98,7 +93,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:ButtonSouth
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_ca501da3275c48e0be1f338fbb3d581c
@@ -111,7 +105,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:LeftShoulder
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_5d6ea07fcc6744ac816d5fca6523d8c7
@@ -124,7 +117,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:Select
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_08e42afc50814f6b826b5e200aac248d
@@ -137,7 +129,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:RightTrigger
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_e0be1bc95feb441db1163e13f5adf056
@@ -150,7 +141,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:ButtonWest
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_5ebe1fd6e81948568510f567363ed648
@@ -163,7 +153,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:ButtonSouth
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_9079d59bbe7c483cbec52edfc4c11bfa
@@ -176,7 +165,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:LeftShoulder
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_cc8aead836874dabbbe5d427661a9100
@@ -189,7 +177,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:ButtonNorth
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
   - Id: param_307a7f3ff5794fb8b04d2a7b0cc29bc4
@@ -202,7 +189,6 @@ MonoBehaviour:
     DefaultVector2: {x: 0, y: 0}
     PreviewInputBinding: scalar:LeftStickMagnitude
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 5
     PreviewBoolInputCompareValue: 0.75
   - Id: param_36ffec0edbbd4072bbebb35dceef08e6
@@ -213,11 +199,22 @@ MonoBehaviour:
     DefaultInt: 0
     DefaultFloat: 0
     DefaultVector2: {x: 0, y: 0}
-    PreviewInputBinding: scalar:RightShoulder
+    PreviewInputBinding: 
     PreviewInputScale: 1
-    PreviewBoolInputSource: 0
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
+  - Id: param_equip_trigger
+    Name: State_EquipTrigger
+    Type: 3
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: scalar:RightShoulder
+    PreviewInputScale: 1
+    PreviewBoolInputOperator: 0
+    PreviewBoolInputCompareValue: 0
   BindingGroups:
   - Id: group_77290d31cf034a73aa90d88964596d65
     Name: Move
@@ -232,6 +229,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400002, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -250,6 +252,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400014, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400016, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -266,6 +273,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400024, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400020, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -284,6 +296,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400026, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400022, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -300,6 +317,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400008, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400024, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -318,6 +340,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400022, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400092, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Loop: 0
@@ -334,6 +361,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400014, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400096, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -357,6 +389,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400056, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400076, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -368,6 +405,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400004, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400004, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -391,6 +433,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400010, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400080, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -402,6 +449,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400016, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400016, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
       Speed: 1
@@ -425,6 +477,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400008, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400078, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -436,6 +493,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400002, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
       Speed: 1
@@ -459,6 +521,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400004, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400074, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -470,6 +537,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400006, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400006, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
       Speed: 1
@@ -493,6 +565,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400012, guid: 0043ed7f748f5464d800e516e75624c6, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400082, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -504,6 +581,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400058, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400058, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -527,6 +609,11 @@ MonoBehaviour:
       Loop: 1
       Conditions: []
     - Slot: Default
+      Clip: {fileID: 7400064, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400084, guid: 914b09da235eea34ebdc4e71d057e815, type: 3}
       Speed: 1
       Loop: 1
@@ -538,6 +625,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400082, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1.5
+      Loop: 0
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400116, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1.5
@@ -556,6 +648,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400076, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400114, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Loop: 1
@@ -572,6 +669,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400078, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400118, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -590,6 +692,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400074, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 0
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400112, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Loop: 0
@@ -606,6 +713,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400010, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400026, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -624,6 +736,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400012, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400030, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -640,6 +757,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400014, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400028, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -658,6 +780,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400012, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400018, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -674,6 +801,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400024, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400038, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -692,6 +824,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400034, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400048, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -708,6 +845,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400090, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400072, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -726,6 +868,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400026, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400042, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -742,6 +889,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400088, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400078, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -760,6 +912,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400018, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400034, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -776,6 +933,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400032, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400050, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -794,6 +956,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400020, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400038, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -810,6 +977,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400022, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400036, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -828,6 +1000,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400030, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400044, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -844,6 +1021,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400028, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400046, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -862,6 +1044,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400050, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400062, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -878,6 +1065,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400056, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400068, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -896,6 +1088,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400052, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400066, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -912,6 +1109,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400054, guid: 87e6bba8b3ae86e4da9c84f6d832e37d, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400064, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -930,6 +1132,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400052, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400128, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Loop: 1
@@ -946,6 +1153,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400016, guid: 72bc559d4b44eb14bb687cefb4d1c638, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400032, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
@@ -964,6 +1176,11 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400036, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400060, guid: 459a127509d869b40908dffa197da5fa, type: 3}
       Speed: 1
       Loop: 1
@@ -980,6 +1197,11 @@ MonoBehaviour:
     Conditions: []
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
+    - Slot: Default
+      Clip: {fileID: 7400050, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
     - Slot: Default
       Clip: {fileID: 7400126, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
@@ -998,12 +1220,61 @@ MonoBehaviour:
     ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
     Clips:
     - Slot: Default
+      Clip: {fileID: 7400040, guid: 6844dcb6a866ab34fa96c67e39eab693, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
       Clip: {fileID: 7400124, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
       Speed: 1
       Loop: 1
       Conditions: []
     - Slot: Default
       Clip: {fileID: 7400004, guid: 74ab6da24dee7ca40a83456cd2488156, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_b7ec9d1b0adc42aaa0b0b30df4d38794
+    Name: Equip
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400150, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400000, guid: 6d0b268b0bd91c44eb369715ba96d320, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    _legacyClip: {fileID: 0}
+  - Id: binding_f1d4639375084a0c9cfbf54399457a3c
+    Name: Unequip
+    GroupId: 
+    Conditions: []
+    ClipIndexParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+    Clips:
+    - Slot: Default
+      Clip: {fileID: 7400006, guid: 0cf6cd90fa783f74d9a28a42e2071737, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400152, guid: e7468f78a01b86e439c96f57154dab25, type: 3}
+      Speed: 1
+      Loop: 1
+      Conditions: []
+    - Slot: Default
+      Clip: {fileID: 7400002, guid: 6d0b268b0bd91c44eb369715ba96d320, type: 3}
       Speed: 1
       Loop: 1
       Conditions: []
@@ -1088,7 +1359,7 @@ MonoBehaviour:
   - Id: state_9c372a49a89942df8d0b2a5b205fda9e
     Name: Reload
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -198, y: 267}
+    NodePosition: {x: -212, y: 267}
     MinDurationSeconds: 1
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -1392,7 +1663,7 @@ MonoBehaviour:
     Name: Start_Jump
     LayerId: layer_3e432cac3d0b4918b696995479a1444d
     NodePosition: {x: -339, y: 87}
-    MinDurationSeconds: 0.5
+    MinDurationSeconds: 0.15
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 0
@@ -1525,8 +1796,8 @@ MonoBehaviour:
   - Id: state_b67ee98cddc5439da7a2cf863e2ad6e2
     Name: Grenade/Unequip Grenade
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -497, y: 284}
-    MinDurationSeconds: 0.6
+    NodePosition: {x: -496, y: 284}
+    MinDurationSeconds: 0.4
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 0
@@ -1595,8 +1866,8 @@ MonoBehaviour:
   - Id: state_0c757e792ee84838a7778718d4272cf4
     Name: Grenade/Throw Grenade Far
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -444, y: 604}
-    MinDurationSeconds: 1.2
+    NodePosition: {x: -440, y: 604}
+    MinDurationSeconds: 0.8
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 0
@@ -1631,7 +1902,7 @@ MonoBehaviour:
     Name: Grenade/Equip Grenade
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     NodePosition: {x: -857, y: 284}
-    MinDurationSeconds: 0.4
+    MinDurationSeconds: 0.6
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 0
@@ -2226,6 +2497,105 @@ MonoBehaviour:
       TurnSpeed: 1
       MaxMagnitude: 1
       OverlayWeight: 1
+  - Id: state_1b735e0211a143d2938c9745d4ec44a8
+    Name: Cycle Weapon/__fa_scope_anchor__
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: 300, y: -40}
+    MinDurationSeconds: 0
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips: []
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 0
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_e8e8418ae90241b1943b81fbb8fc4503
+    Name: Cycle Weapon/Equip
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -874, y: 107}
+    MinDurationSeconds: 1
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_b7ec9d1b0adc42aaa0b0b30df4d38794
+      Clip: {fileID: 0}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 0
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
+  - Id: state_a42f090f084b40548c4cbc3a26ed3a27
+    Name: Cycle Weapon/Unequip
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    NodePosition: {x: -1128, y: 103}
+    MinDurationSeconds: 1
+    CanTransitionOut: 1
+    WriteDefaults: 0
+    MotionType: 0
+    Clips:
+    - Slot: Default
+      ReferenceMode: 1
+      BindingId: binding_f1d4639375084a0c9cfbf54399457a3c
+      Clip: {fileID: 0}
+      Speed: 1
+      Loop: 1
+    BlendTree:
+      Type: 0
+      ParameterXId: 
+      ParameterYId: 
+      ParameterVector2Id: 
+      PoseTimeParameterId: 
+      DirectBlendParameterId: 
+      InputOffsetX: 0
+      InputPowerX: 1
+      NormalizeTimeScale: 1
+      AutoDetectOnClipAssign: 0
+      Children: []
+    Presentation:
+      Semantic: 0
+      Offset: 0
+      Power: 1
+      BlendSpeed: 1
+      TurnSpeed: 1
+      MaxMagnitude: 1
+      OverlayWeight: 1
   Transitions:
   - Id: transition_6a468d3c3b064edbbfe0415d923d1717
     Name: Transition
@@ -2256,6 +2626,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_ebc63f971b67493f92dca2d66e5f2d79
     Name: Transition
     FromStateId: state_6256137cab304779b0fc5d0fdeee5024
@@ -2278,6 +2649,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_ccf4a8677ef24452b67abcaf66500e44
     Name: Transition
     FromStateId: state_6256137cab304779b0fc5d0fdeee5024
@@ -2300,6 +2672,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_3eb5f5e360854943b6303e5b63eef2f8
     Name: Entry
     FromStateId: __entry__
@@ -2315,6 +2688,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_9e15c50fc6f940e1a3880594056af058
     Name: Transition
     FromStateId: __any__
@@ -2344,6 +2718,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_4f630e918da4483f90c3c379804b58d2
     Name: Transition
     FromStateId: __any__
@@ -2373,6 +2748,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_8d67bcc3e58d428e9b8e183fbc9c21f5
     Name: Transition
     FromStateId: state_6256137cab304779b0fc5d0fdeee5024
@@ -2395,6 +2771,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_cace276310694faa86c67daa5a4a5006
     Name: Transition
     FromStateId: state_00e9b6d941694303859053ecf36a7689
@@ -2417,6 +2794,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_7eed70b8625b42218f58ec9ab8821740
     Name: Transition
     FromStateId: state_00e9b6d941694303859053ecf36a7689
@@ -2446,6 +2824,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_dbf89ffd7e924e98931838ba083dafb9
     Name: Transition
     FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
@@ -2475,6 +2854,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_5e8bebae05e54cc38560a172aa3793bf
     Name: Transition
     FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
@@ -2490,6 +2870,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_9c71295a77814505976bb3e1f5c4d791
     Name: Transition
     FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
@@ -2519,6 +2900,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_c33e57d5f78247ee8688be3a83247eae
     Name: Transition
     FromStateId: state_9c372a49a89942df8d0b2a5b205fda9e
@@ -2534,6 +2916,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_a32513ec7c5d4e048ad2f38c31bf050f
     Name: Transition
     FromStateId: __any__
@@ -2556,6 +2939,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_bc278b05630041dd92cf060ce655b510
     Name: Transition
     FromStateId: state_e618232f27c5468384ccf9b17d2bfa14
@@ -2578,6 +2962,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_6118994434cd4f3f8fddcf5863db4725
     Name: Transition
     FromStateId: __any__
@@ -2607,6 +2992,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_1fd2554f77114a1ea94d39652f03bf95
     Name: Transition
     FromStateId: state_0719c87eae2c4c26969032bd8819158e
@@ -2629,6 +3015,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 1
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_49a2249e623f44008bedbd6a49cdf773
     Name: Entry
     FromStateId: __entry__
@@ -2644,6 +3031,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_0f50d04b29b34dba9fb753248139b506
     Name: Transition
     FromStateId: state_09a6d70288e34bd9abe021d67e6ae4f1
@@ -2666,6 +3054,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_36df2824b69e4e8c9873de30b37e0510
     Name: Transition
     FromStateId: state_350c6b5ac014473b8b4af0aed6293534
@@ -2688,6 +3077,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_6068db152a3741cbac5719097332441b
     Name: Transition
     FromStateId: state_09a6d70288e34bd9abe021d67e6ae4f1
@@ -2710,6 +3100,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_c28e11c66cd141079b67e51723e5a5b4
     Name: Transition
     FromStateId: __any__
@@ -2732,6 +3123,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_0840b7ee0cb3481685c280643255b9bd
     Name: Transition
     FromStateId: __any__
@@ -2754,6 +3146,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_db06ff0944bd4dbc901707b90d77c53c
     Name: Transition
     FromStateId: __any__
@@ -2790,6 +3183,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_6e5c6b17fc3344f6b8b16235ae6970c4
     Name: Transition
     FromStateId: state_d831572fa72a422382fd9ebdcc1121fc
@@ -2819,6 +3213,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_cef2c0c85a304e5e81e7fffc0b15b01e
     Name: Transition
     FromStateId: state_d831572fa72a422382fd9ebdcc1121fc
@@ -2841,6 +3236,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_b5d4daea38ad43c789708a37a3274e0c
     Name: Transition
     FromStateId: state_b67ee98cddc5439da7a2cf863e2ad6e2
@@ -2856,6 +3252,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_52a07b17767641b78ee6415edc743a23
     Name: Transition
     FromStateId: state_0c757e792ee84838a7778718d4272cf4
@@ -2871,6 +3268,7 @@ MonoBehaviour:
     InterruptionSource: 1
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_1bdb5234646d44bcab1aa7d696307d2c
     Name: Transition
     FromStateId: __any__
@@ -2893,6 +3291,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_8055b15faa274cdc9177417f36ff85ad
     Name: Transition
     FromStateId: state_43c7960140cd4a0ab7f00c660a931d40
@@ -2915,6 +3314,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_40fb0032bf244fc39f4341a55e2d8590
     Name: Entry
     FromStateId: __entry__
@@ -2930,6 +3330,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_4c7e8c691c7a427dba9b3cc7779ee322
     Name: Transition
     FromStateId: state_43c7960140cd4a0ab7f00c660a931d40
@@ -2952,6 +3353,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_b78c07fb7c8a4c5cb9379138e242b695
     Name: Transition
     FromStateId: state_ae2925b990e441d88057e072aac08d58
@@ -2974,6 +3376,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_35a57b6b21c647f0843f4cf81c5b471b
     Name: Transition
     FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
@@ -2996,6 +3399,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_42e107cd771544afa2fbbc78e849093b
     Name: Transition
     FromStateId: state_ae2925b990e441d88057e072aac08d58
@@ -3018,6 +3422,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_86a1b9c5d0d14b939dd5bf58600d4172
     Name: Transition
     FromStateId: state_ae2925b990e441d88057e072aac08d58
@@ -3040,6 +3445,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_50c2f1aa081e4de99b7b89374fd32a8b
     Name: Transition
     FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
@@ -3062,6 +3468,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_aac469c81aba45549d2e02affa39b0b6
     Name: Transition
     FromStateId: state_5093fae8f30a407caf20331150391d9d
@@ -3077,6 +3484,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_879933c9ac52410f8b11998d45da1c77
     Name: Transition
     FromStateId: state_5093fae8f30a407caf20331150391d9d
@@ -3099,6 +3507,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_5a86a66a4fe0411ebf28cf929876f929
     Name: Transition
     FromStateId: __any__
@@ -3128,6 +3537,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_bbeb559251aa4937b97664f4ecf0f00d
     Name: Entry
     FromStateId: __entry__
@@ -3150,6 +3560,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_b01c71b88583453ebddbd76db8049e08
     Name: Transition
     FromStateId: __any__
@@ -3179,6 +3590,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_d3353a73ef5c4c03b5de77efad22d1df
     Name: Entry
     FromStateId: __entry__
@@ -3194,6 +3606,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_27969a6dbe444c9e8cd2a925d18e6172
     Name: Transition
     FromStateId: __any__
@@ -3209,6 +3622,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_ae74205f90b840f185a182e542f02422
     Name: Transition
     FromStateId: state_af542725c9ef4c918805e85bfca1dfdb
@@ -3231,6 +3645,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_a27e8f7eb41b428eac7ce9eb584f8813
     Name: Transition
     FromStateId: state_8eb4f5f716be4c629d8a056310d7a763
@@ -3260,6 +3675,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_d0a0c3b0298d4dd5821a92f2d756c917
     Name: Transition
     FromStateId: state_8eb4f5f716be4c629d8a056310d7a763
@@ -3282,6 +3698,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_3cc9c37b90bc4b4eb8e07e4fddd2c344
     Name: Transition
     FromStateId: state_219a3d5eb40940b79540802677d268c9
@@ -3297,6 +3714,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
+    PreviewResults: []
   - Id: transition_ab1f6c8a48ad4a08bcd5fce6893e7cb0
     Name: Entry
     FromStateId: __entry__
@@ -3319,6 +3737,7 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   - Id: transition_c3be1272710e4a19bda60fbcd95a61c2
     Name: Transition
     FromStateId: __any__
@@ -3355,6 +3774,125 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
+  - Id: transition_9e4d8731386f4e01af98ce8952b4801a
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_a42f090f084b40548c4cbc3a26ed3a27
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+    PreviewResults: []
+  - Id: transition_52d9629973d64a348e82e58e4a1258a4
+    Name: Transition
+    FromStateId: state_a42f090f084b40548c4cbc3a26ed3a27
+    ToStateId: state_e8e8418ae90241b1943b81fbb8fc4503
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+    PreviewResults:
+    - ParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+      Operation: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+      CycleMinValue: 0
+      CycleMaxValue: 2
+  - Id: transition_d63aea6c3c9b4b9c82e48ceae5301295
+    Name: Transition
+    FromStateId: state_e8e8418ae90241b1943b81fbb8fc4503
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+    PreviewResults: []
+  - Id: transition_fdb3b9384ac14b5a8622fd893d0b0208
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_1b735e0211a143d2938c9745d4ec44a8
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_equip_trigger
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
+  - Id: transition_d5d541fcf84448eda36c327073371973
+    Name: Transition
+    FromStateId: state_1b735e0211a143d2938c9745d4ec44a8
+    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 4.75
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+    PreviewResults: []
+  - Id: transition_4217f8a40fbb48b486527b8399769bdd
+    Name: Transition
+    FromStateId: state_8eb4f5f716be4c629d8a056310d7a763
+    ToStateId: __exit__
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 1
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   ScopeUtilityNodeLayouts:
   - LayerId: layer_3e432cac3d0b4918b696995479a1444d
     ScopePath: 
@@ -3387,7 +3925,7 @@ MonoBehaviour:
   - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     ScopePath: Grenade
     HasScopeNodePosition: 1
-    ScopeNodePosition: {x: -212, y: 398}
+    ScopeNodePosition: {x: -212, y: 392}
     EntryNodePosition: {x: -1119, y: 182}
     AnyNodePosition: {x: -1119, y: 280}
     ExitNodePosition: {x: -179, y: 280}
@@ -3398,10 +3936,20 @@ MonoBehaviour:
     EntryNodePosition: {x: -1157, y: 140}
     AnyNodePosition: {x: -1183, y: 323}
     ExitNodePosition: {x: -445, y: 242}
+  - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: Cycle Weapon
+    HasScopeNodePosition: 1
+    ScopeNodePosition: {x: -587, y: -12}
+    EntryNodePosition: {x: -1334, y: 103}
+    AnyNodePosition: {x: -1334, y: 241.5}
+    ExitNodePosition: {x: -635, y: 130}
   ScopeTransitionSuppressions:
   - TransitionId: transition_52a07b17767641b78ee6415edc743a23
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     ScopePath: 
   - TransitionId: transition_b5d4daea38ad43c789708a37a3274e0c
+    LayerId: layer_4766da9aa1624562a91b0139bfb45cee
+    ScopePath: 
+  - TransitionId: transition_d5d541fcf84448eda36c327073371973
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     ScopePath: 

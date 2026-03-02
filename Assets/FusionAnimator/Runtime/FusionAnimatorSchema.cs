@@ -21,13 +21,6 @@ namespace FusionAnimator
         Y = 2,
     }
 
-    public enum FusionAnimatorPreviewBoolInputSource
-    {
-        Float = 0,
-        Int = 1,
-        Vector2Magnitude = 2,
-    }
-
     public enum FusionAnimatorLayerBlendMode
     {
         Override = 0,
@@ -85,6 +78,12 @@ namespace FusionAnimator
         ShootOverlay = 3,
     }
 
+    public enum FusionAnimatorTransitionResultOperation
+    {
+        Set = 0,
+        Cycle = 1,
+    }
+
     [Serializable]
     public sealed class FusionAnimatorParameterDefinition
     {
@@ -98,7 +97,6 @@ namespace FusionAnimator
         [SerializeField] public Vector2 DefaultVector2;
         [SerializeField] public string PreviewInputBinding;
         [SerializeField] public float PreviewInputScale = 1.0f;
-        [SerializeField] public FusionAnimatorPreviewBoolInputSource PreviewBoolInputSource = FusionAnimatorPreviewBoolInputSource.Float;
         [SerializeField] public FusionAnimatorConditionOperator PreviewBoolInputOperator = FusionAnimatorConditionOperator.Greater;
         [SerializeField] public float PreviewBoolInputCompareValue = 0.5f;
     }
@@ -252,6 +250,19 @@ namespace FusionAnimator
     }
 
     [Serializable]
+    public sealed class FusionAnimatorTransitionResultDefinition
+    {
+        [SerializeField] public string ParameterId;
+        [SerializeField] public FusionAnimatorTransitionResultOperation Operation = FusionAnimatorTransitionResultOperation.Set;
+        [SerializeField] public bool BoolValue;
+        [SerializeField] public int IntValue;
+        [SerializeField] public float FloatValue;
+        [SerializeField] public Vector2 Vector2Value;
+        [SerializeField] public int CycleMinValue;
+        [SerializeField] public int CycleMaxValue = 1;
+    }
+
+    [Serializable]
     public sealed class FusionAnimatorTransitionDefinition
     {
         [SerializeField] public string Id;
@@ -269,6 +280,7 @@ namespace FusionAnimator
         [SerializeField] public FusionAnimatorInterruptionSource InterruptionSource = FusionAnimatorInterruptionSource.CurrentThenNext;
         [SerializeField] public bool CanInterrupt = true;
         [SerializeField] public List<FusionAnimatorConditionDefinition> Conditions = new List<FusionAnimatorConditionDefinition>();
+        [SerializeField] public List<FusionAnimatorTransitionResultDefinition> PreviewResults = new List<FusionAnimatorTransitionResultDefinition>();
     }
 
     public static class FusionAnimatorClipBindingUtility
