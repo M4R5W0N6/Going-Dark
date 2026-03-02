@@ -1,5 +1,6 @@
 namespace TPSBR
 {
+	using System;
 	using UnityEngine;
 	using Fusion;
 	using Fusion.Addons.InterestManagement;
@@ -35,7 +36,6 @@ namespace TPSBR
 		public SceneContext     Context        { get; set; }
 		public bool             IsInitialized => _initCounter <= 0;
 
-		[Networked]
 		public Agent            ActiveAgent    { get; private set; }
 		[Networked]
 		public NetworkPrefabRef AgentPrefab    { get; set; }
@@ -50,6 +50,8 @@ namespace TPSBR
 		private NetworkString<_64> NetworkedUserID { get; set; }
 		[Networked]
 		private NetworkString<_32> NetworkedNickname { get; set; }
+		[Networked]
+		private NetworkBehaviourId ActiveAgentReference { get; set; }
 
 		private byte      _syncToken;
 		private Agent     _activeAgent;
@@ -75,6 +77,12 @@ namespace TPSBR
 			}
 
 			ActiveAgent = agent;
+			_activeAgent = agent;
+
+			if (HasStateAuthority == true)
+			{
+				ActiveAgentReference = agent != null ? agent.Id : NetworkBehaviourId.None;
+			}
 
 			UpdateLocalState();
 		}
@@ -93,6 +101,11 @@ namespace TPSBR
 			ActiveAgent = null;
 			_activeAgent = null;
 			_platformAgent = null;
+
+			if (HasStateAuthority == true)
+			{
+				ActiveAgentReference = NetworkBehaviourId.None;
+			}
 
 			if (agentToDespawn != null && agentToDespawn.Object != null)
 			{
@@ -140,7 +153,8 @@ namespace TPSBR
 		protected override void OnSpawned()
 		{
 			_syncToken      = default;
-			_activeAgent    = ActiveAgent;
+			_activeAgent    = ResolveActiveAgent();
+			ActiveAgent     = _activeAgent;
 			_observePlayer  = Object.InputAuthority;
 			_playerDataSent = false;
 			_initCounter    = 10;
@@ -241,14 +255,20 @@ namespace TPSBR
 
 		private void UpdateLocalState()
 		{
-			if (_activeAgent != ActiveAgent)
+			Agent resolvedActiveAgent = ResolveActiveAgent();
+			if (_activeAgent != resolvedActiveAgent)
 			{
-				_activeAgent   = ActiveAgent;
+				_activeAgent   = resolvedActiveAgent;
+				ActiveAgent    = resolvedActiveAgent;
 				_observePlayer = Object.InputAuthority;
 
 				if (_activeAgent != null)
 				{
 					InterestView = _activeAgent.InterestView;
+				}
+				else
+				{
+					InterestView = null;
 				}
 			}
 
@@ -269,6 +289,66 @@ namespace TPSBR
 					_platformAgent = _activeAgent;
 				}
 			}
+		}
+
+		private Agent ResolveActiveAgent()
+		{
+			var cachedAgent = _activeAgent;
+			if (cachedAgent != null)
+			{
+				if (cachedAgent.Object == null || cachedAgent.Object.IsValid == false || cachedAgent.Id != ActiveAgentReference)
+				{
+					cachedAgent = null;
+				}
+			}
+
+			var activeAgentReference = ActiveAgentReference;
+			if (activeAgentReference == default || activeAgentReference == NetworkBehaviourId.None)
+			{
+				return null;
+			}
+
+			if (cachedAgent != null)
+			{
+				return cachedAgent;
+			}
+
+			if (TryResolveBehaviourSafe(Runner, activeAgentReference, out Agent resolvedAgent) == true &&
+				resolvedAgent != null &&
+				resolvedAgent.Object != null &&
+				resolvedAgent.Object.IsValid == true)
+			{
+				return resolvedAgent;
+			}
+
+			if (HasStateAuthority == true)
+			{
+				ActiveAgentReference = NetworkBehaviourId.None;
+			}
+
+			return null;
+		}
+
+		private static bool TryResolveBehaviourSafe<T>(NetworkRunner runner, NetworkBehaviourId behaviourId, out T behaviour) where T : NetworkBehaviour
+		{
+			behaviour = null;
+			if (runner == null || behaviourId == default || behaviourId == NetworkBehaviourId.None)
+				return false;
+
+			try
+			{
+				return runner.TryFindBehaviour(behaviourId, out behaviour) == true && behaviour != null;
+			}
+			catch (Exception ex) when (IsFusionAssertException(ex))
+			{
+				behaviour = null;
+				return false;
+			}
+		}
+
+		private static bool IsFusionAssertException(Exception ex)
+		{
+			return ex != null && ex.GetType().Name == "AssertException";
 		}
 
 		[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]

@@ -77,7 +77,7 @@ namespace TPSBR
 			int currentWeaponSlot = _weapons.CurrentWeaponSlot;
 			if (currentWeaponSlot > 2)
 			{
-				currentWeaponSlot = 0; // For grenades we use unarmed set
+				currentWeaponSlot = 1; // For grenades we use pistol set
 			}
 
 			if (currentWeaponSlot < 0)
@@ -243,14 +243,11 @@ namespace TPSBR
 				return 0.0f;
 
 			BlendTreeNode[] nodes = Sets[setID].Nodes;
-			if (nodes == null || nodes.Length < 9)
-				return 0.0f;
-
 			int   fromNodeIndex;
 			int   toNodeIndex;
 			float alpha;
 
-			float angle = Vector2.SignedAngle(Vector2.up, localNormalizedDirection);
+			float angle = Vector2.Angle(localNormalizedDirection, Vector2.up);
 			if (angle >= 0.0f)
 			{
 				if      (angle <=  45.0f) { fromNodeIndex = 1; toNodeIndex = 6; alpha = Mathf.Clamp01((angle -   0.0f) / 45.0f); }

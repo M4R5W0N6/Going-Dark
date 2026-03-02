@@ -43,7 +43,7 @@ namespace TPSBR
 		private Transform    _fireAudioEffectsRoot;
 
 		[Networked, Capacity(8)]
-		private NetworkArray<Weapon> _weapons { get; }
+		private NetworkArray<NetworkBehaviourId> _weaponReferences { get; }
 		[Networked]
 		private byte _currentWeaponSlot { get; set; }
 		[Networked]
@@ -199,9 +199,9 @@ namespace TPSBR
 			PendingWeapon       = null;
 			CurrentWeapon       = null;
 
-			for (int i = 0; i < _weapons.Length; i++)
+			for (int i = 0; i < _weaponReferences.Length; i++)
 			{
-				_weapons.Set(i, null);
+				_weaponReferences.Set(i, NetworkBehaviourId.None);
 				_localWeapons[i] = null;
 			}
 
@@ -233,18 +233,21 @@ namespace TPSBR
 		public void OnDespawned()
 		{
 			// Cleanup weapons
-			for (int i = 0; i < _weapons.Length; i++)
+			for (int i = 0; i < _weaponReferences.Length; i++)
 			{
 				Weapon weapon = ResolveWeapon(i);
 				if (weapon != null)
 				{
 					weapon.Deinitialize(Object);
-					Runner.Despawn(weapon.Object);
+					if (HasStateAuthority == true)
+					{
+						Runner.Despawn(weapon.Object);
+					}
 				}
 
 				if (HasStateAuthority == true)
 				{
-					_weapons.Set(i, null);
+					_weaponReferences.Set(i, NetworkBehaviourId.None);
 				}
 
 				_localWeapons[i] = null;
@@ -354,7 +357,7 @@ namespace TPSBR
 
 		public bool HasWeapon(int slot, bool checkAmmo = false)
 		{
-			if (slot < 0 || slot >= _weapons.Length)
+			if (slot < 0 || slot >= _weaponReferences.Length)
 				return false;
 
 			var weapon = ResolveWeapon(slot);
@@ -368,7 +371,7 @@ namespace TPSBR
 
 		public int GetNextWeaponSlot(int fromSlot, int minSlot = 0, bool checkAmmo = true)
 		{
-			int weaponCount = _weapons.Length;
+			int weaponCount = _weaponReferences.Length;
 
 			for (int i = 0; i < weaponCount; i++)
 			{
@@ -419,7 +422,7 @@ namespace TPSBR
 
 		public bool AddAmmo(int weaponSlot, int amount, out string result)
 		{
-			if (weaponSlot < 0 || weaponSlot >= _weapons.Length)
+			if (weaponSlot < 0 || weaponSlot >= _weaponReferences.Length)
 			{
 				result = string.Empty;
 				return false;
@@ -471,7 +474,7 @@ namespace TPSBR
 
 			Vector2 lastRecoil = Vector2.zero;
 
-			for (int i = 0; i < _weapons.Length; i++)
+			for (int i = 0; i < _weaponReferences.Length; i++)
 			{
 				var weapon = ResolveWeapon(i);
 				if (weapon == null)
@@ -527,7 +530,7 @@ namespace TPSBR
 
 		private void DropAllWeapons()
 		{
-			for (int i = 1; i < _weapons.Length; i++)
+			for (int i = 1; i < _weaponReferences.Length; i++)
 			{
 				DropWeapon(i);
 			}
@@ -615,13 +618,16 @@ namespace TPSBR
 
 			Runner.SetPlayerAlwaysInterested(Object.InputAuthority, weapon.Object, true);
 
-			_weapons.Set(weapon.WeaponSlot, weapon);
+			if (HasStateAuthority == true)
+			{
+				_weaponReferences.Set(weapon.WeaponSlot, weapon.Id);
+			}
 			_localWeapons[weapon.WeaponSlot] = weapon;
 		}
 
 		private void RemoveWeapon(int slot)
 		{
-			if (slot < 0 || slot >= _weapons.Length)
+			if (slot < 0 || slot >= _weaponReferences.Length)
 				return;
 
 			var weapon = ResolveWeapon(slot);
@@ -630,7 +636,7 @@ namespace TPSBR
 				_localWeapons[slot] = null;
 				if (HasStateAuthority == true)
 				{
-					_weapons.Set(slot, null);
+					_weaponReferences.Set(slot, NetworkBehaviourId.None);
 				}
 				return;
 			}
@@ -643,7 +649,10 @@ namespace TPSBR
 
 			Runner.SetPlayerAlwaysInterested(Object.InputAuthority, weapon.Object, false);
 
-			_weapons.Set(slot, null);
+			if (HasStateAuthority == true)
+			{
+				_weaponReferences.Set(slot, NetworkBehaviourId.None);
+			}
 			_localWeapons[slot] = null;
 		}
 
@@ -651,7 +660,7 @@ namespace TPSBR
 		{
 			byte bestWeaponSlot = 0;
 
-			for (int i = 0; i < _weapons.Length; i++)
+			for (int i = 0; i < _weaponReferences.Length; i++)
 			{
 				Weapon weapon = ResolveWeapon(i);
 				if (weapon != null)
@@ -671,49 +680,68 @@ namespace TPSBR
 
 		private Weapon ResolveWeapon(int slot)
 		{
-			if (slot < 0 || slot >= _weapons.Length)
+			if (slot < 0 || slot >= _weaponReferences.Length)
 				return null;
 
-			try
+			var localWeapon = _localWeapons[slot];
+			if (localWeapon != null)
 			{
-				var weapon = _weapons[slot];
-				if (weapon == null)
-				{
-					_localWeapons[slot] = null;
-					if (HasStateAuthority == true)
-					{
-						_weapons.Set(slot, null);
-					}
-					return null;
-				}
-
-				_localWeapons[slot] = weapon;
-				return weapon;
-			}
-			catch (Exception ex) when (IsRecoverableWeaponReadException(ex))
-			{
-				var localWeapon = _localWeapons[slot];
-				if (localWeapon != null && (localWeapon.Object == null || localWeapon.Object.IsValid == false))
+				if (localWeapon.Object == null || localWeapon.Object.IsValid == false)
 				{
 					_localWeapons[slot] = null;
 					localWeapon = null;
 				}
+			}
 
-				if (HasStateAuthority == true)
-				{
-					_weapons.Set(slot, null);
-				}
+			NetworkBehaviourId weaponReference = _weaponReferences[slot];
+			if (weaponReference == default || weaponReference == NetworkBehaviourId.None)
+			{
+				_localWeapons[slot] = null;
+				return null;
+			}
 
+			if (localWeapon != null && localWeapon.Id == weaponReference)
+			{
 				return localWeapon;
+			}
+
+			if (TryResolveBehaviourSafe(Runner, weaponReference, out Weapon weapon) == true && weapon != null)
+			{
+				if (weapon.Object != null && weapon.Object.IsValid == true)
+				{
+					_localWeapons[slot] = weapon;
+					return weapon;
+				}
+			}
+
+			if (HasStateAuthority == true)
+			{
+				_weaponReferences.Set(slot, NetworkBehaviourId.None);
+			}
+
+			_localWeapons[slot] = null;
+			return null;
+		}
+
+		private static bool TryResolveBehaviourSafe<T>(NetworkRunner runner, NetworkBehaviourId behaviourId, out T behaviour) where T : NetworkBehaviour
+		{
+			behaviour = null;
+			if (runner == null || behaviourId == default || behaviourId == NetworkBehaviourId.None)
+				return false;
+
+			try
+			{
+				return runner.TryFindBehaviour(behaviourId, out behaviour) == true && behaviour != null;
+			}
+			catch (Exception ex) when (IsFusionAssertException(ex))
+			{
+				behaviour = null;
+				return false;
 			}
 		}
 
-		private static bool IsRecoverableWeaponReadException(Exception ex)
+		private static bool IsFusionAssertException(Exception ex)
 		{
-			if (ex is InvalidCastException)
-				return true;
-
-			// Fusion assert exceptions can surface as "AssertException" depending on runtime assembly.
 			return ex != null && ex.GetType().Name == "AssertException";
 		}
 	}
