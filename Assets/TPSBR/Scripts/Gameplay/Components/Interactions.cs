@@ -198,17 +198,14 @@ namespace TPSBR
 			if (useAuthoritativeInputRay == true)
 			{
 				GameplayInput fixedInput = _character.Agent.AgentInput.FixedInput;
-				if (fixedInput.HasAimRay == true)
-				{
-					cameraPosition = fixedInput.AimRayOrigin;
-					cameraDirection = fixedInput.AimRayDirection;
+				cameraPosition = fixedInput.AimRayOrigin;
+				cameraDirection = fixedInput.AimRayDirection;
 
-					bool invalidInputPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
-					if (invalidInputPosition == false && cameraDirection.sqrMagnitude > 0.0001f)
-					{
-						cameraDirection.Normalize();
-						return true;
-					}
+				bool invalidInputPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
+				if (invalidInputPosition == false && cameraDirection.sqrMagnitude > 0.0001f)
+				{
+					cameraDirection.Normalize();
+					return true;
 				}
 			}
 

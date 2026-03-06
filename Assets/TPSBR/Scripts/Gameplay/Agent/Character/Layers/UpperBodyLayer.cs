@@ -48,14 +48,17 @@ namespace TPSBR
 
 			if (_unequip.IsFinished(disarmTime) == true)
 			{
-				_weapons.DisarmCurrentWeapon();
-
 				if (_weapons.PendingWeaponSlot > 0)
 				{
 					if (_unequip.IsFinished(switchTime) == true)
 					{
 						_equip.SetAnimationTime(0.0f);
 						_equip.Activate(0.2f);
+
+						if (Controller is CharacterAnimationController characterAnimationController)
+						{
+							characterAnimationController.NotifyLegacyEquipStateActivated();
+						}
 					}
 				}
 				else
@@ -68,8 +71,6 @@ namespace TPSBR
 
 			if (_equip.IsFinished(equipTime) == true)
 			{
-				_weapons.ArmPendingWeapon();
-
 				if (_equip.IsFinished(1.0f) == true)
 				{
 					_equip.Deactivate(0.2f);

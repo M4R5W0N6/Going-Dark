@@ -21,22 +21,19 @@ namespace TPSBR
 		private ClipState _equipState;
 
 		private Weapons _weapons;
+		private bool _throwStarted;
 
 		// PUBLIC METHODS
 
 		public void ProcessThrow(bool start, bool hold)
 		{
+			_throwStarted = false;
+
 			AnimationState activeState = GetActiveState();
 
 			if (activeState == _throwState)
 			{
 				float time = _throwState.AnimationTime;
-
-				if (time > 0.45f)
-				{
-					// Fire half way in throw
-					_weapons.Fire();
-				}
 
 				if (time < 0.95f)
 					return;
@@ -51,6 +48,7 @@ namespace TPSBR
 			if (activeState == _armState && hold == false && _weapons.CanFireWeapon(start) == true)
 			{
 				_throwState.Activate(0.15f);
+				_throwStarted = true;
 			}
 			else if ((activeState == _holdState || activeState == _reloadState) && (start == true || hold == true) && _weapons.CanFireWeapon(start) == true)
 			{
@@ -86,6 +84,13 @@ namespace TPSBR
 			_equipState.Activate(0.2f);
 		}
 
+		public bool ConsumeThrowStarted()
+		{
+			bool throwStarted = _throwStarted;
+			_throwStarted = false;
+			return throwStarted;
+		}
+
 		// MixerState INTERFACE
 
 		protected override void OnInitialize()
@@ -96,11 +101,6 @@ namespace TPSBR
 		protected override void OnFixedUpdate()
 		{
 			AnimationState activeState = GetActiveState();
-
-			if (activeState == _equipState && _equipState.AnimationTime > 0.5f)
-			{
-				_weapons.ArmPendingWeapon();
-			}
 
 			if (activeState == _throwState && _throwState.AnimationTime > 0.95f)
 			{

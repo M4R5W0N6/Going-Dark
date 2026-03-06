@@ -233,15 +233,7 @@ namespace TPSBR
 
 			// SetKinematicSpeed
 
-			IMoveSpeedProvider moveSpeedProvider = kcc.MoveState;
-			if (moveSpeedProvider != null)
-			{
-				data.KinematicSpeed = moveSpeedProvider.GetBaseSpeed((Quaternion.Inverse(data.TransformRotation) * data.KinematicDirection).XZ0().normalized, default);
-			}
-			else
-			{
-				data.KinematicSpeed = data.KinematicDirection.IsAlmostZero(0.0001f) == true ? 0.0f : 1.0f;
-			}
+			data.KinematicSpeed = kcc.MoveState.GetBaseSpeed((Quaternion.Inverse(data.TransformRotation) * data.KinematicDirection).XZ0().normalized, default);
 			data.KinematicSpeed *= _speedMultiplier;
 
 			// SetKinematicVelocity

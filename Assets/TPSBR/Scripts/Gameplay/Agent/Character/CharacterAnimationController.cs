@@ -1,14 +1,29 @@
 namespace TPSBR
 {
 	using UnityEngine;
+	using FusionAnimator;
 	using Fusion.Addons.KCC;
 	using Fusion.Addons.AnimationController;
 
 	[DefaultExecutionOrder(3)]
-	public sealed class CharacterAnimationController : AnimationController
+	public sealed partial class CharacterAnimationController : AnimationController
 	{
+		private const float UPPER_BODY_EQUIP_ARM_TIME       = 0.4f;
+		private const float UPPER_BODY_UNEQUIP_DISARM_TIME  = 0.5f;
+		private const float UPPER_BODY_UNEQUIP_SWITCH_TIME  = 1.0f;
+		private const float UPPER_BODY_THROW_START_TIME     = 0.2f;
+		private const float UPPER_BODY_GRENDE_EQUIP_TIME    = 0.5f;
+		private const float UPPER_BODY_GRENDE_THROW_FIRE_TIME = 0.45f;
+		private const float UPPER_BODY_RELOAD_EXIT_TIME     = 0.9f;
+		private const float UPPER_BODY_RELOAD_RETURN_TIME   = 0.05f;
+		private const float SHOOT_TRIGGER_DURATION          = 0.05f;
+
 		// PRIVATE MEMBERS
 
+		[SerializeField]
+		private FusionAnimatorGraphAsset _fusionAnimatorGraph;
+		[SerializeField]
+		private bool _useFusionGraphMode;
 		[SerializeField]
 		private Transform       _leftHand;
 		[SerializeField]
@@ -29,11 +44,20 @@ namespace TPSBR
 		private UpperBodyLayer  _upperBody;
 		private ShootLayer      _shoot;
 		private LookLayer       _look;
+		private bool            _autoFusionGraphMode;
+		private int             _legacyArmPendingTick = int.MinValue;
+		private int             _legacyDisarmTick     = int.MinValue;
+		private int             _legacyFireTick       = int.MinValue;
+
+		private bool UseFusionGraphMode => (_useFusionGraphMode == true || _autoFusionGraphMode == true) && _fusionAnimatorGraph != null;
 
 		// PUBLIC METHODS
 
 		public bool CanJump()
 		{
+			if (UseFusionGraphMode == true)
+				return CanJumpFusion();
+
 			if (_fullBody.IsActive() == true)
 			{
 				if (_fullBody.Jump.IsActive(true) == true)
@@ -51,6 +75,9 @@ namespace TPSBR
 
 		public bool CanSwitchWeapons(bool force)
 		{
+			if (UseFusionGraphMode == true)
+				return CanSwitchWeaponsFusion(force);
+
 			if (_fullBody.IsActive() == true)
 			{
 				if (_fullBody.Dead.IsActive() == true)
@@ -72,6 +99,16 @@ namespace TPSBR
 
 		public void SetDead(bool isDead)
 		{
+			if (UseFusionGraphMode == true)
+			{
+				SetDeadFusion(isDead);
+				return;
+			}
+
+			bool currentlyDead = _fullBody != null && _fullBody.Dead.IsActive();
+			if (currentlyDead == isDead)
+				return;
+
 			if (isDead == true)
 			{
 				_fullBody.Dead.Activate(0.2f);
@@ -94,6 +131,9 @@ namespace TPSBR
 
 		public bool StartFire()
 		{
+			if (UseFusionGraphMode == true)
+				return StartFireFusion();
+
 			if (_fullBody.Dead.IsActive() == true)
 					return false;
 			if (_upperBody.HasActiveState() == true)
@@ -106,11 +146,24 @@ namespace TPSBR
 
 		public void ProcessThrow(bool start, bool hold)
 		{
+			if (UseFusionGraphMode == true)
+			{
+				ProcessThrowFusion(start, hold);
+				return;
+			}
+
 			_upperBody.Grenade.ProcessThrow(start, hold);
+			if (_upperBody.Grenade.ConsumeThrowStarted() == true)
+			{
+				QueueLegacyFire(UPPER_BODY_GRENDE_THROW_FIRE_TIME);
+			}
 		}
 
 		public bool StartReload()
 		{
+			if (UseFusionGraphMode == true)
+				return StartReloadFusion();
+
 			if (_upperBody.Grenade.IsActive() == true)
 				return _upperBody.Grenade.ProcessReload();
 
@@ -127,17 +180,25 @@ namespace TPSBR
 
 		public void SwitchWeapons()
 		{
+			if (UseFusionGraphMode == true)
+			{
+				SwitchWeaponsFusion();
+				return;
+			}
+
 			_upperBody.Reload.Deactivate(0.2f);
 
 			if (_weapons.PendingWeapon is ThrowableWeapon)
 			{
 				_upperBody.Grenade.Equip();
+				QueueLegacyArmPending(UPPER_BODY_GRENDE_EQUIP_TIME);
 				return;
 			}
 
 			if (_weapons.PendingWeaponSlot > 0)
 			{
 				_weapons.DisarmCurrentWeapon();
+				QueueLegacyArmPending(UPPER_BODY_EQUIP_ARM_TIME);
 
 				_upperBody.Equip.SetAnimationTime(0.0f);
 				_upperBody.Equip.Activate(0.2f);
@@ -146,11 +207,26 @@ namespace TPSBR
 			{
 				_upperBody.Unequip.SetAnimationTime(0.0f);
 				_upperBody.Unequip.Activate(0.2f);
+				QueueLegacyDisarm(UPPER_BODY_UNEQUIP_DISARM_TIME);
 			}
+		}
+
+		internal void NotifyLegacyEquipStateActivated()
+		{
+			if (UseFusionGraphMode == true)
+				return;
+
+			QueueLegacyArmPending(UPPER_BODY_EQUIP_ARM_TIME);
 		}
 
 		public void Turn(float angle)
 		{
+			if (UseFusionGraphMode == true)
+			{
+				TurnFusion(angle);
+				return;
+			}
+
 			_lowerBody.Turn.Refresh(angle);
 		}
 
@@ -163,6 +239,14 @@ namespace TPSBR
 
 		protected override void OnSpawned()
 		{
+			if (UseFusionGraphMode == true)
+			{
+				OnSpawnedFusion();
+				return;
+			}
+
+			ClearLegacyGameplayQueue();
+
 			if (HasStateAuthority == true)
 			{
 				Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
@@ -178,11 +262,21 @@ namespace TPSBR
 
 		protected override void OnFixedUpdate()
 		{
+			if (UseFusionGraphMode == true)
+			{
+				OnFixedUpdateFusion();
+				return;
+			}
+
+			ProcessLegacyGameplayQueue();
+
 			if (_jetpack.IsActive == true && _fullBody.Jetpack.IsActive() == false)
 			{
 				_upperBody.Reload.Deactivate(0.2f);
+				_upperBody.DeactivateAllStates(0.1f, true);
 
 				_weapons.DisarmCurrentWeapon();
+				ClearLegacyGameplayQueue();
 
 				_fullBody.Jetpack.Activate(0.1f);
 			}
@@ -196,8 +290,24 @@ namespace TPSBR
 
 		protected override void OnEvaluate()
 		{
+			if (UseFusionGraphMode == true)
+			{
+				OnEvaluateFusion();
+				return;
+			}
+
 			SnapWeapon();
 		}
+
+		protected override void OnInterpolate()
+		{
+			if (UseFusionGraphMode == true)
+			{
+				OnInterpolateFusion();
+			}
+		}
+
+		protected override bool UseBuiltInLayerEvaluation => UseFusionGraphMode == false;
 
 		// MonoBehaviour INTERFACE
 
@@ -210,6 +320,17 @@ namespace TPSBR
 			_weapons    = this.GetComponentNoAlloc<Weapons>();
 			_jetpack    = this.GetComponentNoAlloc<Jetpack>();
 
+			if (_fusionAnimatorGraph != null && _useFusionGraphMode == false && (Layers == null || Layers.Count == 0))
+			{
+				_autoFusionGraphMode = true;
+			}
+
+			if (UseFusionGraphMode == true)
+			{
+				AwakeFusion();
+				return;
+			}
+
 			_locomotion = FindLayer<LocomotionLayer>();
 			_fullBody   = FindLayer<FullBodyLayer>();
 			_lowerBody  = FindLayer<LowerBodyLayer>();
@@ -217,7 +338,10 @@ namespace TPSBR
 			_shoot      = FindLayer<ShootLayer>();
 			_look       = FindLayer<LookLayer>();
 
-			_kcc.MoveState = _locomotion.FindState<MoveState>();
+			if (_kcc != null && _locomotion != null)
+			{
+				_kcc.MoveState = _locomotion.FindState<MoveState>();
+			}
 		}
 
 		// PRIVATE METHODS
@@ -284,6 +408,9 @@ namespace TPSBR
 
 		private bool CanSnapHand()
 		{
+			if (UseFusionGraphMode == true)
+				return CanSnapHandFusion();
+
 			if (_fullBody.Dead.IsActive() == true || _fullBody.Jetpack.IsActive() == true)
 				return false;
 
@@ -299,5 +426,79 @@ namespace TPSBR
 
 			return true;
 		}
+
+		public new void SetInterlacedEvaluation(EEvaluationTarget target, int frames, int seed)
+		{
+			if (UseFusionGraphMode == true)
+				return;
+
+			base.SetInterlacedEvaluation(target, frames, seed);
+		}
+
+		private void QueueLegacyArmPending(float delaySeconds)
+		{
+			QueueLegacyTick(ref _legacyArmPendingTick, delaySeconds);
+		}
+
+		private void QueueLegacyDisarm(float delaySeconds)
+		{
+			QueueLegacyTick(ref _legacyDisarmTick, delaySeconds);
+		}
+
+		private void QueueLegacyFire(float delaySeconds)
+		{
+			QueueLegacyTick(ref _legacyFireTick, delaySeconds);
+		}
+
+		private void QueueLegacyTick(ref int targetTick, float delaySeconds)
+		{
+			int scheduledTick = GetCurrentTick() + SecondsToTicks(delaySeconds);
+			if (targetTick == int.MinValue || scheduledTick < targetTick)
+			{
+				targetTick = scheduledTick;
+			}
+		}
+
+		private void ProcessLegacyGameplayQueue()
+		{
+			int tick = GetCurrentTick();
+
+			if (_legacyDisarmTick != int.MinValue && tick >= _legacyDisarmTick)
+			{
+				_weapons.DisarmCurrentWeapon();
+				_legacyDisarmTick = int.MinValue;
+			}
+
+			if (_legacyArmPendingTick != int.MinValue && tick >= _legacyArmPendingTick)
+			{
+				_weapons.ArmPendingWeapon();
+				_legacyArmPendingTick = int.MinValue;
+			}
+
+			if (_legacyFireTick != int.MinValue && tick >= _legacyFireTick)
+			{
+				_weapons.Fire();
+				_legacyFireTick = int.MinValue;
+			}
+		}
+
+		private void ClearLegacyGameplayQueue()
+		{
+			_legacyArmPendingTick = int.MinValue;
+			_legacyDisarmTick = int.MinValue;
+			_legacyFireTick = int.MinValue;
+		}
+
+		private int GetCurrentTick()
+		{
+			return Runner != null ? Runner.Tick.Raw : 0;
+		}
+
+		private int SecondsToTicks(float seconds)
+		{
+			float deltaTime = Runner != null ? Runner.DeltaTime : 0.02f;
+			return Mathf.Max(1, Mathf.CeilToInt(seconds / Mathf.Max(0.0001f, deltaTime)));
+		}
+
 	}
 }

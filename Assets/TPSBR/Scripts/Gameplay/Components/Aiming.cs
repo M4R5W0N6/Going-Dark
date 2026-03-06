@@ -31,10 +31,29 @@ namespace TPSBR
 		private bool _surfaceDeflection = true;
 		[SerializeField, Range(1, 16)]
 		private int _surfaceDeflectionIterations = 6;
+		[SerializeField, Min(0.05f)]
+		private float _surfaceDeflectionStepDistance = 0.6f;
 		[SerializeField, Min(0.001f)]
 		private float _surfaceDeflectionSurfaceOffset = 0.02f;
 		[SerializeField, Min(0.05f)]
 		private float _surfaceDeflectionMaxTravelDistance = 8.0f;
+
+		[Networked]
+		private Vector3 _replicatedAimRayOrigin { get; set; }
+		[Networked]
+		private Vector3 _replicatedAimRayDirection { get; set; }
+		[Networked]
+		private NetworkBool _replicatedHasAimRay { get; set; }
+		[Networked]
+		private Vector3 _replicatedFireOrigin { get; set; }
+		[Networked]
+		private Vector3 _replicatedCameraHitPoint { get; set; }
+		[Networked]
+		private Vector3 _replicatedFireHitPoint { get; set; }
+		[Networked]
+		private NetworkBool _replicatedHasAimHitPoints { get; set; }
+		[Networked]
+		private NetworkBool _replicatedAimIsUndesiredTargetPoint { get; set; }
 
 		private Health     _health;
 		private Weapons    _weapons;
@@ -45,6 +64,8 @@ namespace TPSBR
 		private Transform  _targetPositionProxy;
 		private Transform  _screenHitPointProxy;
 		private Transform  _fireHitPointProxy;
+		private bool       _loggedMissingAuthoritativeAimRay;
+		private bool       _loggedMissingAuthoritativeHitPoints;
 
 		public Vector3 GetTargetPoint(bool checkReachability, bool resolveRenderHistory)
 		{
@@ -82,10 +103,41 @@ namespace TPSBR
 			characterHitPoint = default;
 			isUndesiredTargetPoint = false;
 
+			if (resolveRenderHistory == true)
+			{
+				bool hasLocalInputAuthority = HasLocalInputAimingAuthority() == true;
+				if (HasStateAuthority == true || hasLocalInputAuthority == true)
+				{
+					if (TryGetAimPipeline(true, out fireOrigin, out _, out cameraHitPoint, out characterHitPoint, out isUndesiredTargetPoint) == true)
+						return true;
+				}
+
+				return TryGetReplicatedAuthoritativeHitPoints(out fireOrigin, out cameraHitPoint, out characterHitPoint, out isUndesiredTargetPoint);
+			}
+
 			if (TryGetAimPipeline(resolveRenderHistory, out fireOrigin, out _, out cameraHitPoint, out characterHitPoint, out isUndesiredTargetPoint) == false)
 				return false;
 
 			return true;
+		}
+
+		public bool TryGetCrosshairRay(bool resolveRenderHistory, out Vector3 rayOrigin, out Vector3 rayDirection)
+		{
+			rayOrigin = default;
+			rayDirection = default;
+
+			return TryResolveCrosshairRay(resolveRenderHistory, out rayOrigin, out rayDirection);
+		}
+
+		public bool HasDeterministicLookAtSource(bool resolveRenderHistory)
+		{
+			if (resolveRenderHistory == false)
+				return true;
+
+			if (TryGetAuthoritativeInputAimRay(out _, out _) == true)
+				return true;
+
+			return _replicatedHasAimHitPoints == true;
 		}
 
 		public void GetAimPose(bool resolveRenderHistory, out Vector3 origin, out Vector3 point)
@@ -137,12 +189,11 @@ namespace TPSBR
 			if (_character == null)
 				return false;
 
-			bool hasLocalInputAuthority = _character.HasInputAuthority == true &&
+			bool hasLocalRenderAuthority = IsLocallyObservedAimingOwner() == true &&
 				Context != null &&
-				Context.HasInput == true &&
 				Context.Camera != null;
 
-			if (resolveRenderHistory == false && hasLocalInputAuthority == true)
+			if (resolveRenderHistory == false && hasLocalRenderAuthority == true)
 			{
 				Context.Camera.SyncForGameplayRender();
 				Context.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out Quaternion postBlendRotation, out _);
@@ -173,6 +224,40 @@ namespace TPSBR
 		public override void Despawned(NetworkRunner runner, bool hasState)
 		{
 			CleanupDebugHitPointProxies();
+		}
+
+		public override void FixedUpdateNetwork()
+		{
+			if (HasStateAuthority == false)
+				return;
+
+			if (TryGetAuthoritativeInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection) == true)
+			{
+				_replicatedAimRayOrigin = rayOrigin;
+				_replicatedAimRayDirection = rayDirection;
+				_replicatedHasAimRay = true;
+				_loggedMissingAuthoritativeAimRay = false;
+			}
+			else if (_loggedMissingAuthoritativeAimRay == false)
+			{
+				Debug.LogWarning($"[{nameof(Aiming)}] Missing authoritative aim ray in FixedUpdateNetwork for state authority object {Object?.Id}.", this);
+				_loggedMissingAuthoritativeAimRay = true;
+			}
+
+			if (TryGetAimPipeline(true, out Vector3 fireOrigin, out _, out Vector3 cameraHitPoint, out Vector3 fireHitPoint, out bool isUndesiredTargetPoint) == true)
+			{
+				_replicatedFireOrigin = fireOrigin;
+				_replicatedCameraHitPoint = cameraHitPoint;
+				_replicatedFireHitPoint = fireHitPoint;
+				_replicatedAimIsUndesiredTargetPoint = isUndesiredTargetPoint;
+				_replicatedHasAimHitPoints = true;
+				_loggedMissingAuthoritativeHitPoints = false;
+			}
+			else if (_loggedMissingAuthoritativeHitPoints == false)
+			{
+				Debug.LogWarning($"[{nameof(Aiming)}] Missing authoritative hitpoint chain in FixedUpdateNetwork for state authority object {Object?.Id}.", this);
+				_loggedMissingAuthoritativeHitPoints = true;
+			}
 		}
 
 		public override void Render()
@@ -255,54 +340,13 @@ namespace TPSBR
 			return false;
 		}
 
-		private bool TryGetCameraAimHitPoint(bool resolveRenderHistory, Vector3 targetPosition, out Vector3 cameraPosition, out Vector3 point)
+		private bool TryGetCameraAimHitPoint(bool resolveRenderHistory, out Vector3 cameraPosition, out Vector3 point)
 		{
 			cameraPosition = default;
 			point = default;
 			IsCrosshairOnHiddenLayer = false;
 			IsCrosshairOnAgent = false;
-			Vector3 cameraRayDirection = default;
-			bool hasExplicitCameraRayDirection = false;
-
-			bool requiresAuthoritativeInputRay = resolveRenderHistory == true &&
-				Object != null &&
-				Object.InputAuthority != PlayerRef.None;
-
-			if (requiresAuthoritativeInputRay == true)
-			{
-				if (TryGetAuthoritativeInputAimRay(out cameraPosition, out cameraRayDirection) == false)
-					return false;
-
-				hasExplicitCameraRayDirection = true;
-			}
-
-			bool hasLocalInputAuthority = _character != null &&
-				_character.HasInputAuthority == true &&
-				Context != null &&
-				Context.HasInput == true;
-
-			// Use local post-blend CM pose only for the locally controlled agent.
-			// Remote agents must use their own replicated camera transform.
-			if (hasExplicitCameraRayDirection == false &&
-				resolveRenderHistory == false &&
-				hasLocalInputAuthority == true &&
-				Context != null &&
-				Context.Camera != null)
-			{
-				Context.Camera.SyncForGameplayRender();
-				Context.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out _, out _);
-				cameraPosition = postBlendPosition;
-			}
-			else if (hasExplicitCameraRayDirection == false)
-			{
-				if (_character == null)
-					return false;
-
-				TransformData observedCamera = _character.GetCameraTransform(resolveRenderHistory);
-				cameraPosition = observedCamera.Position;
-			}
-
-			if (float.IsNaN(cameraPosition.x) == true || float.IsNaN(cameraPosition.y) == true || float.IsNaN(cameraPosition.z) == true)
+			if (TryResolveCrosshairRay(resolveRenderHistory, out cameraPosition, out Vector3 cameraRayDirection) == false)
 				return false;
 
 			LayerMask cameraHitMask = ResolveCameraHitMask();
@@ -310,14 +354,6 @@ namespace TPSBR
 			if (_weapons != null)
 			{
 				cameraTargetHitMask |= _weapons.HitMask;
-			}
-			if (hasExplicitCameraRayDirection == false)
-			{
-				Vector3 cameraToTarget = targetPosition - cameraPosition;
-				if (cameraToTarget.sqrMagnitude <= 0.0001f)
-					return false;
-
-				cameraRayDirection = cameraToTarget.normalized;
 			}
 
 			float cameraRayDistance = Mathf.Max(1.0f, _cameraRayDistance);
@@ -355,10 +391,209 @@ namespace TPSBR
 			return true;
 		}
 
+		private bool TryResolveCrosshairRay(bool resolveRenderHistory, out Vector3 cameraPosition, out Vector3 cameraRayDirection)
+		{
+			cameraPosition = default;
+			cameraRayDirection = default;
+
+			if (_character == null)
+				return false;
+
+			bool hasLocalRenderAuthority = IsLocallyObservedAimingOwner() == true &&
+				Context != null &&
+				Context.Camera != null;
+
+			if (resolveRenderHistory == true)
+			{
+				if (TryGetAuthoritativeInputAimRay(out cameraPosition, out cameraRayDirection) == true)
+					return true;
+
+				return TryGetReplicatedAuthoritativeAimRay(out cameraPosition, out cameraRayDirection);
+			}
+
+			if (resolveRenderHistory == false && hasLocalRenderAuthority == true)
+			{
+				Context.Camera.SyncForGameplayRender();
+				Context.Camera.GetPostBlendCameraPose(out Vector3 postBlendPosition, out Quaternion postBlendRotation, out float fieldOfView);
+				cameraPosition = postBlendPosition;
+
+				if (TryResolveCrosshairDirection(postBlendRotation, fieldOfView, out cameraRayDirection) == false)
+					return false;
+
+				return true;
+			}
+
+			return TryGetObservedCrosshairRay(resolveRenderHistory, out cameraPosition, out cameraRayDirection);
+		}
+
+		private bool TryGetReplicatedAuthoritativeAimRay(out Vector3 rayOrigin, out Vector3 rayDirection)
+		{
+			rayOrigin = default;
+			rayDirection = default;
+
+			if (_replicatedHasAimRay == false)
+				return false;
+
+			rayOrigin = _replicatedAimRayOrigin;
+			rayDirection = _replicatedAimRayDirection;
+			bool invalidOrigin = float.IsNaN(rayOrigin.x) || float.IsNaN(rayOrigin.y) || float.IsNaN(rayOrigin.z);
+			if (invalidOrigin == true || rayDirection.sqrMagnitude <= 0.0001f)
+				return false;
+
+			rayDirection.Normalize();
+			return true;
+		}
+
+		private bool TryGetReplicatedAuthoritativeHitPoints(out Vector3 fireOrigin, out Vector3 cameraHitPoint, out Vector3 fireHitPoint, out bool isUndesiredTargetPoint)
+		{
+			fireOrigin = default;
+			cameraHitPoint = default;
+			fireHitPoint = default;
+			isUndesiredTargetPoint = false;
+
+			if (_replicatedHasAimHitPoints == false)
+				return false;
+
+			fireOrigin = _replicatedFireOrigin;
+			cameraHitPoint = _replicatedCameraHitPoint;
+			fireHitPoint = _replicatedFireHitPoint;
+			isUndesiredTargetPoint = _replicatedAimIsUndesiredTargetPoint;
+
+			bool invalidFireOrigin = float.IsNaN(fireOrigin.x) || float.IsNaN(fireOrigin.y) || float.IsNaN(fireOrigin.z);
+			bool invalidCameraHitPoint = float.IsNaN(cameraHitPoint.x) || float.IsNaN(cameraHitPoint.y) || float.IsNaN(cameraHitPoint.z);
+			bool invalidFireHitPoint = float.IsNaN(fireHitPoint.x) || float.IsNaN(fireHitPoint.y) || float.IsNaN(fireHitPoint.z);
+			if (invalidFireOrigin == true || invalidCameraHitPoint == true || invalidFireHitPoint == true)
+				return false;
+
+			return true;
+		}
+
+		private bool TryGetObservedCrosshairRay(bool resolveRenderHistory, out Vector3 cameraPosition, out Vector3 cameraRayDirection)
+		{
+			cameraPosition = default;
+			cameraRayDirection = default;
+
+			if (_character == null)
+				return false;
+
+			TransformData observedCamera = _character.GetCameraTransform(resolveRenderHistory);
+			cameraPosition = observedCamera.Position;
+			bool invalidPosition = float.IsNaN(cameraPosition.x) || float.IsNaN(cameraPosition.y) || float.IsNaN(cameraPosition.z);
+			if (invalidPosition == true)
+				return false;
+
+			float fieldOfView = ResolveCrosshairFieldOfView();
+			if (TryResolveCrosshairDirection(observedCamera.Rotation, fieldOfView, out cameraRayDirection) == false)
+				return false;
+
+			return true;
+		}
+
+		private float ResolveCrosshairFieldOfView()
+		{
+			if (_character != null)
+			{
+				float currentFov = _character.CurrentFOV;
+				if (float.IsNaN(currentFov) == false && currentFov > 0.01f)
+					return currentFov;
+
+				float desiredFov = _character.DesiredFOV;
+				if (float.IsNaN(desiredFov) == false && desiredFov > 0.01f)
+					return desiredFov;
+
+				float baseFov = _character.BaseFOV;
+				if (float.IsNaN(baseFov) == false && baseFov > 0.01f)
+					return baseFov;
+			}
+
+			if (Context != null && Context.Camera != null && Context.Camera.Camera != null)
+			{
+				float cameraFov = Context.Camera.Camera.fieldOfView;
+				if (float.IsNaN(cameraFov) == false && cameraFov > 0.01f)
+					return cameraFov;
+			}
+
+			return 60.0f;
+		}
+
+		private bool TryResolveCrosshairDirection(Quaternion cameraRotation, float fieldOfView, out Vector3 direction)
+		{
+			direction = cameraRotation * Vector3.forward;
+
+			Vector2 crosshairViewport = new Vector2(0.5f, 0.5f);
+			SceneContext sceneContext = Context;
+			if (sceneContext != null)
+			{
+				if (sceneContext.HasUICrosshairViewport == true)
+				{
+					crosshairViewport = sceneContext.UICrosshairViewport;
+				}
+				else if (sceneContext.HasUICrosshairViewportX == true)
+				{
+					crosshairViewport = new Vector2(sceneContext.UICrosshairViewportX, 0.5f);
+				}
+			}
+
+			crosshairViewport.x = Mathf.Clamp01(crosshairViewport.x);
+			crosshairViewport.y = Mathf.Clamp01(crosshairViewport.y);
+
+			float aspect = 0.0f;
+			Camera outputCamera = sceneContext != null && sceneContext.Camera != null ? sceneContext.Camera.Camera : null;
+			if (outputCamera != null)
+			{
+				Rect pixelRect = outputCamera.pixelRect;
+				if (pixelRect.width > 0.01f && pixelRect.height > 0.01f)
+				{
+					aspect = pixelRect.width / pixelRect.height;
+				}
+				else if (outputCamera.aspect > 0.0001f)
+				{
+					aspect = outputCamera.aspect;
+				}
+			}
+
+			if (aspect <= 0.0001f && Screen.height > 0)
+			{
+				aspect = (float)Screen.width / Screen.height;
+			}
+
+			if (aspect > 0.0001f && fieldOfView > 0.0f && float.IsNaN(fieldOfView) == false)
+			{
+				float tanHalfVerticalFov = Mathf.Tan(fieldOfView * Mathf.Deg2Rad * 0.5f);
+				if (tanHalfVerticalFov > 0.0001f && float.IsNaN(tanHalfVerticalFov) == false)
+				{
+					float normalizedX = crosshairViewport.x * 2.0f - 1.0f;
+					float normalizedY = crosshairViewport.y * 2.0f - 1.0f;
+
+					Vector3 localDirection = new Vector3(
+						normalizedX * tanHalfVerticalFov * aspect,
+						normalizedY * tanHalfVerticalFov,
+						1.0f);
+
+					if (localDirection.sqrMagnitude > 0.0001f)
+					{
+						direction = cameraRotation * localDirection.normalized;
+					}
+				}
+			}
+
+			if (direction.sqrMagnitude <= 0.0001f)
+				return false;
+
+			direction.Normalize();
+			return true;
+		}
+
 		private bool TryGetAuthoritativeInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection)
 		{
 			rayOrigin = default;
 			rayDirection = default;
+
+			if (TryGetRunnerInputAimRay(out rayOrigin, out rayDirection) == true)
+				return true;
+
+			if (IsProxy == true)
+				return false;
 
 			if (_character == null || _character.Agent == null || _character.Agent.AgentInput == null)
 				return false;
@@ -369,6 +604,28 @@ namespace TPSBR
 
 			rayOrigin = fixedInput.AimRayOrigin;
 			rayDirection = fixedInput.AimRayDirection;
+
+			bool invalidOrigin = float.IsNaN(rayOrigin.x) || float.IsNaN(rayOrigin.y) || float.IsNaN(rayOrigin.z);
+			if (invalidOrigin == true || rayDirection.sqrMagnitude <= 0.0001f)
+				return false;
+
+			rayDirection.Normalize();
+			return true;
+		}
+
+		private bool TryGetRunnerInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection)
+		{
+			rayOrigin = default;
+			rayDirection = default;
+
+			if (Runner == null || Object == null || Object.InputAuthority == PlayerRef.None)
+				return false;
+
+			if (Runner.TryGetInputForPlayer(Object.InputAuthority, out GameplayInput input) == false || input.HasAimRay == false)
+				return false;
+
+			rayOrigin = input.AimRayOrigin;
+			rayDirection = input.AimRayDirection;
 
 			bool invalidOrigin = float.IsNaN(rayOrigin.x) || float.IsNaN(rayOrigin.y) || float.IsNaN(rayOrigin.z);
 			if (invalidOrigin == true || rayDirection.sqrMagnitude <= 0.0001f)
@@ -448,7 +705,7 @@ namespace TPSBR
 			}
 
 			Vector3 rawScreenHitPoint = default;
-			bool hasCameraHitPoint = TryGetCameraAimHitPoint(resolveRenderHistory, targetPosition, out Vector3 cameraPosition, out rawScreenHitPoint);
+			bool hasCameraHitPoint = TryGetCameraAimHitPoint(resolveRenderHistory, out Vector3 cameraPosition, out rawScreenHitPoint);
 			if (hasCameraHitPoint == false)
 				return false;
 
@@ -767,10 +1024,22 @@ namespace TPSBR
 
 		private bool IsLocalDebugOwner()
 		{
-			return _character != null &&
-				_character.HasInputAuthority == true &&
-				Context != null &&
-				Context.HasInput == true;
+			return IsLocallyObservedAimingOwner();
+		}
+
+		private bool IsLocallyObservedAimingOwner()
+		{
+			return Agent.IsLocalObservedInputOwner(_character != null ? _character.Agent : null);
+		}
+
+		private bool HasLocalInputAimingAuthority()
+		{
+			Agent agent = _character != null ? _character.Agent : null;
+			if (agent == null || agent.HasInputAuthority == false)
+				return false;
+
+			SceneContext context = agent.Context;
+			return context != null && context.HasInput == true;
 		}
 
 		private void EnsureDebugHitPointProxies()

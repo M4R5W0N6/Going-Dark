@@ -96,6 +96,12 @@ namespace TPSBR
 			int setID = GetSetID();
 			if (setID < 0)
 				return;
+			if (_sets == null || setID >= _sets.Length)
+				return;
+
+			LookSet set = _sets[setID];
+			if (set == null || set.Nodes == null || set.Nodes.Length == 0)
+				return;
 
 			for (int i = 0, count = _inputs; i < count; ++i)
 			{
@@ -103,7 +109,7 @@ namespace TPSBR
 			}
 
 			int   node  = 0;
-			float angle = (pitch + 720.0f + _sets[setID].Offset) % 360.0f;
+			float angle = (pitch + 720.0f + set.Offset) % 360.0f;
 
 			if (angle > 180.0f)
 			{
@@ -111,7 +117,12 @@ namespace TPSBR
 				angle = 360.0f - angle;
 			}
 
-			angle = Mathf.Clamp(Mathf.Pow(angle, _sets[setID].Power), 0.0f, 90.0f);
+			if (node >= set.Nodes.Length)
+			{
+				node = set.Nodes.Length - 1;
+			}
+
+			angle = Mathf.Clamp(Mathf.Pow(angle, set.Power), 0.0f, 90.0f);
 
 			if (angle.IsNaN() == true)
 			{
@@ -119,8 +130,10 @@ namespace TPSBR
 			}
 
 			int clipIndex = setID * 2 + node;
+			if (clipIndex < 0 || clipIndex >= _inputs)
+				return;
 
-			_sets[setID].Nodes[node].PlayableClip.SetTime(angle / 90.0f);
+			set.Nodes[node].PlayableClip.SetTime(angle / 90.0f);
 
 			_mixer.SetInputWeight(clipIndex, 1.0f);
 		}
@@ -136,7 +149,7 @@ namespace TPSBR
 				currentWeaponSlot = 1; // For grenades we use pistol set
 			}
 
-			if (currentWeaponSlot < 0)
+			if (currentWeaponSlot < 0 || _sets == null || currentWeaponSlot >= _sets.Length)
 				return -1;
 
 			return currentWeaponSlot;

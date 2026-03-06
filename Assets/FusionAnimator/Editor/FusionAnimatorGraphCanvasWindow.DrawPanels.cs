@@ -5131,14 +5131,14 @@ namespace FusionAnimator.Editor
                 {
                     EnsureUndo();
                     child.Threshold = RoundBlendValue(threshold);
-                    if (blendTree.Type == FusionAnimatorBlendTreeType.OneD)
+                    if (blendTree.Type == FusionAnimatorBlendTreeType.OneD || blendTree.Type == FusionAnimatorBlendTreeType.OneDSignedSpeed)
                     {
                         child.Position = new Vector2(child.Threshold, 0.0f);
                     }
                     changed = true;
                 }
 
-                if (blendTree.Type == FusionAnimatorBlendTreeType.OneD)
+                if (blendTree.Type == FusionAnimatorBlendTreeType.OneD || blendTree.Type == FusionAnimatorBlendTreeType.OneDSignedSpeed)
                 {
                     float xPosition = EditorGUILayout.FloatField(new GUIContent("Position X", "1D child position (X axis)."), child.Position.x);
                     float roundedX = RoundBlendValue(xPosition);
@@ -5200,6 +5200,7 @@ namespace FusionAnimator.Editor
             switch (blendTree.Type)
             {
                 case FusionAnimatorBlendTreeType.OneD:
+                case FusionAnimatorBlendTreeType.OneDSignedSpeed:
                 {
                     float directionalThreshold = GetDirectionalThresholdFromName(name);
                     if (Mathf.Abs(directionalThreshold) > 0.0001f || NameImpliesForward(name))

@@ -12,6 +12,19 @@ namespace TPSBR
 
 		public bool IsObserved => Context != null && Context.ObservedAgent == this;
 
+		public static bool IsLocalObservedInputOwner(Agent agent)
+		{
+			if (agent == null || agent.HasInputAuthority == false)
+				return false;
+
+			SceneContext context = agent.Context;
+			if (context == null || context.HasInput == false)
+				return false;
+
+			Agent observedAgent = context.ObservedAgent;
+			return observedAgent == null || observedAgent == agent;
+		}
+
 		public AgentInput        AgentInput   => _agentInput;
 		public Aiming            Aiming       => _aiming;
 		public Interactions      Interactions => _interactions;
@@ -471,12 +484,17 @@ namespace TPSBR
 				return;
 
 			float fallVelocity = -kccData.DesiredVelocity.y;
+			if (float.IsFinite(fallVelocity) == false)
+				return;
+
 			for (int i = 1; i < 3; ++i)
 			{
 				var historyData = _character.CharacterController.GetHistoryData(kccData.Tick - i);
 				if (historyData != null)
 				{
 					fallVelocity = Mathf.Max(fallVelocity, -historyData.DesiredVelocity.y);
+					if (float.IsFinite(fallVelocity) == false)
+						return;
 				}
 			}
 
@@ -484,9 +502,13 @@ namespace TPSBR
 				return;
 
 			float damage = MathUtility.Map(_minFallDamageVelocity, _maxFallDamageVelocity, 0f, _maxFallDamage, fallVelocity);
+			if (float.IsFinite(damage) == false)
+				return;
 
 			if (damage <= _minFallDamage)
 				return;
+
+			Debug.LogWarning($"[{nameof(Agent)}] Fall damage candidate for {name} at tick {Runner.Tick.Raw}: fallVelocity={fallVelocity:F3}, damage={damage:F3}, grounded={kccData.IsGrounded}, wasGrounded={kccData.WasGrounded}");
 
 			var hitData = new HitData
 			{

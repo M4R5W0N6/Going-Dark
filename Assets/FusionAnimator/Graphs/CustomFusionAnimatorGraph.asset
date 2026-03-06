@@ -203,7 +203,7 @@ MonoBehaviour:
     PreviewInputScale: 1
     PreviewBoolInputOperator: 4
     PreviewBoolInputCompareValue: 0.5
-  - Id: param_equip_trigger
+  - Id: param_fdeb490900344b2983ddd7ee07d23c36
     Name: State_EquipTrigger
     Type: 3
     DefaultBool: 0
@@ -215,6 +215,18 @@ MonoBehaviour:
     PreviewInputScale: 1
     PreviewBoolInputOperator: 0
     PreviewBoolInputCompareValue: 0
+  - Id: param_d1dae8a80361483287fb4410ee31e468
+    Name: State_LookAt
+    Type: 4
+    DefaultBool: 0
+    Invert: 0
+    DefaultInt: 0
+    DefaultFloat: 0
+    DefaultVector2: {x: 0, y: 0}
+    PreviewInputBinding: vector2:RightStick
+    PreviewInputScale: 1
+    PreviewBoolInputOperator: 4
+    PreviewBoolInputCompareValue: 0.5
   BindingGroups:
   - Id: group_77290d31cf034a73aa90d88964596d65
     Name: Move
@@ -1324,7 +1336,7 @@ MonoBehaviour:
   - Id: state_9404df2fc8ae4ab487c24198b17b3c3d
     Name: Shoot
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: 90, y: -35}
+    NodePosition: {x: -318, y: 104}
     MinDurationSeconds: 0.2
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -1359,7 +1371,7 @@ MonoBehaviour:
   - Id: state_9c372a49a89942df8d0b2a5b205fda9e
     Name: Reload
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -212, y: 267}
+    NodePosition: {x: -315, y: 329}
     MinDurationSeconds: 1
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -1429,7 +1441,7 @@ MonoBehaviour:
   - Id: state_00e9b6d941694303859053ecf36a7689
     Name: Aim
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -315, y: -161}
+    NodePosition: {x: -318, y: 215}
     MinDurationSeconds: 0
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -1509,7 +1521,7 @@ MonoBehaviour:
       Type: 5
       ParameterXId: 
       ParameterYId: 
-      ParameterVector2Id: param_23bddf65568349caacf214092d4b8d03
+      ParameterVector2Id: param_d1dae8a80361483287fb4410ee31e468
       PoseTimeParameterId: 
       DirectBlendParameterId: 
       InputOffsetX: 0
@@ -1733,7 +1745,7 @@ MonoBehaviour:
     Name: End_Jump
     LayerId: layer_3e432cac3d0b4918b696995479a1444d
     NodePosition: {x: -66, y: 87}
-    MinDurationSeconds: 0.5
+    MinDurationSeconds: 0.25
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 0
@@ -2099,7 +2111,7 @@ MonoBehaviour:
     Name: Move/Walk End
     LayerId: layer_3e432cac3d0b4918b696995479a1444d
     NodePosition: {x: -744, y: 78}
-    MinDurationSeconds: 1
+    MinDurationSeconds: 0.5
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 1
@@ -2314,7 +2326,7 @@ MonoBehaviour:
     Name: Move/Run End
     LayerId: layer_3e432cac3d0b4918b696995479a1444d
     NodePosition: {x: -445, y: 502}
-    MinDurationSeconds: 1
+    MinDurationSeconds: 0.5
     CanTransitionOut: 1
     WriteDefaults: 0
     MotionType: 1
@@ -2462,7 +2474,7 @@ MonoBehaviour:
       Speed: 1
       Loop: 1
     BlendTree:
-      Type: 1
+      Type: 6
       ParameterXId: param_23bddf65568349caacf214092d4b8d03.x
       ParameterYId: 
       ParameterVector2Id: 
@@ -2477,7 +2489,7 @@ MonoBehaviour:
         ReferenceMode: 0
         BindingId: 
         Clip: {fileID: 7400006, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
-        Threshold: 0
+        Threshold: -1
         Position: {x: -1, y: 0}
         DirectParameterId: 
         TimeScale: 1
@@ -2485,7 +2497,7 @@ MonoBehaviour:
         ReferenceMode: 0
         BindingId: 
         Clip: {fileID: 7400002, guid: d6eb43744dd87b848a1838dabd494c2e, type: 3}
-        Threshold: 0
+        Threshold: 1
         Position: {x: 1, y: 0}
         DirectParameterId: 
         TimeScale: 1
@@ -2529,7 +2541,7 @@ MonoBehaviour:
   - Id: state_e8e8418ae90241b1943b81fbb8fc4503
     Name: Cycle Weapon/Equip
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -874, y: 107}
+    NodePosition: {x: -875, y: 103}
     MinDurationSeconds: 1
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -2564,7 +2576,7 @@ MonoBehaviour:
   - Id: state_a42f090f084b40548c4cbc3a26ed3a27
     Name: Cycle Weapon/Unequip
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee
-    NodePosition: {x: -1128, y: 103}
+    NodePosition: {x: -1094, y: 242}
     MinDurationSeconds: 1
     CanTransitionOut: 1
     WriteDefaults: 0
@@ -2621,52 +2633,6 @@ MonoBehaviour:
       Vector2Value: {x: 0, y: 0}
     - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
       Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_ebc63f971b67493f92dca2d66e5f2d79
-    Name: Transition
-    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
-    ToStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
-      Operator: 0
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_ccf4a8677ef24452b67abcaf66500e44
-    Name: Transition
-    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
-    ToStateId: state_9c372a49a89942df8d0b2a5b205fda9e
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_7e2055831edd487ba53f13730dce064d
-      Operator: 0
       UseAbsoluteValue: 0
       BoolValue: 0
       IntValue: 0
@@ -2748,174 +2714,6 @@ MonoBehaviour:
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_8d67bcc3e58d428e9b8e183fbc9c21f5
-    Name: Transition
-    FromStateId: state_6256137cab304779b0fc5d0fdeee5024
-    ToStateId: state_00e9b6d941694303859053ecf36a7689
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
-      Operator: 0
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_cace276310694faa86c67daa5a4a5006
-    Name: Transition
-    FromStateId: state_00e9b6d941694303859053ecf36a7689
-    ToStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_bf3d1959c1624ba2911b621128b706c2
-      Operator: 0
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_7eed70b8625b42218f58ec9ab8821740
-    Name: Transition
-    FromStateId: state_00e9b6d941694303859053ecf36a7689
-    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
-      Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
-      Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_dbf89ffd7e924e98931838ba083dafb9
-    Name: Transition
-    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
-    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
-      Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
-      Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_5e8bebae05e54cc38560a172aa3793bf
-    Name: Transition
-    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
-    ToStateId: state_00e9b6d941694303859053ecf36a7689
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions: []
-    PreviewResults: []
-  - Id: transition_9c71295a77814505976bb3e1f5c4d791
-    Name: Transition
-    FromStateId: state_9404df2fc8ae4ab487c24198b17b3c3d
-    ToStateId: state_9c372a49a89942df8d0b2a5b205fda9e
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions:
-    - ParameterId: param_7e2055831edd487ba53f13730dce064d
-      Operator: 0
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    - ParameterId: param_08e42afc50814f6b826b5e200aac248d
-      Operator: 1
-      UseAbsoluteValue: 0
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-    PreviewResults: []
-  - Id: transition_c33e57d5f78247ee8688be3a83247eae
-    Name: Transition
-    FromStateId: state_9c372a49a89942df8d0b2a5b205fda9e
-    ToStateId: state_6256137cab304779b0fc5d0fdeee5024
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions: []
     PreviewResults: []
   - Id: transition_a32513ec7c5d4e048ad2f38c31bf050f
     Name: Transition
@@ -3009,7 +2807,7 @@ MonoBehaviour:
     CanInterrupt: 1
     Conditions:
     - ParameterId: param_cc8aead836874dabbbe5d427661a9100
-      Operator: 0
+      Operator: 1
       UseAbsoluteValue: 0
       BoolValue: 0
       IntValue: 0
@@ -3710,7 +3508,7 @@ MonoBehaviour:
     ExitTimeNormalized: 1
     StartOffsetNormalized: 0
     FixedDuration: 1
-    BlendDurationSeconds: 0.1
+    BlendDurationSeconds: 0
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
@@ -3730,12 +3528,26 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions:
-    - ParameterId: param_23bddf65568349caacf214092d4b8d03.x
-      Operator: 4
-      UseAbsoluteValue: 1
+    - ParameterId: param_5ebe1fd6e81948568510f567363ed648
+      Operator: 0
+      UseAbsoluteValue: 0
       BoolValue: 0
       IntValue: 0
       FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
+      Operator: 7
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    - ParameterId: param_23bddf65568349caacf214092d4b8d03.x
+      Operator: 5
+      UseAbsoluteValue: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0.05
       Vector2Value: {x: 0, y: 0}
     PreviewResults: []
   - Id: transition_c3be1272710e4a19bda60fbcd95a61c2
@@ -3768,53 +3580,13 @@ MonoBehaviour:
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
     - ParameterId: param_23bddf65568349caacf214092d4b8d03.x
-      Operator: 4
+      Operator: 5
       UseAbsoluteValue: 1
       BoolValue: 0
       IntValue: 0
-      FloatValue: 0
+      FloatValue: 0.05
       Vector2Value: {x: 0, y: 0}
     PreviewResults: []
-  - Id: transition_9e4d8731386f4e01af98ce8952b4801a
-    Name: Entry
-    FromStateId: __entry__
-    ToStateId: state_a42f090f084b40548c4cbc3a26ed3a27
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions: []
-    PreviewResults: []
-  - Id: transition_52d9629973d64a348e82e58e4a1258a4
-    Name: Transition
-    FromStateId: state_a42f090f084b40548c4cbc3a26ed3a27
-    ToStateId: state_e8e8418ae90241b1943b81fbb8fc4503
-    Priority: 0
-    Mute: 0
-    Solo: 0
-    HasExitTime: 0
-    ExitTimeNormalized: 1
-    StartOffsetNormalized: 0
-    FixedDuration: 1
-    BlendDurationSeconds: 0.1
-    InterruptionSource: 3
-    CanInterrupt: 1
-    Conditions: []
-    PreviewResults:
-    - ParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
-      Operation: 1
-      BoolValue: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-      CycleMinValue: 0
-      CycleMaxValue: 2
   - Id: transition_d63aea6c3c9b4b9c82e48ceae5301295
     Name: Transition
     FromStateId: state_e8e8418ae90241b1943b81fbb8fc4503
@@ -3826,7 +3598,7 @@ MonoBehaviour:
     ExitTimeNormalized: 1
     StartOffsetNormalized: 0
     FixedDuration: 1
-    BlendDurationSeconds: 0.1
+    BlendDurationSeconds: 0
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions: []
@@ -3846,7 +3618,7 @@ MonoBehaviour:
     InterruptionSource: 3
     CanInterrupt: 1
     Conditions:
-    - ParameterId: param_equip_trigger
+    - ParameterId: param_fdeb490900344b2983ddd7ee07d23c36
       Operator: 0
       UseAbsoluteValue: 0
       BoolValue: 0
@@ -3893,6 +3665,76 @@ MonoBehaviour:
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
     PreviewResults: []
+  - Id: transition_a8f59d6bf0e64565813747166fa2c89f
+    Name: Transition
+    FromStateId: state_0c757e792ee84838a7778718d4272cf4
+    ToStateId: state_43c7960140cd4a0ab7f00c660a931d40
+    Priority: -1
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_9079d59bbe7c483cbec52edfc4c11bfa
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
+  - Id: transition_1827a63e1cdb4c0699b3a70c47ec1698
+    Name: Entry
+    FromStateId: __entry__
+    ToStateId: state_e8e8418ae90241b1943b81fbb8fc4503
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions: []
+    PreviewResults:
+    - ParameterId: param_36ffec0edbbd4072bbebb35dceef08e6
+      Operation: 1
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+      CycleMinValue: 0
+      CycleMaxValue: 2
+  - Id: transition_eccdb186e4ca4bfea86ae943a277c498
+    Name: Transition
+    FromStateId: __any__
+    ToStateId: state_00e9b6d941694303859053ecf36a7689
+    Priority: 0
+    Mute: 0
+    Solo: 0
+    HasExitTime: 0
+    ExitTimeNormalized: 1
+    StartOffsetNormalized: 0
+    FixedDuration: 1
+    BlendDurationSeconds: 0.1
+    InterruptionSource: 3
+    CanInterrupt: 1
+    Conditions:
+    - ParameterId: param_c1ad26f3ffec4ba6b43cfdb11f5c1963
+      Operator: 0
+      UseAbsoluteValue: 0
+      BoolValue: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+    PreviewResults: []
   ScopeUtilityNodeLayouts:
   - LayerId: layer_3e432cac3d0b4918b696995479a1444d
     ScopePath: 
@@ -3905,9 +3747,9 @@ MonoBehaviour:
     ScopePath: 
     HasScopeNodePosition: 0
     ScopeNodePosition: {x: 0, y: 0}
-    EntryNodePosition: {x: -587, y: 127}
+    EntryNodePosition: {x: -587, y: -39}
     AnyNodePosition: {x: -587, y: 267}
-    ExitNodePosition: {x: 185, y: 127}
+    ExitNodePosition: {x: -587, y: 69}
   - LayerId: layer_486c3da5769347838f95c16b986ccf8a
     ScopePath: 
     HasScopeNodePosition: 0
@@ -3925,7 +3767,7 @@ MonoBehaviour:
   - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     ScopePath: Grenade
     HasScopeNodePosition: 1
-    ScopeNodePosition: {x: -212, y: 392}
+    ScopeNodePosition: {x: -311, y: 443}
     EntryNodePosition: {x: -1119, y: 182}
     AnyNodePosition: {x: -1119, y: 280}
     ExitNodePosition: {x: -179, y: 280}
@@ -3939,10 +3781,10 @@ MonoBehaviour:
   - LayerId: layer_4766da9aa1624562a91b0139bfb45cee
     ScopePath: Cycle Weapon
     HasScopeNodePosition: 1
-    ScopeNodePosition: {x: -587, y: -12}
+    ScopeNodePosition: {x: -311, y: 541}
     EntryNodePosition: {x: -1334, y: 103}
     AnyNodePosition: {x: -1334, y: 241.5}
-    ExitNodePosition: {x: -635, y: 130}
+    ExitNodePosition: {x: -740, y: 103}
   ScopeTransitionSuppressions:
   - TransitionId: transition_52a07b17767641b78ee6415edc743a23
     LayerId: layer_4766da9aa1624562a91b0139bfb45cee

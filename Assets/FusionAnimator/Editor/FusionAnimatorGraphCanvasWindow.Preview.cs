@@ -2367,10 +2367,14 @@ namespace FusionAnimator.Editor
 
             float[] weights = new float[validChildren.Count];
             float explicitPoseTime01 = -1.0f;
+            float oneDSignedSpeedScale = 1.0f;
             switch (blendTree.Type)
             {
                 case FusionAnimatorBlendTreeType.OneD:
                     ResolveOneDWeights(blendTree, validChildren, weights);
+                    break;
+                case FusionAnimatorBlendTreeType.OneDSignedSpeed:
+                    ResolveOneDSignedSpeedWeights(blendTree, validChildren, weights, out oneDSignedSpeedScale);
                     break;
                 case FusionAnimatorBlendTreeType.TwoDSimpleDirectional:
                     ResolveTwoDSimpleDirectionalWeights(blendTree, validChildren, weights);
@@ -2415,7 +2419,7 @@ namespace FusionAnimator.Editor
                 {
                     Clip = childClip,
                     Weight = normalizedWeight,
-                    TimeScale = Mathf.Max(0.01f, validChildren[i].TimeScale),
+                    TimeScale = Mathf.Max(0.01f, validChildren[i].TimeScale * oneDSignedSpeedScale),
                     Loop = childClip.isLooping,
                     ExplicitNormalizedTime = explicitPoseTime01,
                 });
@@ -2486,6 +2490,68 @@ namespace FusionAnimator.Editor
             }
 
             weights[firstIndex] = 1.0f;
+        }
+
+        private void ResolveOneDSignedSpeedWeights(FusionAnimatorBlendTreeDefinition blendTree, List<FusionAnimatorBlendTreeChild> children, float[] weights, out float speedScale)
+        {
+            float x = GetPreviewFloatValue(blendTree.ParameterXId);
+            speedScale = Mathf.Abs(x);
+
+            int selectedIndex = -1;
+            float bestDistance = float.MaxValue;
+            bool positiveSide = x > 0.0f;
+            bool negativeSide = x < 0.0f;
+
+            float GetChildX(int childIndex)
+            {
+                FusionAnimatorBlendTreeChild child = children[childIndex];
+                return Mathf.Abs(child.Position.x) > 0.0001f || Mathf.Abs(child.Position.y) > 0.0001f
+                    ? child.Position.x
+                    : child.Threshold;
+            }
+
+            for (int i = 0; i < children.Count; ++i)
+            {
+                float childX = GetChildX(i);
+                if (positiveSide == true && childX < 0.0f)
+                {
+                    continue;
+                }
+                if (negativeSide == true && childX > 0.0f)
+                {
+                    continue;
+                }
+
+                float distance = Mathf.Abs(childX - x);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    selectedIndex = i;
+                }
+            }
+
+            if (selectedIndex < 0)
+            {
+                for (int i = 0; i < children.Count; ++i)
+                {
+                    float distance = Mathf.Abs(GetChildX(i) - x);
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        selectedIndex = i;
+                    }
+                }
+            }
+
+            if (selectedIndex < 0 && children.Count > 0)
+            {
+                selectedIndex = 0;
+            }
+
+            if (selectedIndex >= 0)
+            {
+                weights[selectedIndex] = 1.0f;
+            }
         }
 
         private void ResolveTwoDSimpleDirectionalWeights(FusionAnimatorBlendTreeDefinition blendTree, List<FusionAnimatorBlendTreeChild> children, float[] weights)

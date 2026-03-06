@@ -63,6 +63,7 @@ namespace FusionAnimator
     public enum FusionAnimatorBlendTreeType
     {
         OneD = 0,
+        OneDSignedSpeed = 6,
         TwoDSimpleDirectional = 1,
         TwoDFreeformDirectional = 2,
         TwoDFreeformCartesian = 3,

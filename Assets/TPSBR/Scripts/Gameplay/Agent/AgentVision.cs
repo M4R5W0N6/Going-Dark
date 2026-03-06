@@ -442,20 +442,7 @@ namespace TPSBR
 
 		private bool IsLocalVisionOwner()
 		{
-			if (_agent == null)
-				return false;
-
-			SceneContext context = _agent.Context;
-			if (context == null || context.HasInput == false)
-				return false;
-			if (_agent.HasInputAuthority == false)
-				return false;
-
-			Agent observedAgent = context.ObservedAgent;
-			if (observedAgent != null)
-				return observedAgent == _agent;
-
-			return true;
+			return Agent.IsLocalObservedInputOwner(_agent);
 		}
 
 		private void SyncSpotLightPose(bool isLocalControlled)

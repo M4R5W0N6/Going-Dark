@@ -9,13 +9,20 @@ namespace FusionAnimator.Editor
     {
         public override void OnInspectorGUI()
         {
+            FusionAnimatorGraphAsset graph = (FusionAnimatorGraphAsset)target;
+
+            if (GUILayout.Button("Edit in Fusion Animator Canvas", GUILayout.Height(24.0f)))
+            {
+                FusionAnimatorGraphCanvasWindow.Open(graph);
+            }
+
+            GUILayout.Space(6.0f);
+
             serializedObject.Update();
             DrawDefaultInspector();
             serializedObject.ApplyModifiedProperties();
 
             GUILayout.Space(8.0f);
-
-            FusionAnimatorGraphAsset graph = (FusionAnimatorGraphAsset)target;
 
             using (new EditorGUILayout.HorizontalScope())
             {

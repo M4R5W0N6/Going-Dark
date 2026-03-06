@@ -635,9 +635,24 @@ namespace TPSBR
 
 		private void UpdateAimRayInput()
 		{
-			_renderInput.HasAimRay = false;
-			_renderInput.AimRayOrigin = default;
-			_renderInput.AimRayDirection = default;
+			_renderInput.HasAimRay = _previousRenderInput.HasAimRay;
+			_renderInput.AimRayOrigin = _previousRenderInput.AimRayOrigin;
+			_renderInput.AimRayDirection = _previousRenderInput.AimRayDirection;
+
+			if (_renderInput.HasAimRay == true)
+			{
+				bool invalidPreviousOrigin = float.IsNaN(_renderInput.AimRayOrigin.x) || float.IsNaN(_renderInput.AimRayOrigin.y) || float.IsNaN(_renderInput.AimRayOrigin.z);
+				if (invalidPreviousOrigin == true || _renderInput.AimRayDirection.sqrMagnitude <= 0.0001f)
+				{
+					_renderInput.HasAimRay = false;
+					_renderInput.AimRayOrigin = default;
+					_renderInput.AimRayDirection = default;
+				}
+				else
+				{
+					_renderInput.AimRayDirection.Normalize();
+				}
+			}
 
 			if (Context == null || Context.Camera == null)
 				return;
@@ -719,14 +734,14 @@ namespace TPSBR
 				if (pendingWeaponSlot >= 4)
 				{
 					int previousWeaponSlot = _agent.Weapons.PreviousWeaponSlot;
-					if (previousWeaponSlot >= 1 && previousWeaponSlot <= 3 &&
+					if (previousWeaponSlot >= 1 && previousWeaponSlot <= 2 &&
 						_agent.Weapons.HasWeapon(previousWeaponSlot, true) == true)
 					{
 						return (byte)(previousWeaponSlot + 1);
 					}
 				}
 
-				int startSlot = pendingWeaponSlot >= 1 && pendingWeaponSlot <= 3 ? pendingWeaponSlot : 0;
+				int startSlot = pendingWeaponSlot >= 1 && pendingWeaponSlot <= 2 ? pendingWeaponSlot : 0;
 				int nextWeaponSlot = GetNextStandardWeaponSlot(startSlot, pendingWeaponSlot);
 
 				if (nextWeaponSlot > 0)
@@ -767,9 +782,9 @@ namespace TPSBR
 
 		private int GetNextStandardWeaponSlot(int fromSlot, int ignoreSlot)
 		{
-			for (int i = 1; i <= 3; ++i)
+			for (int i = 1; i <= 2; ++i)
 			{
-				int slot = ((fromSlot + i - 1) % 3) + 1;
+				int slot = ((fromSlot + i - 1) % 2) + 1;
 				if (slot == ignoreSlot)
 					continue;
 
