@@ -231,14 +231,15 @@ namespace TPSBR
 			if (HasStateAuthority == false)
 				return;
 
-			if (TryGetAuthoritativeInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection) == true)
+			bool hasAuthoritativeAimRay = TryGetAuthoritativeInputAimRay(out Vector3 rayOrigin, out Vector3 rayDirection);
+			if (hasAuthoritativeAimRay == true)
 			{
 				_replicatedAimRayOrigin = rayOrigin;
 				_replicatedAimRayDirection = rayDirection;
 				_replicatedHasAimRay = true;
 				_loggedMissingAuthoritativeAimRay = false;
 			}
-			else if (_loggedMissingAuthoritativeAimRay == false)
+			else if (_loggedMissingAuthoritativeAimRay == false && ShouldLogMissingAuthoritativeAimData() == true)
 			{
 				Debug.LogWarning($"[{nameof(Aiming)}] Missing authoritative aim ray in FixedUpdateNetwork for state authority object {Object?.Id}.", this);
 				_loggedMissingAuthoritativeAimRay = true;
@@ -253,7 +254,9 @@ namespace TPSBR
 				_replicatedHasAimHitPoints = true;
 				_loggedMissingAuthoritativeHitPoints = false;
 			}
-			else if (_loggedMissingAuthoritativeHitPoints == false)
+			else if (hasAuthoritativeAimRay == true &&
+				_loggedMissingAuthoritativeHitPoints == false &&
+				ShouldLogMissingAuthoritativeAimData() == true)
 			{
 				Debug.LogWarning($"[{nameof(Aiming)}] Missing authoritative hitpoint chain in FixedUpdateNetwork for state authority object {Object?.Id}.", this);
 				_loggedMissingAuthoritativeHitPoints = true;
@@ -633,6 +636,24 @@ namespace TPSBR
 
 			rayDirection.Normalize();
 			return true;
+		}
+
+		private bool ShouldLogMissingAuthoritativeAimData()
+		{
+			if (Runner == null || Object == null || Object.IsValid == false || Object.IsInSimulation == false)
+				return false;
+			if (Object.InputAuthority == PlayerRef.None)
+				return false;
+			if (_health != null && _health.IsAlive == false)
+				return false;
+
+			if (TryGetRunnerInputAimRay(out _, out _) == true)
+				return true;
+
+			if (IsProxy == true || _character == null || _character.Agent == null || _character.Agent.AgentInput == null)
+				return false;
+
+			return _character.Agent.AgentInput.FixedInput.HasAimRay == true;
 		}
 
 		private LayerMask ResolveCameraHitMask()
