@@ -74,6 +74,7 @@ namespace TPSBR
 		private float _hybridSmoothedAspect = 1.0f;
 		private bool _hasBlendState;
 		private Vector3 _blendSmoothedDynamicDirection = Vector3.forward;
+		private float _blendAimPriority;
 		private Texture2D _blendCookieTexture;
 		private Color32[] _blendCookiePixels;
 		private float _lastBlendCookieMinorAxis = -1.0f;
@@ -115,12 +116,13 @@ namespace TPSBR
 		{
 			_hasAppliedState = false;
 			_lastLightEnabled = false;
-			_hasHybridState = false;
-			_hybridSmoothedAspect = 1.0f;
-			_hasBlendState = false;
-			ClearBlendCookie();
-			if (_blendCookieTexture != null)
-			{
+				_hasHybridState = false;
+				_hybridSmoothedAspect = 1.0f;
+				_hasBlendState = false;
+				_blendAimPriority = 0.0f;
+				ClearBlendCookie();
+				if (_blendCookieTexture != null)
+				{
 				if (Application.isPlaying)
 				{
 					Destroy(_blendCookieTexture);
@@ -466,12 +468,13 @@ namespace TPSBR
 
 			if (_lookAtMode != LookAtMode.Fixed)
 			{
+				const bool resolveRenderHistory = true;
 				if (_agent == null || _agent.Aiming == null ||
-					_agent.Aiming.TryGetCrosshairAndHitPoints(false, out Vector3 aimFireOrigin, out Vector3 cameraHitPoint, out Vector3 characterHitPoint, out _) == false)
+					_agent.Aiming.TryGetCrosshairAndHitPoints(resolveRenderHistory, out Vector3 aimFireOrigin, out Vector3 cameraHitPoint, out Vector3 characterHitPoint, out _) == false)
 				{
-					if (_didLogMissingAimRay == false)
+					if (_didLogMissingAimRay == false && ShouldLogAimResolveFailure(_agent != null ? _agent.Aiming : null, resolveRenderHistory) == true)
 					{
-						Debug.LogWarning("[AgentVision] Failed to resolve local crosshair hit point. Vision cone pose update skipped.", this);
+						Debug.LogWarning("[AgentVision] Failed to resolve deterministic crosshair hit point. Vision cone pose update skipped.", this);
 						_didLogMissingAimRay = true;
 					}
 					return;
@@ -582,8 +585,8 @@ namespace TPSBR
 					targetRotation = _hybridSmoothedRotation;
 					ApplySpotLightAngles(_baseMappedViewAngle);
 				}
-				else if (_lookAtMode == LookAtMode.Blend)
-				{
+					else if (_lookAtMode == LookAtMode.Blend)
+					{
 					Vector3 rawDynamicDirection = characterHitPoint - firePosition;
 					if (rawDynamicDirection.sqrMagnitude <= EPSILON)
 					{
@@ -619,15 +622,19 @@ namespace TPSBR
 					float baseViewAngle = _lastAppliedViewAngle > 0.0f ? _lastAppliedViewAngle : _baseMappedViewAngle;
 					baseViewAngle = Mathf.Clamp(baseViewAngle, 1.0f, MAX_VISION_SPOT_ANGLE);
 
-					BuildEnclosingCone(fixedDirection, baseViewAngle, _blendSmoothedDynamicDirection, baseViewAngle, out Vector3 blendDirection, out float blendViewAngle);
+						BuildEnclosingCone(fixedDirection, baseViewAngle, _blendSmoothedDynamicDirection, baseViewAngle, out Vector3 blendDirection, out float blendViewAngle);
 
-					float blendMaxViewAngle = Mathf.Min(MAX_VISION_SPOT_ANGLE, Mathf.Max(1.0f, baseViewAngle * BLEND_MAX_FOV_MULTIPLIER));
-					blendViewAngle = Mathf.Clamp(blendViewAngle, 1.0f, blendMaxViewAngle);
+						float blendMaxViewAngle = Mathf.Min(MAX_VISION_SPOT_ANGLE, Mathf.Max(1.0f, baseViewAngle * BLEND_MAX_FOV_MULTIPLIER));
+						blendViewAngle = Mathf.Clamp(blendViewAngle, 1.0f, blendMaxViewAngle);
+						bool isAiming = IsAgentAiming();
+						float targetAimPriority = isAiming == true ? 1.0f : 0.0f;
+						_blendAimPriority = Mathf.Lerp(_blendAimPriority, targetAimPriority, lerpFactor);
+						_blendAimPriority = Mathf.Clamp01(_blendAimPriority);
 
-					Vector3 blendMajorAxis = Vector3.ProjectOnPlane(_blendSmoothedDynamicDirection - fixedDirection, blendDirection);
-					if (blendMajorAxis.sqrMagnitude <= EPSILON)
-					{
-						blendMajorAxis = Vector3.ProjectOnPlane(cameraRotation * Vector3.right, blendDirection);
+						Vector3 blendMajorAxis = Vector3.ProjectOnPlane(_blendSmoothedDynamicDirection - fixedDirection, blendDirection);
+						if (blendMajorAxis.sqrMagnitude <= EPSILON)
+						{
+							blendMajorAxis = Vector3.ProjectOnPlane(cameraRotation * Vector3.right, blendDirection);
 					}
 					if (blendMajorAxis.sqrMagnitude <= EPSILON)
 					{
@@ -647,28 +654,37 @@ namespace TPSBR
 					if (blendUp.sqrMagnitude <= EPSILON)
 					{
 						blendUp = Vector3.up;
-					}
-					blendUp.Normalize();
+						}
+						blendUp.Normalize();
 
-					targetRotation = Quaternion.LookRotation(blendDirection, blendUp);
-					_hasHybridState = false;
-					_hybridSmoothedAspect = 1.0f;
-					ApplySpotLightAngles(blendViewAngle);
-					if (_useEllipsoidalCookie == true)
-					{
-						float minorAxis = Mathf.Clamp01(baseViewAngle / Mathf.Max(baseViewAngle, blendViewAngle));
-						ApplyBlendCookie(minorAxis);
-					}
-					else
-					{
+						Vector3 prioritizedDirection = Vector3.Slerp(blendDirection, _blendSmoothedDynamicDirection, _blendAimPriority);
+						if (prioritizedDirection.sqrMagnitude <= EPSILON)
+						{
+							prioritizedDirection = blendDirection;
+						}
+						prioritizedDirection.Normalize();
+
+						targetRotation = Quaternion.LookRotation(prioritizedDirection, blendUp);
+						_hasHybridState = false;
+						_hybridSmoothedAspect = 1.0f;
+						float prioritizedViewAngle = Mathf.Lerp(blendViewAngle, baseViewAngle, _blendAimPriority);
+						ApplySpotLightAngles(prioritizedViewAngle);
+						if (_useEllipsoidalCookie == true)
+						{
+							float minorAxis = Mathf.Clamp01(baseViewAngle / Mathf.Max(baseViewAngle, prioritizedViewAngle));
+							ApplyBlendCookie(minorAxis);
+						}
+						else
+						{
 						ClearBlendCookie();
 					}
 				}
-				else
-				{
-					ClearBlendCookie();
-					_hasBlendState = false;
-					Vector3 crosshairWorldDirection = characterHitPoint - firePosition;
+					else
+					{
+						ClearBlendCookie();
+						_hasBlendState = false;
+						_blendAimPriority = 0.0f;
+						Vector3 crosshairWorldDirection = characterHitPoint - firePosition;
 					if (crosshairWorldDirection.sqrMagnitude <= EPSILON)
 					{
 						crosshairWorldDirection = fixedDirection;
@@ -721,6 +737,7 @@ namespace TPSBR
 				_hasHybridState = false;
 				_hybridSmoothedAspect = 1.0f;
 				_hasBlendState = false;
+				_blendAimPriority = 0.0f;
 				ApplySpotLightAngles(_baseMappedViewAngle);
 			}
 			if (Vector3.Distance(_spotLight.transform.position, firePosition) > 0.0001f)
@@ -733,6 +750,26 @@ namespace TPSBR
 			}
 			
 			_didLogMissingAimRay = false;
+		}
+
+		private bool ShouldLogAimResolveFailure(Aiming aiming, bool resolveRenderHistory)
+		{
+			if (aiming == null || _agent == null)
+				return false;
+			if (_agent.Object == null || _agent.Runner == null || _agent.Object.IsValid == false || _agent.Object.IsInSimulation == false)
+				return false;
+			if (aiming.HasDeterministicLookAtSource(resolveRenderHistory) == false)
+				return false;
+
+			return true;
+		}
+
+		private bool IsAgentAiming()
+		{
+			if (_character == null || _character.CharacterController == null)
+				return false;
+
+			return _character.CharacterController.Data.Aim == true;
 		}
 
 		private bool TryGetObservedCameraPose(out Vector3 position, out Quaternion rotation)
