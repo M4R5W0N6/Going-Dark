@@ -354,23 +354,27 @@ namespace TPSBR
 				return;
 
 			Transform weaponHandle = _weapons.CurrentWeaponHandle;
-			if (HasInputAuthority == true || _agent.IsObserved == true)
+			if (weaponHandle == null)
+				return;
+
+			weaponHandle.localRotation = _weapons.CurrentWeaponBaseRotation;
+
+			bool isLocalObservedInputOwner = Agent.IsLocalObservedInputOwner(_agent);
+			if (TryResolveWeaponModelLookRotation(weaponHandle, out Quaternion targetRotation) == true)
 			{
-				weaponHandle.localRotation = _weapons.CurrentWeaponBaseRotation;
+				if (isLocalObservedInputOwner == true)
+				{
+					Quaternion handleRotation = weaponHandle.rotation;
+					float snapPower = Mathf.Clamp(Mathf.Abs(_kcc.FixedData.LookPitch) / 60.0f, _aimSnapPower, 1.0f);
+					Vector3 snapRotation = Quaternion.Slerp(handleRotation, targetRotation, snapPower).eulerAngles;
 
-				Quaternion handleRotation = weaponHandle.rotation;
-				Quaternion targetRotation = Quaternion.LookRotation(_agent.Context.Camera.transform.position + _agent.Context.Camera.transform.forward * 100.0f - weaponHandle.position);
-
-				float   snapPower    = Mathf.Clamp(Mathf.Abs(_kcc.FixedData.LookPitch) / 60.0f, _aimSnapPower, 1.0f);
-				Vector3 snapRotation = Quaternion.Slerp(handleRotation, targetRotation, snapPower).eulerAngles;
-
-				snapRotation.y = targetRotation.eulerAngles.y;
-
-				weaponHandle.rotation = Quaternion.Euler(snapRotation);
-			}
-			else
-			{
-				weaponHandle.rotation = Quaternion.LookRotation(_kcc.FixedData.LookDirection);
+					snapRotation.y = targetRotation.eulerAngles.y;
+					weaponHandle.rotation = Quaternion.Euler(snapRotation);
+				}
+				else
+				{
+					weaponHandle.rotation = targetRotation;
+				}
 			}
 
 			Transform leftHandTarget = _weapons.CurrentWeapon.LeftHandTarget;
@@ -404,6 +408,35 @@ namespace TPSBR
 				_leftHand.position = leftHandTarget.position;
 				_leftHand.rotation = leftHandTarget.rotation;
 			}
+		}
+
+		private bool TryResolveWeaponModelLookRotation(Transform weaponHandle, out Quaternion lookRotation)
+		{
+			lookRotation = default;
+			if (weaponHandle == null)
+				return false;
+
+			Aiming aiming = _agent != null ? _agent.Aiming : null;
+			if (aiming != null)
+			{
+				bool resolveRenderHistory = Runner != null && Runner.Stage != default;
+				if (aiming.TryGetCrosshairAndHitPoints(resolveRenderHistory, out _, out _, out Vector3 fireHitPoint, out _) == true)
+				{
+					Vector3 toTarget = fireHitPoint - weaponHandle.position;
+					if (toTarget.sqrMagnitude > 0.0001f)
+					{
+						lookRotation = Quaternion.LookRotation(toTarget.normalized, Vector3.up);
+						return true;
+					}
+				}
+			}
+
+			Vector3 lookDirection = _kcc != null ? _kcc.FixedData.LookDirection : transform.forward;
+			if (lookDirection.sqrMagnitude <= 0.0001f)
+				return false;
+
+			lookRotation = Quaternion.LookRotation(lookDirection.normalized, Vector3.up);
+			return true;
 		}
 
 		private bool CanSnapHand()
