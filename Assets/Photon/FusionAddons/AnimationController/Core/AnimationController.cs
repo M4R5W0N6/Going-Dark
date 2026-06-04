@@ -428,7 +428,7 @@ namespace Fusion.Addons.AnimationController
 
 		// NetworkBehaviour INTERFACE
 
-		public override sealed int? DynamicWordCount => UseBuiltInLayerEvaluation == true ? GetNetworkDataWordCount() : 0;
+		public override sealed int? DynamicWordCount => (UseBuiltInLayerEvaluation == true ? GetNetworkDataWordCount() : 0) + GetCustomNetworkDataWordCount();
 
 		public override sealed void Spawned()
 		{
@@ -443,13 +443,13 @@ namespace Fusion.Addons.AnimationController
 			_output = AnimationPlayableOutput.Create(_graph, name, _animator);
 			_output.SetSourcePlayable(_mixer);
 
+			if (HasNetworkData() == true && Object.HasStateAuthority == false)
+			{
+				ReadNetworkData();
+			}
+
 			if (UseBuiltInLayerEvaluation == true)
 			{
-				if (Object.HasStateAuthority == false)
-				{
-					ReadNetworkData();
-				}
-
 				AnimationLayer[] layers = _layers;
 				for (int i = 0, count = layers.Length; i < count; ++i)
 				{
@@ -516,7 +516,7 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterSpawned.AfterSpawned()
 		{
-			if (UseBuiltInLayerEvaluation == false)
+			if (HasNetworkData() == false)
 				return;
 
 			if (Object.IsInSimulation == true)
@@ -529,7 +529,7 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterClientPredictionReset.AfterClientPredictionReset()
 		{
-			if (UseBuiltInLayerEvaluation == false)
+			if (HasNetworkData() == false)
 				return;
 
 			_restoreStateMarker.Begin();
@@ -541,7 +541,7 @@ namespace Fusion.Addons.AnimationController
 
 		void IAfterTick.AfterTick()
 		{
-			if (UseBuiltInLayerEvaluation == false)
+			if (HasNetworkData() == false)
 				return;
 
 			_afterTickMarker.Begin();

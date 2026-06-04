@@ -7,15 +7,6 @@
             "id": "a2b313f4-8e41-45bc-aae8-484d1ddab78f",
             "actions": [
                 {
-                    "name": "Sprint",
-                    "type": "Button",
-                    "id": "3daf7cc2-8c77-40bf-abef-01773fdd9fbf",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "CompositeLean",
                     "type": "Value",
                     "id": "3a0e2e27-1893-4259-aea2-06b2915cf293",
@@ -184,10 +175,10 @@
                 {
                     "name": "WASD",
                     "id": "00ca640b-d935-4593-8157-c05846ea39b3",
-                    "path": "Dpad",
+                    "path": "2DVector(mode=0)",
                     "interactions": "",
-                    "processors": "",
-                    "groups": "",
+                    "processors": "ScaledDirectional(walkScale=0.75)",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Move",
                     "isComposite": true,
                     "isPartOfComposite": false
@@ -382,7 +373,7 @@
                 {
                     "name": "",
                     "id": "2ce5a9f7-cf97-4d47-a9eb-6d32c161c9df",
-                    "path": "<Keyboard>/leftShift",
+                    "path": "<Keyboard>/ctrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -521,28 +512,6 @@
                     "action": "CompositeLean",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "f023fc20-8702-4e2c-a0ac-b4392f625184",
-                    "path": "<Gamepad>/leftStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "78cafe22-e797-42d8-b4c1-01ce9d005ed9",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "",

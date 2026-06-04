@@ -2703,6 +2703,8 @@ namespace FusionAnimator.Editor
                 IntValue = condition.IntValue,
                 FloatValue = condition.FloatValue,
                 Vector2Value = condition.Vector2Value,
+                RangeMin = condition.RangeMin,
+                RangeMax = condition.RangeMax,
             };
         }
 

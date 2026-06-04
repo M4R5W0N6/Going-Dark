@@ -541,11 +541,27 @@ namespace FusionAnimator.Editor
                 }
                 else if (conditionParameter.Type == FusionAnimatorParameterType.Int)
                 {
-                    condition.IntValue = EditorGUILayout.IntField("Int Value", condition.IntValue);
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        condition.RangeMin = EditorGUILayout.FloatField("Range Min", condition.RangeMin);
+                        condition.RangeMax = EditorGUILayout.FloatField("Range Max", condition.RangeMax);
+                    }
+                    else
+                    {
+                        condition.IntValue = EditorGUILayout.IntField("Int Value", condition.IntValue);
+                    }
                 }
                 else if (conditionParameter.Type == FusionAnimatorParameterType.Float || conditionParameter.Type == FusionAnimatorParameterType.Vector2)
                 {
-                    condition.FloatValue = EditorGUILayout.FloatField("Float Value", condition.FloatValue);
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        condition.RangeMin = EditorGUILayout.FloatField("Range Min", condition.RangeMin);
+                        condition.RangeMax = EditorGUILayout.FloatField("Range Max", condition.RangeMax);
+                    }
+                    else
+                    {
+                        condition.FloatValue = EditorGUILayout.FloatField("Float Value", condition.FloatValue);
+                    }
                 }
                 EditorGUILayout.EndVertical();
             }

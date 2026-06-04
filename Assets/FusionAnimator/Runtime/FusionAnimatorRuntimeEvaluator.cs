@@ -598,6 +598,11 @@ namespace FusionAnimator
                     }
 
                     float lhs = condition.UseAbsoluteValue ? Mathf.Abs(value) : value;
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        return CompareNumericRange(lhs, condition.RangeMin, condition.RangeMax);
+                    }
+
                     return CompareNumeric(lhs, condition.IntValue, condition.Operator);
                 }
                 case FusionAnimatorParameterType.Float:
@@ -609,6 +614,11 @@ namespace FusionAnimator
                     }
 
                     float lhs = condition.UseAbsoluteValue ? Mathf.Abs(value) : value;
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        return CompareNumericRange(lhs, condition.RangeMin, condition.RangeMax);
+                    }
+
                     return CompareNumeric(lhs, condition.FloatValue, condition.Operator);
                 }
                 case FusionAnimatorParameterType.Vector2:
@@ -642,6 +652,7 @@ namespace FusionAnimator
                     {
                         case FusionAnimatorConditionOperator.IsTrue: return magnitude > 0.000001f;
                         case FusionAnimatorConditionOperator.IsFalse: return magnitude <= 0.000001f;
+                        case FusionAnimatorConditionOperator.Range: return CompareNumericRange(magnitude, condition.RangeMin, condition.RangeMax);
                         default: return CompareNumeric(magnitude, condition.FloatValue, condition.Operator);
                     }
                 }
@@ -1395,6 +1406,13 @@ namespace FusionAnimator
                 case FusionAnimatorConditionOperator.LessOrEqual: return lhs <= rhs;
                 default: return false;
             }
+        }
+
+        private static bool CompareNumericRange(float value, float rangeMin, float rangeMax)
+        {
+            float min = Mathf.Min(rangeMin, rangeMax);
+            float max = Mathf.Max(rangeMin, rangeMax);
+            return value >= min && value <= max;
         }
 
         private float ResolveReferenceLengthSeconds(FusionAnimatorStateDefinition state, IFusionAnimatorParameterSource parameters)

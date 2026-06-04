@@ -61,6 +61,7 @@ namespace FusionAnimator.Editor
             FusionAnimatorConditionOperator.GreaterOrEqual,
             FusionAnimatorConditionOperator.Less,
             FusionAnimatorConditionOperator.LessOrEqual,
+            FusionAnimatorConditionOperator.Range,
         };
 
         private sealed class ParameterUsageLocation
@@ -3301,24 +3302,54 @@ namespace FusionAnimator.Editor
                         }
                         case FusionAnimatorParameterType.Int:
                         {
-                            int intValue = EditorGUILayout.IntField(new GUIContent("Int Value", "Integer comparison target value."), condition.IntValue);
-                            if (intValue != condition.IntValue)
+                            if (condition.Operator == FusionAnimatorConditionOperator.Range)
                             {
-                                ensureUndo?.Invoke();
-                                condition.IntValue = intValue;
-                                changed = true;
+                                float minValue = EditorGUILayout.FloatField(new GUIContent("Range Min", "Inclusive lower bound for the sampled value."), condition.RangeMin);
+                                float maxValue = EditorGUILayout.FloatField(new GUIContent("Range Max", "Inclusive upper bound for the sampled value."), condition.RangeMax);
+                                if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                {
+                                    ensureUndo?.Invoke();
+                                    condition.RangeMin = minValue;
+                                    condition.RangeMax = maxValue;
+                                    changed = true;
+                                }
+                            }
+                            else
+                            {
+                                int intValue = EditorGUILayout.IntField(new GUIContent("Int Value", "Integer comparison target value."), condition.IntValue);
+                                if (intValue != condition.IntValue)
+                                {
+                                    ensureUndo?.Invoke();
+                                    condition.IntValue = intValue;
+                                    changed = true;
+                                }
                             }
 
                             break;
                         }
                         case FusionAnimatorParameterType.Float:
                         {
-                            float floatValue = EditorGUILayout.FloatField(new GUIContent("Float Value", "Float comparison target value."), condition.FloatValue);
-                            if (Mathf.Approximately(floatValue, condition.FloatValue) == false)
+                            if (condition.Operator == FusionAnimatorConditionOperator.Range)
                             {
-                                ensureUndo?.Invoke();
-                                condition.FloatValue = floatValue;
-                                changed = true;
+                                float minValue = EditorGUILayout.FloatField(new GUIContent("Range Min", "Inclusive lower bound for the sampled value."), condition.RangeMin);
+                                float maxValue = EditorGUILayout.FloatField(new GUIContent("Range Max", "Inclusive upper bound for the sampled value."), condition.RangeMax);
+                                if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                {
+                                    ensureUndo?.Invoke();
+                                    condition.RangeMin = minValue;
+                                    condition.RangeMax = maxValue;
+                                    changed = true;
+                                }
+                            }
+                            else
+                            {
+                                float floatValue = EditorGUILayout.FloatField(new GUIContent("Float Value", "Float comparison target value."), condition.FloatValue);
+                                if (Mathf.Approximately(floatValue, condition.FloatValue) == false)
+                                {
+                                    ensureUndo?.Invoke();
+                                    condition.FloatValue = floatValue;
+                                    changed = true;
+                                }
                             }
 
                             break;
@@ -3329,15 +3360,37 @@ namespace FusionAnimator.Editor
                             {
                                 FusionAnimatorParameterReferenceUtility.TryParse(condition.ParameterId, out _, out FusionAnimatorParameterComponent component);
                                 bool componentSelected = component != FusionAnimatorParameterComponent.None;
-                                GUIContent valueLabel = componentSelected
-                                    ? new GUIContent("Float Value", "Vector2 component comparison target value.")
-                                    : new GUIContent("Magnitude Value", "Vector2 magnitude comparison target value.");
-                                float magnitudeValue = EditorGUILayout.FloatField(valueLabel, condition.FloatValue);
-                                if (Mathf.Approximately(magnitudeValue, condition.FloatValue) == false)
+                                if (condition.Operator == FusionAnimatorConditionOperator.Range)
                                 {
-                                    ensureUndo?.Invoke();
-                                    condition.FloatValue = magnitudeValue;
-                                    changed = true;
+                                    GUIContent minLabel = componentSelected
+                                        ? new GUIContent("Range Min", "Inclusive lower bound for the selected Vector2 component.")
+                                        : new GUIContent("Range Min", "Inclusive lower bound for Vector2 magnitude.");
+                                    GUIContent maxLabel = componentSelected
+                                        ? new GUIContent("Range Max", "Inclusive upper bound for the selected Vector2 component.")
+                                        : new GUIContent("Range Max", "Inclusive upper bound for Vector2 magnitude.");
+
+                                    float minValue = EditorGUILayout.FloatField(minLabel, condition.RangeMin);
+                                    float maxValue = EditorGUILayout.FloatField(maxLabel, condition.RangeMax);
+                                    if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                    {
+                                        ensureUndo?.Invoke();
+                                        condition.RangeMin = minValue;
+                                        condition.RangeMax = maxValue;
+                                        changed = true;
+                                    }
+                                }
+                                else
+                                {
+                                    GUIContent valueLabel = componentSelected
+                                        ? new GUIContent("Float Value", "Vector2 component comparison target value.")
+                                        : new GUIContent("Magnitude Value", "Vector2 magnitude comparison target value.");
+                                    float magnitudeValue = EditorGUILayout.FloatField(valueLabel, condition.FloatValue);
+                                    if (Mathf.Approximately(magnitudeValue, condition.FloatValue) == false)
+                                    {
+                                        ensureUndo?.Invoke();
+                                        condition.FloatValue = magnitudeValue;
+                                        changed = true;
+                                    }
                                 }
                             }
 
@@ -4691,24 +4744,54 @@ namespace FusionAnimator.Editor
                         }
                         case FusionAnimatorParameterType.Int:
                         {
-                            int intValue = EditorGUILayout.IntField(new GUIContent("Int Value", "Integer comparison target value."), condition.IntValue);
-                            if (intValue != condition.IntValue)
+                            if (condition.Operator == FusionAnimatorConditionOperator.Range)
                             {
-                                EnsureUndo();
-                                condition.IntValue = intValue;
-                                changed = true;
+                                float minValue = EditorGUILayout.FloatField(new GUIContent("Range Min", "Inclusive lower bound for the sampled value."), condition.RangeMin);
+                                float maxValue = EditorGUILayout.FloatField(new GUIContent("Range Max", "Inclusive upper bound for the sampled value."), condition.RangeMax);
+                                if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                {
+                                    EnsureUndo();
+                                    condition.RangeMin = minValue;
+                                    condition.RangeMax = maxValue;
+                                    changed = true;
+                                }
+                            }
+                            else
+                            {
+                                int intValue = EditorGUILayout.IntField(new GUIContent("Int Value", "Integer comparison target value."), condition.IntValue);
+                                if (intValue != condition.IntValue)
+                                {
+                                    EnsureUndo();
+                                    condition.IntValue = intValue;
+                                    changed = true;
+                                }
                             }
 
                             break;
                         }
                         case FusionAnimatorParameterType.Float:
                         {
-                            float floatValue = EditorGUILayout.FloatField(new GUIContent("Float Value", "Float comparison target value."), condition.FloatValue);
-                            if (Mathf.Approximately(floatValue, condition.FloatValue) == false)
+                            if (condition.Operator == FusionAnimatorConditionOperator.Range)
                             {
-                                EnsureUndo();
-                                condition.FloatValue = floatValue;
-                                changed = true;
+                                float minValue = EditorGUILayout.FloatField(new GUIContent("Range Min", "Inclusive lower bound for the sampled value."), condition.RangeMin);
+                                float maxValue = EditorGUILayout.FloatField(new GUIContent("Range Max", "Inclusive upper bound for the sampled value."), condition.RangeMax);
+                                if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                {
+                                    EnsureUndo();
+                                    condition.RangeMin = minValue;
+                                    condition.RangeMax = maxValue;
+                                    changed = true;
+                                }
+                            }
+                            else
+                            {
+                                float floatValue = EditorGUILayout.FloatField(new GUIContent("Float Value", "Float comparison target value."), condition.FloatValue);
+                                if (Mathf.Approximately(floatValue, condition.FloatValue) == false)
+                                {
+                                    EnsureUndo();
+                                    condition.FloatValue = floatValue;
+                                    changed = true;
+                                }
                             }
 
                             break;
@@ -4719,15 +4802,37 @@ namespace FusionAnimator.Editor
                             {
                                 FusionAnimatorParameterReferenceUtility.TryParse(condition.ParameterId, out _, out FusionAnimatorParameterComponent component);
                                 bool componentSelected = component != FusionAnimatorParameterComponent.None;
-                                GUIContent valueLabel = componentSelected
-                                    ? new GUIContent("Float Value", "Vector2 component comparison target value.")
-                                    : new GUIContent("Magnitude Value", "Vector2 magnitude comparison target value.");
-                                float magnitudeValue = EditorGUILayout.FloatField(valueLabel, condition.FloatValue);
-                                if (Mathf.Approximately(magnitudeValue, condition.FloatValue) == false)
+                                if (condition.Operator == FusionAnimatorConditionOperator.Range)
                                 {
-                                    EnsureUndo();
-                                    condition.FloatValue = magnitudeValue;
-                                    changed = true;
+                                    GUIContent minLabel = componentSelected
+                                        ? new GUIContent("Range Min", "Inclusive lower bound for the selected Vector2 component.")
+                                        : new GUIContent("Range Min", "Inclusive lower bound for Vector2 magnitude.");
+                                    GUIContent maxLabel = componentSelected
+                                        ? new GUIContent("Range Max", "Inclusive upper bound for the selected Vector2 component.")
+                                        : new GUIContent("Range Max", "Inclusive upper bound for Vector2 magnitude.");
+
+                                    float minValue = EditorGUILayout.FloatField(minLabel, condition.RangeMin);
+                                    float maxValue = EditorGUILayout.FloatField(maxLabel, condition.RangeMax);
+                                    if (Mathf.Approximately(minValue, condition.RangeMin) == false || Mathf.Approximately(maxValue, condition.RangeMax) == false)
+                                    {
+                                        EnsureUndo();
+                                        condition.RangeMin = minValue;
+                                        condition.RangeMax = maxValue;
+                                        changed = true;
+                                    }
+                                }
+                                else
+                                {
+                                    GUIContent valueLabel = componentSelected
+                                        ? new GUIContent("Float Value", "Vector2 component comparison target value.")
+                                        : new GUIContent("Magnitude Value", "Vector2 magnitude comparison target value.");
+                                    float magnitudeValue = EditorGUILayout.FloatField(valueLabel, condition.FloatValue);
+                                    if (Mathf.Approximately(magnitudeValue, condition.FloatValue) == false)
+                                    {
+                                        EnsureUndo();
+                                        condition.FloatValue = magnitudeValue;
+                                        changed = true;
+                                    }
                                 }
                             }
 
@@ -7154,6 +7259,8 @@ namespace FusionAnimator.Editor
                     IntValue = condition.IntValue,
                     FloatValue = condition.FloatValue,
                     Vector2Value = condition.Vector2Value,
+                    RangeMin = condition.RangeMin,
+                    RangeMax = condition.RangeMax,
                 });
             }
 

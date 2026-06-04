@@ -1172,6 +1172,7 @@ namespace FusionAnimator.Editor
                 case FusionAnimatorConditionOperator.GreaterOrEqual: return "Greater Or Equal";
                 case FusionAnimatorConditionOperator.Less: return "Less";
                 case FusionAnimatorConditionOperator.LessOrEqual: return "Less Or Equal";
+                case FusionAnimatorConditionOperator.Range: return "Range";
                 default: return op.ToString();
             }
         }
@@ -3314,11 +3315,21 @@ namespace FusionAnimator.Editor
                 case FusionAnimatorParameterType.Int:
                 {
                     float lhs = condition.UseAbsoluteValue ? Mathf.Abs(entry.IntValue) : entry.IntValue;
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        return CompareNumericRange(lhs, condition.RangeMin, condition.RangeMax);
+                    }
+
                     return CompareNumeric(lhs, condition.IntValue, condition.Operator);
                 }
                 case FusionAnimatorParameterType.Float:
                 {
                     float lhs = condition.UseAbsoluteValue ? Mathf.Abs(entry.FloatValue) : entry.FloatValue;
+                    if (condition.Operator == FusionAnimatorConditionOperator.Range)
+                    {
+                        return CompareNumericRange(lhs, condition.RangeMin, condition.RangeMax);
+                    }
+
                     return CompareNumeric(lhs, condition.FloatValue, condition.Operator);
                 }
                 case FusionAnimatorParameterType.Vector2:
@@ -3348,6 +3359,8 @@ namespace FusionAnimator.Editor
                             return lhs > 0.000001f;
                         case FusionAnimatorConditionOperator.IsFalse:
                             return lhs <= 0.000001f;
+                        case FusionAnimatorConditionOperator.Range:
+                            return CompareNumericRange(lhs, condition.RangeMin, condition.RangeMax);
                         default:
                             return CompareNumeric(lhs, condition.FloatValue, condition.Operator);
                     }
@@ -3556,6 +3569,16 @@ namespace FusionAnimator.Editor
                 default:
                     return false;
             }
+        }
+
+        private static bool CompareNumericRange(float value, float rangeMin, float rangeMax)
+        {
+            if (rangeMin <= rangeMax)
+            {
+                return value >= rangeMin && value <= rangeMax;
+            }
+
+            return value >= rangeMax && value <= rangeMin;
         }
 
         private static Type ResolveInputActionReferenceType()

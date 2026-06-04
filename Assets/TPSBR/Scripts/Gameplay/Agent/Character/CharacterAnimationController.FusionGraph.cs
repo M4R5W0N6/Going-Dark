@@ -20,20 +20,22 @@ namespace TPSBR
 		private const float LOOK_YAW_INPUT_DEADZONE = 1.0f;
 		private const float SPRINT_SPEED_THRESHOLD  = 4.0f;
 		private const float TRIGGER_PULSE_DURATION  = 0.06f;
+		private const int   FUSION_GRAPH_NETWORK_WORD_COUNT = 6 + MAX_FUSION_GRAPH_LAYERS * 7;
 
-		private int _fusionShootTriggerUntilTick = int.MinValue;
-		private int _fusionReloadTriggerTick = int.MinValue;
-		private int _fusionThrowTriggerTick = int.MinValue;
-		private int _fusionEquipTriggerTick = int.MinValue;
+		private int  _fusionShootTriggerUntilTick = int.MinValue;
+		private int  _fusionReloadTriggerTick     = int.MinValue;
+		private int  _fusionThrowTriggerTick      = int.MinValue;
+		private int  _fusionEquipTriggerTick      = int.MinValue;
 		private bool _fusionNetIsThrowing;
+		private bool _fusionNetSnapshotsInitialized;
 
-		private readonly int[] _fusionNetCurrentStateIndices = new int[MAX_FUSION_GRAPH_LAYERS];
-		private readonly float[] _fusionNetCurrentStateTimes = new float[MAX_FUSION_GRAPH_LAYERS];
-		private readonly int[] _fusionNetBlendFromStateIndices = new int[MAX_FUSION_GRAPH_LAYERS];
-		private readonly float[] _fusionNetBlendFromStateTimes = new float[MAX_FUSION_GRAPH_LAYERS];
-		private readonly int[] _fusionNetBlendToStateIndices = new int[MAX_FUSION_GRAPH_LAYERS];
-		private readonly float[] _fusionNetBlendDurations = new float[MAX_FUSION_GRAPH_LAYERS];
-		private readonly float[] _fusionNetBlendElapsed = new float[MAX_FUSION_GRAPH_LAYERS];
+		private readonly int[]   _fusionNetCurrentStateIndices   = new int[MAX_FUSION_GRAPH_LAYERS];
+		private readonly float[] _fusionNetCurrentStateTimes     = new float[MAX_FUSION_GRAPH_LAYERS];
+		private readonly int[]   _fusionNetBlendFromStateIndices = new int[MAX_FUSION_GRAPH_LAYERS];
+		private readonly float[] _fusionNetBlendFromStateTimes   = new float[MAX_FUSION_GRAPH_LAYERS];
+		private readonly int[]   _fusionNetBlendToStateIndices   = new int[MAX_FUSION_GRAPH_LAYERS];
+		private readonly float[] _fusionNetBlendDurations        = new float[MAX_FUSION_GRAPH_LAYERS];
+		private readonly float[] _fusionNetBlendElapsed          = new float[MAX_FUSION_GRAPH_LAYERS];
 
 		private struct FusionClipPose
 		{
@@ -139,7 +141,6 @@ namespace TPSBR
 		private string _fusionStateThrowingId;
 		private string _fusionStateLookAtId;
 		private string _fusionStateJetpackId;
-		private string _fusionStateSprintingId;
 		private string _fusionStateWeaponId;
 		private string _fusionStateEquipTriggerId;
 
@@ -232,7 +233,14 @@ namespace TPSBR
 				_fusionSnapshots[i] = FusionLayerSnapshot.Empty;
 			}
 
-			InitializeFusionNetworkSnapshots();
+			if (HasStateAuthority == true)
+			{
+				InitializeFusionNetworkSnapshots();
+			}
+			else
+			{
+				TryReadFusionSnapshotsFromNetwork();
+			}
 		}
 
 		private void OnFixedUpdateFusion()
@@ -248,6 +256,21 @@ namespace TPSBR
 			}
 
 			_fusionLoggedGraphStateFailure = false;
+
+			if (IsFusionPureProxy() == true)
+			{
+				ReadCurrentNetworkData();
+
+				if (TryReadFusionSnapshotsFromNetwork() == true)
+				{
+					BuildFixedFusionPoses();
+					ApplyFixedFusionPoses();
+				}
+
+				_fusionFixedLookYawDelta = 0.0f;
+				_fusionWasResimulation = Runner != null && Runner.IsResimulation == true;
+				return;
+			}
 
 			ProcessLegacyGameplayQueue();
 
@@ -559,7 +582,6 @@ namespace TPSBR
 			_fusionStateThrowingId   = FindFusionParameterId("State_IsThrowing");
 			_fusionStateLookAtId     = FindFusionParameterId("State_LookAt");
 			_fusionStateJetpackId    = FindFusionParameterId("State_Jetpack");
-			_fusionStateSprintingId  = FindFusionParameterId("State_IsSprinting");
 			_fusionStateWeaponId     = FindFusionParameterId("State_Weapon");
 			_fusionStateEquipTriggerId = FindFusionParameterId("State_EquipTrigger");
 		}
@@ -691,6 +713,7 @@ namespace TPSBR
 
 		private void InitializeFusionNetworkSnapshots()
 		{
+			_fusionNetSnapshotsInitialized = false;
 			_fusionShootTriggerUntilTick = int.MinValue;
 			_fusionReloadTriggerTick = int.MinValue;
 			_fusionThrowTriggerTick = int.MinValue;
@@ -707,6 +730,8 @@ namespace TPSBR
 				_fusionNetBlendDurations[i] = 0.0f;
 				_fusionNetBlendElapsed[i] = 0.0f;
 			}
+
+			_fusionNetSnapshotsInitialized = true;
 		}
 
 		private void CaptureFusionSnapshotsFromEvaluators()
@@ -733,6 +758,9 @@ namespace TPSBR
 
 		private void WriteFusionSnapshotsToNetwork()
 		{
+			if (HasStateAuthority == false)
+				return;
+
 			for (int i = 0, count = _fusionLayers.Count; i < count; ++i)
 			{
 				FusionLayerSnapshot snapshot = _fusionSnapshots[i];
@@ -744,6 +772,8 @@ namespace TPSBR
 				_fusionNetBlendDurations[i] = snapshot.BlendDuration;
 				_fusionNetBlendElapsed[i] = snapshot.BlendElapsed;
 			}
+
+			_fusionNetSnapshotsInitialized = true;
 		}
 
 		private void ReadFusionSnapshotsFromNetwork()
@@ -761,6 +791,120 @@ namespace TPSBR
 					BlendElapsed = _fusionNetBlendElapsed[i],
 				};
 			}
+		}
+
+		private bool TryReadFusionSnapshotsFromNetwork()
+		{
+			if (_fusionNetSnapshotsInitialized == false)
+				return false;
+
+			ReadFusionSnapshotsFromNetwork();
+			return true;
+		}
+
+		protected override int GetCustomNetworkDataWordCount()
+		{
+			return UseFusionGraphMode == true ? FUSION_GRAPH_NETWORK_WORD_COUNT : 0;
+		}
+
+		protected override unsafe void ReadCustomNetworkData(AnimationReadWriteInfo readWriteInfo)
+		{
+			if (UseFusionGraphMode == false)
+				return;
+
+			int* ptr = readWriteInfo.Ptr;
+
+			_fusionShootTriggerUntilTick = *ptr; ++ptr;
+			_fusionReloadTriggerTick = *ptr; ++ptr;
+			_fusionThrowTriggerTick = *ptr; ++ptr;
+			_fusionEquipTriggerTick = *ptr; ++ptr;
+			_fusionNetIsThrowing = *ptr != 0; ++ptr;
+			_fusionNetSnapshotsInitialized = *ptr != 0; ++ptr;
+
+			for (int i = 0; i < MAX_FUSION_GRAPH_LAYERS; ++i)
+			{
+				_fusionNetCurrentStateIndices[i] = *ptr; ++ptr;
+				_fusionNetCurrentStateTimes[i] = *((float*)ptr); ++ptr;
+				_fusionNetBlendFromStateIndices[i] = *ptr; ++ptr;
+				_fusionNetBlendFromStateTimes[i] = *((float*)ptr); ++ptr;
+				_fusionNetBlendToStateIndices[i] = *ptr; ++ptr;
+				_fusionNetBlendDurations[i] = *((float*)ptr); ++ptr;
+				_fusionNetBlendElapsed[i] = *((float*)ptr); ++ptr;
+			}
+
+			readWriteInfo.Ptr = ptr;
+		}
+
+		protected override unsafe void WriteCustomNetworkData(AnimationReadWriteInfo readWriteInfo)
+		{
+			if (UseFusionGraphMode == false)
+				return;
+
+			if (HasStateAuthority == false)
+			{
+				readWriteInfo.Ptr += FUSION_GRAPH_NETWORK_WORD_COUNT;
+				return;
+			}
+
+			int* ptr = readWriteInfo.Ptr;
+
+			*ptr = _fusionShootTriggerUntilTick; ++ptr;
+			*ptr = _fusionReloadTriggerTick; ++ptr;
+			*ptr = _fusionThrowTriggerTick; ++ptr;
+			*ptr = _fusionEquipTriggerTick; ++ptr;
+			*ptr = _fusionNetIsThrowing == true ? 1 : 0; ++ptr;
+			*ptr = _fusionNetSnapshotsInitialized == true ? 1 : 0; ++ptr;
+
+			for (int i = 0; i < MAX_FUSION_GRAPH_LAYERS; ++i)
+			{
+				*ptr = _fusionNetCurrentStateIndices[i]; ++ptr;
+				*((float*)ptr) = _fusionNetCurrentStateTimes[i]; ++ptr;
+				*ptr = _fusionNetBlendFromStateIndices[i]; ++ptr;
+				*((float*)ptr) = _fusionNetBlendFromStateTimes[i]; ++ptr;
+				*ptr = _fusionNetBlendToStateIndices[i]; ++ptr;
+				*((float*)ptr) = _fusionNetBlendDurations[i]; ++ptr;
+				*((float*)ptr) = _fusionNetBlendElapsed[i]; ++ptr;
+			}
+
+			readWriteInfo.Ptr = ptr;
+		}
+
+		protected override void InterpolateCustomNetworkData(ref AnimationInterpolationInfo interpolationInfo)
+		{
+			if (UseFusionGraphMode == false)
+				return;
+
+			_fusionShootTriggerUntilTick = ReadFusionGraphNetworkInt(ref interpolationInfo);
+			_fusionReloadTriggerTick = ReadFusionGraphNetworkInt(ref interpolationInfo);
+			_fusionThrowTriggerTick = ReadFusionGraphNetworkInt(ref interpolationInfo);
+			_fusionEquipTriggerTick = ReadFusionGraphNetworkInt(ref interpolationInfo);
+			_fusionNetIsThrowing = ReadFusionGraphNetworkInt(ref interpolationInfo) != 0;
+			_fusionNetSnapshotsInitialized = ReadFusionGraphNetworkInt(ref interpolationInfo) != 0;
+
+			for (int i = 0; i < MAX_FUSION_GRAPH_LAYERS; ++i)
+			{
+				_fusionNetCurrentStateIndices[i] = ReadFusionGraphNetworkInt(ref interpolationInfo);
+				_fusionNetCurrentStateTimes[i] = ReadFusionGraphNetworkFloat(ref interpolationInfo);
+				_fusionNetBlendFromStateIndices[i] = ReadFusionGraphNetworkInt(ref interpolationInfo);
+				_fusionNetBlendFromStateTimes[i] = ReadFusionGraphNetworkFloat(ref interpolationInfo);
+				_fusionNetBlendToStateIndices[i] = ReadFusionGraphNetworkInt(ref interpolationInfo);
+				_fusionNetBlendDurations[i] = ReadFusionGraphNetworkFloat(ref interpolationInfo);
+				_fusionNetBlendElapsed[i] = ReadFusionGraphNetworkFloat(ref interpolationInfo);
+			}
+		}
+
+		private static int ReadFusionGraphNetworkInt(ref AnimationInterpolationInfo interpolationInfo)
+		{
+			int value = interpolationInfo.ToBuffer.ReinterpretState<int>(interpolationInfo.Offset);
+			++interpolationInfo.Offset;
+			return value;
+		}
+
+		private static float ReadFusionGraphNetworkFloat(ref AnimationInterpolationInfo interpolationInfo)
+		{
+			float value = interpolationInfo.ToBuffer.ReinterpretState<float>(interpolationInfo.Offset);
+			++interpolationInfo.Offset;
+			return value;
 		}
 
 		private void RestoreFusionEvaluatorsFromNetworkSnapshots()
@@ -1015,12 +1159,10 @@ namespace TPSBR
 			SetFusionBool(_fusionStateDeadId, deadState);
 			SetFusionBool(_fusionStateGroundedId, kccData.IsGrounded);
 			SetFusionBool(_fusionStateJetpackId, IsJetpackActiveSafe());
-			bool hasMoveInput = kccData.InputDirection.OnlyXZ().IsAlmostZero(0.05f) == false;
 			bool throwingState = ResolveThrowingState();
 			bool reloadingState = IsWeaponReloading();
 			bool autoReloadPending = IsWeaponAutoReloadPending();
 			ThrowableWeapon currentThrowableWeapon = ResolveCurrentThrowableWeapon();
-			SetFusionBool(_fusionStateSprintingId, kccData.IsGrounded == true && kccData.Aim == false && hasMoveInput == true);
 			SetFusionBool(_fusionStateShootingId, IsWeaponFiring());
 			SetFusionBool(_fusionStateReloadingId, reloadingState);
 			SetFusionBool(_fusionStateThrowingId, throwingState);
@@ -1077,18 +1219,6 @@ namespace TPSBR
 			Vector3 sourceDirection = kccData.InputDirection.OnlyXZ();
 
 			if (sourceDirection.IsAlmostZero(0.025f) == true)
-			{
-				if (HasInputAuthority == false && HasStateAuthority == false)
-				{
-					sourceDirection = kccData.RealVelocity.OnlyXZ();
-				}
-				else
-				{
-					sourceDirection = kccData.KinematicDirection.OnlyXZ();
-				}
-			}
-
-			if (sourceDirection.IsAlmostZero(0.025f) == true)
 				return Vector2.zero;
 
 			Vector3 local = referenceTransform.InverseTransformDirection(sourceDirection).XZ0();
@@ -1097,7 +1227,13 @@ namespace TPSBR
 				local.x = -local.x;
 			}
 
-			return new Vector2(Mathf.Clamp(local.x, -1.0f, 1.0f), Mathf.Clamp(local.y, -1.0f, 1.0f));
+			Vector2 move = new Vector2(local.x, local.y);
+			if (move.sqrMagnitude > 1.0f)
+			{
+				move.Normalize();
+			}
+
+			return move;
 		}
 
 		private Vector2 ResolveLookInput(KCCData kccData, bool interpolated)
@@ -1259,6 +1395,11 @@ namespace TPSBR
 			return context != null && context.HasInput == true;
 		}
 
+		private bool IsFusionPureProxy()
+		{
+			return HasStateAuthority == false && HasInputAuthority == false;
+		}
+
 		private bool IsLocalFusionRenderOwner()
 		{
 			return Agent.IsLocalObservedInputOwner(_agent);
@@ -1292,6 +1433,16 @@ namespace TPSBR
 
 			if (shouldForceRenderStep == false)
 				return;
+
+			if (IsFusionPureProxy() == true)
+			{
+				if (TryReadFusionSnapshotsFromNetwork() == true)
+				{
+					BuildFixedFusionPoses();
+				}
+
+				return;
+			}
 
 			float deltaTime = Time.deltaTime;
 			if (float.IsNaN(deltaTime) == true || deltaTime < 0.0f)
@@ -1411,6 +1562,9 @@ namespace TPSBR
 		{
 			if (_fusionDead == true || IsJetpackActiveSafe() == true)
 				return false;
+
+			if (IsFusionPureProxy() == true)
+				return _fusionNetIsThrowing;
 
 			if (_weapons != null)
 			{

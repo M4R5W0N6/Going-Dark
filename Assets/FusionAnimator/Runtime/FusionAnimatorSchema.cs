@@ -46,6 +46,7 @@ namespace FusionAnimator
         GreaterOrEqual = 5,
         Less = 6,
         LessOrEqual = 7,
+        Range = 8,
     }
 
     public enum FusionAnimatorMotionType
@@ -248,6 +249,8 @@ namespace FusionAnimator
         [SerializeField] public int IntValue;
         [SerializeField] public float FloatValue;
         [SerializeField] public Vector2 Vector2Value;
+        [SerializeField] public float RangeMin;
+        [SerializeField] public float RangeMax;
     }
 
     [Serializable]

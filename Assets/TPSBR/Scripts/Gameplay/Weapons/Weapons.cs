@@ -61,24 +61,27 @@ namespace TPSBR
 
 		public void DisarmCurrentWeapon()
 		{
-			if (_currentWeaponSlot == 0)
+			int currentWeaponSlot = SanitizeWeaponSlot(_currentWeaponSlot);
+			if (currentWeaponSlot == 0)
+			{
+				_currentWeaponSlot = 0;
 				return;
+			}
 
 			if (CurrentWeapon != null)
 			{
 				CurrentWeapon.DisarmWeapon();
 			}
 
-			if (_currentWeaponSlot > 0)
+			if (currentWeaponSlot > 0)
 			{
-				_previousWeaponSlot = _currentWeaponSlot;
+				_previousWeaponSlot = (byte)currentWeaponSlot;
 			}
 
 			_currentWeaponSlot = 0;
 
 			CurrentWeapon             = ResolveWeapon(_currentWeaponSlot);
-			CurrentWeaponHandle       = _slots[_currentWeaponSlot].Active;
-			CurrentWeaponBaseRotation = _slots[_currentWeaponSlot].BaseRotation;
+			RefreshCurrentWeaponSlotData(_currentWeaponSlot);
 
 			if (CurrentWeapon != null)
 			{
@@ -88,6 +91,8 @@ namespace TPSBR
 
 		public void SetPendingWeapon(int slot)
 		{
+			slot = SanitizeWeaponSlot(slot);
+
 			if (_pendingWeaponSlot == slot)
 				return;
 
@@ -97,7 +102,13 @@ namespace TPSBR
 
 		public void ArmPendingWeapon()
 		{
-			if (_currentWeaponSlot == _pendingWeaponSlot)
+			int currentWeaponSlot = SanitizeWeaponSlot(_currentWeaponSlot);
+			int pendingWeaponSlot = SanitizeWeaponSlot(_pendingWeaponSlot);
+
+			_currentWeaponSlot = (byte)currentWeaponSlot;
+			_pendingWeaponSlot = (byte)pendingWeaponSlot;
+
+			if (currentWeaponSlot == pendingWeaponSlot)
 				return;
 
 			if (CurrentWeapon != null)
@@ -105,16 +116,15 @@ namespace TPSBR
 				CurrentWeapon.DisarmWeapon();
 			}
 
-			if (_currentWeaponSlot > 0)
+			if (currentWeaponSlot > 0)
 			{
-				_previousWeaponSlot = _currentWeaponSlot;
+				_previousWeaponSlot = (byte)currentWeaponSlot;
 			}
 
-			_currentWeaponSlot = _pendingWeaponSlot;
+			_currentWeaponSlot = (byte)pendingWeaponSlot;
 
 			CurrentWeapon             = ResolveWeapon(_currentWeaponSlot);
-			CurrentWeaponHandle       = _slots[_currentWeaponSlot].Active;
-			CurrentWeaponBaseRotation = _slots[_currentWeaponSlot].BaseRotation;
+			RefreshCurrentWeaponSlotData(_currentWeaponSlot);
 
 			if (CurrentWeapon != null)
 			{
@@ -455,10 +465,14 @@ namespace TPSBR
 			_health = GetComponent<Health>();
 			_character = GetComponent<Character>();
 			_aiming = GetComponent<Aiming>();
-			_fireAudioEffects = _fireAudioEffectsRoot.GetComponentsInChildren<AudioEffect>();
+			_fireAudioEffects = _fireAudioEffectsRoot != null ? _fireAudioEffectsRoot.GetComponentsInChildren<AudioEffect>() : Array.Empty<AudioEffect>();
 
-			foreach (WeaponSlot slot in _slots)
+			for (int i = 0, count = _slots != null ? _slots.Length : 0; i < count; ++i)
 			{
+				WeaponSlot slot = _slots[i];
+				if (slot == null)
+					continue;
+
 				if (slot.Active != null)
 				{
 					slot.BaseRotation = slot.Active.localRotation;
@@ -468,9 +482,61 @@ namespace TPSBR
 
 		// PRIVATE METHODS
 
+		private int SanitizeWeaponSlot(int slot)
+		{
+			return IsValidWeaponSlot(slot) == true ? slot : 0;
+		}
+
+		private bool IsValidWeaponSlot(int slot)
+		{
+			return slot >= 0 && slot < _weaponReferences.Length && _localWeapons != null && slot < _localWeapons.Length;
+		}
+
+		private bool TryGetWeaponSlotData(int slot, out WeaponSlot slotData)
+		{
+			slotData = null;
+			if (IsValidWeaponSlot(slot) == false)
+				return false;
+			if (_slots == null || slot >= _slots.Length)
+				return false;
+
+			slotData = _slots[slot];
+			return slotData != null;
+		}
+
+		private void RefreshCurrentWeaponSlotData(int slot)
+		{
+			if (TryGetWeaponSlotData(slot, out WeaponSlot slotData) == true)
+			{
+				CurrentWeaponHandle = slotData.Active;
+				CurrentWeaponBaseRotation = slotData.BaseRotation;
+				return;
+			}
+
+			CurrentWeaponHandle = default;
+			CurrentWeaponBaseRotation = default;
+		}
+
+		private void ClearLocalWeapon(int slot)
+		{
+			if (IsValidWeaponSlot(slot) == true)
+			{
+				_localWeapons[slot] = default;
+			}
+		}
+
 		private void RefreshWeapons()
 		{
-			PendingWeapon = ResolveWeapon(_pendingWeaponSlot);
+			int pendingWeaponSlot = SanitizeWeaponSlot(_pendingWeaponSlot);
+			int currentWeaponSlot = SanitizeWeaponSlot(_currentWeaponSlot);
+
+			if (HasStateAuthority == true)
+			{
+				_pendingWeaponSlot = (byte)pendingWeaponSlot;
+				_currentWeaponSlot = (byte)currentWeaponSlot;
+			}
+
+			PendingWeapon = ResolveWeapon(pendingWeaponSlot);
 
 			Vector2 lastRecoil = Vector2.zero;
 
@@ -482,7 +548,11 @@ namespace TPSBR
 
 				if (weapon.IsInitialized == false)
 				{
-					weapon.Initialize(Object, _slots[weapon.WeaponSlot].Active, _slots[weapon.WeaponSlot].Inactive);
+					if (IsValidWeaponSlot(weapon.WeaponSlot) == false)
+						continue;
+
+					TryGetWeaponSlotData(weapon.WeaponSlot, out WeaponSlot slotData);
+					weapon.Initialize(Object, slotData != null ? slotData.Active : null, slotData != null ? slotData.Inactive : null);
 					weapon.AssignFireAudioEffects(_fireAudioEffectsRoot, _fireAudioEffects);
 					_localWeapons[weapon.WeaponSlot] = weapon;
 				}
@@ -501,18 +571,20 @@ namespace TPSBR
 				}
 			}
 
-			Weapon currentWeapon = ResolveWeapon(_currentWeaponSlot);
+			Weapon currentWeapon = ResolveWeapon(currentWeaponSlot);
 			if (CurrentWeapon != currentWeapon)
 			{
 				if (currentWeapon == null)
 				{
-					CurrentWeapon.Deinitialize(Object);
-					_localWeapons[_currentWeaponSlot] = default;
+					if (CurrentWeapon != null)
+					{
+						CurrentWeapon.Deinitialize(Object);
+						ClearLocalWeapon(CurrentWeapon.WeaponSlot);
+					}
 				}
 
 				CurrentWeapon             = currentWeapon;
-				CurrentWeaponHandle       = _slots[_currentWeaponSlot].Active;
-				CurrentWeaponBaseRotation = _slots[_currentWeaponSlot].BaseRotation;
+				RefreshCurrentWeaponSlotData(currentWeaponSlot);
 
 				if (CurrentWeapon != null)
 				{
@@ -606,11 +678,14 @@ namespace TPSBR
 		{
 			if (weapon == null)
 				return;
+			if (IsValidWeaponSlot(weapon.WeaponSlot) == false)
+				return;
 
 			RemoveWeapon(weapon.WeaponSlot);
 
 			weapon.Object.AssignInputAuthority(Object.InputAuthority);
-			weapon.Initialize(Object, _slots[weapon.WeaponSlot].Active, _slots[weapon.WeaponSlot].Inactive);
+			TryGetWeaponSlotData(weapon.WeaponSlot, out WeaponSlot slotData);
+			weapon.Initialize(Object, slotData != null ? slotData.Active : null, slotData != null ? slotData.Inactive : null);
 			weapon.AssignFireAudioEffects(_fireAudioEffectsRoot, _fireAudioEffects);
 
 			var aoiProxy = weapon.GetComponent<NetworkAreaOfInterestProxy>();
@@ -627,7 +702,7 @@ namespace TPSBR
 
 		private void RemoveWeapon(int slot)
 		{
-			if (slot < 0 || slot >= _weaponReferences.Length)
+			if (IsValidWeaponSlot(slot) == false)
 				return;
 
 			var weapon = ResolveWeapon(slot);
@@ -680,7 +755,7 @@ namespace TPSBR
 
 		private Weapon ResolveWeapon(int slot)
 		{
-			if (slot < 0 || slot >= _weaponReferences.Length)
+			if (IsValidWeaponSlot(slot) == false)
 				return null;
 
 			var localWeapon = _localWeapons[slot];

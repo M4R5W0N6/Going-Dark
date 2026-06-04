@@ -31,8 +31,25 @@ namespace Fusion.Addons.AnimationController
 		// PROTECTED METHODS
 
 		protected virtual void AddAnimationPropertyProviders(List<IAnimationPropertyProvider> animationPropertyProviders) {}
+		protected virtual int GetCustomNetworkDataWordCount() => 0;
+		protected virtual void ReadCustomNetworkData(AnimationReadWriteInfo readWriteInfo) {}
+		protected virtual void WriteCustomNetworkData(AnimationReadWriteInfo readWriteInfo) {}
+		protected virtual void InterpolateCustomNetworkData(ref AnimationInterpolationInfo interpolationInfo) {}
+
+		protected void ReadCurrentNetworkData()
+		{
+			if (HasNetworkData() == true)
+			{
+				ReadNetworkData();
+			}
+		}
 
 		// PRIVATE METHODS
+
+		private bool HasNetworkData()
+		{
+			return UseBuiltInLayerEvaluation == true || GetCustomNetworkDataWordCount() > 0;
+		}
 
 		private int GetNetworkDataWordCount()
 		{
@@ -65,38 +82,43 @@ namespace Fusion.Addons.AnimationController
 			{
 				_readWriteInfo.Ptr = statePtr;
 
-				AnimationProperiesInfo   animationProperty;
-				AnimationProperiesInfo[] animationProperties = _animationProperties;
-				for (int i = 0, count = animationProperties.Length; i < count; ++i)
+				if (UseBuiltInLayerEvaluation == true)
 				{
-					animationProperty = animationProperties[i];
-
-					byte* objectPtr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(animationProperty.Target, out ulong gcHandle);
-
-					for (int j = 0; j < animationProperty.Count; ++j)
+					AnimationProperiesInfo   animationProperty;
+					AnimationProperiesInfo[] animationProperties = _animationProperties;
+					for (int i = 0, count = animationProperties.Length; i < count; ++i)
 					{
-						int  wordCount   = animationProperty.WordCounts[j];
-						int* propertyPtr = (int*)(objectPtr + animationProperty.FieldOffsets[j]);
+						animationProperty = animationProperties[i];
 
-						for (int n = 0; n < wordCount; ++n)
+						byte* objectPtr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(animationProperty.Target, out ulong gcHandle);
+
+						for (int j = 0; j < animationProperty.Count; ++j)
 						{
-							*propertyPtr = *_readWriteInfo.Ptr;
+							int  wordCount   = animationProperty.WordCounts[j];
+							int* propertyPtr = (int*)(objectPtr + animationProperty.FieldOffsets[j]);
 
-							++_readWriteInfo.Ptr;
-							++propertyPtr;
+							for (int n = 0; n < wordCount; ++n)
+							{
+								*propertyPtr = *_readWriteInfo.Ptr;
+
+								++_readWriteInfo.Ptr;
+								++propertyPtr;
+							}
 						}
+
+						UnsafeUtility.ReleaseGCObject(gcHandle);
 					}
 
-					UnsafeUtility.ReleaseGCObject(gcHandle);
+					IAnimationPropertyProvider   animationPropertyProvider;
+					IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
+					for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
+					{
+						animationPropertyProvider = animationPropertyProviders[i];
+						animationPropertyProvider.Read(_readWriteInfo);
+					}
 				}
 
-				IAnimationPropertyProvider   animationPropertyProvider;
-				IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
-				for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
-				{
-					animationPropertyProvider = animationPropertyProviders[i];
-					animationPropertyProvider.Read(_readWriteInfo);
-				}
+				ReadCustomNetworkData(_readWriteInfo);
 			}
 		}
 
@@ -106,43 +128,51 @@ namespace Fusion.Addons.AnimationController
 			{
 				_readWriteInfo.Ptr = statePtr;
 
-				AnimationProperiesInfo   animationProperty;
-				AnimationProperiesInfo[] animationProperties = _animationProperties;
-				for (int i = 0, count = animationProperties.Length; i < count; ++i)
+				if (UseBuiltInLayerEvaluation == true)
 				{
-					animationProperty = animationProperties[i];
-
-					byte* objectPtr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(animationProperty.Target, out ulong gcHandle);
-
-					for (int j = 0; j < animationProperty.Count; ++j)
+					AnimationProperiesInfo   animationProperty;
+					AnimationProperiesInfo[] animationProperties = _animationProperties;
+					for (int i = 0, count = animationProperties.Length; i < count; ++i)
 					{
-						int  wordCount   = animationProperty.WordCounts[j];
-						int* propertyPtr = (int*)(objectPtr + animationProperty.FieldOffsets[j]);
+						animationProperty = animationProperties[i];
 
-						for (int n = 0; n < wordCount; ++n)
+						byte* objectPtr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(animationProperty.Target, out ulong gcHandle);
+
+						for (int j = 0; j < animationProperty.Count; ++j)
 						{
-							*_readWriteInfo.Ptr = *propertyPtr;
+							int  wordCount   = animationProperty.WordCounts[j];
+							int* propertyPtr = (int*)(objectPtr + animationProperty.FieldOffsets[j]);
 
-							++_readWriteInfo.Ptr;
-							++propertyPtr;
+							for (int n = 0; n < wordCount; ++n)
+							{
+								*_readWriteInfo.Ptr = *propertyPtr;
+
+								++_readWriteInfo.Ptr;
+								++propertyPtr;
+							}
 						}
+
+						UnsafeUtility.ReleaseGCObject(gcHandle);
 					}
 
-					UnsafeUtility.ReleaseGCObject(gcHandle);
+					IAnimationPropertyProvider   animationPropertyProvider;
+					IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
+					for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
+					{
+						animationPropertyProvider = animationPropertyProviders[i];
+						animationPropertyProvider.Write(_readWriteInfo);
+					}
 				}
 
-				IAnimationPropertyProvider   animationPropertyProvider;
-				IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
-				for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
-				{
-					animationPropertyProvider = animationPropertyProviders[i];
-					animationPropertyProvider.Write(_readWriteInfo);
-				}
+				WriteCustomNetworkData(_readWriteInfo);
 			}
 		}
 
 		private unsafe void InterpolateNetworkData()
 		{
+			if (HasNetworkData() == false)
+				return;
+
 			bool buffersValid = TryGetSnapshotsBuffers(out NetworkBehaviourBuffer fromBuffer, out NetworkBehaviourBuffer toBuffer, out float alpha);
 			if (buffersValid == false)
 				return;
@@ -152,37 +182,39 @@ namespace Fusion.Addons.AnimationController
 			interpolationInfo.ToBuffer   = toBuffer;
 			interpolationInfo.Alpha      = alpha;
 
-			int   ticks = interpolationInfo.ToBuffer.Tick - interpolationInfo.FromBuffer.Tick;
-			float tick  = interpolationInfo.FromBuffer.Tick + interpolationInfo.Alpha * ticks;
-
-			AnimationProperiesInfo   animationProperty;
-			AnimationProperiesInfo[] animationProperties = _animationProperties;
-			for (int i = 0, count = animationProperties.Length; i < count; ++i)
+			if (UseBuiltInLayerEvaluation == true)
 			{
-				animationProperty = animationProperties[i];
-
-				for (int j = 0; j < animationProperty.Count; ++j)
+				AnimationProperiesInfo   animationProperty;
+				AnimationProperiesInfo[] animationProperties = _animationProperties;
+				for (int i = 0, count = animationProperties.Length; i < count; ++i)
 				{
-					int wordCount    = animationProperty.WordCounts[j];
-					int targetOffset = interpolationInfo.Offset + wordCount;
+					animationProperty = animationProperties[i];
 
-					InterpolationDelegate interpolationDelegate = animationProperty.InterpolationDelegates[j];
-					if (interpolationDelegate != null)
+					for (int j = 0; j < animationProperty.Count; ++j)
 					{
-						interpolationDelegate(interpolationInfo);
-					}
+						int wordCount    = animationProperty.WordCounts[j];
+						int targetOffset = interpolationInfo.Offset + wordCount;
 
-					interpolationInfo.Offset = targetOffset;
+						InterpolationDelegate interpolationDelegate = animationProperty.InterpolationDelegates[j];
+						if (interpolationDelegate != null)
+						{
+							interpolationDelegate(interpolationInfo);
+						}
+
+						interpolationInfo.Offset = targetOffset;
+					}
+				}
+
+				IAnimationPropertyProvider   animationPropertyProvider;
+				IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
+				for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
+				{
+					animationPropertyProvider = animationPropertyProviders[i];
+					animationPropertyProvider.Interpolate(ref interpolationInfo);
 				}
 			}
 
-			IAnimationPropertyProvider   animationPropertyProvider;
-			IAnimationPropertyProvider[] animationPropertyProviders = _animationPropertyProviders;
-			for (int i = 0, count = animationPropertyProviders.Length; i < count; ++i)
-			{
-				animationPropertyProvider = animationPropertyProviders[i];
-				animationPropertyProvider.Interpolate(ref interpolationInfo);
-			}
+			InterpolateCustomNetworkData(ref interpolationInfo);
 		}
 
 		private void InitializeNetworkProperties()

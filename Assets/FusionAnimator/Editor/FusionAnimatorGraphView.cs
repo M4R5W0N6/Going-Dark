@@ -1500,7 +1500,7 @@ namespace FusionAnimator.Editor
             StateNodeView entryView = CreateSpecialNodeView(
                 FusionAnimatorGraphAsset.SpecialNodeEntryId,
                 "Entry",
-                "Scope entry point. Incoming transition designates default state for this scope.",
+                "Scope entry point. Outgoing transitions can route to multiple states via conditions.",
                 hasInput: false,
                 hasOutput: true,
                 entryPos,
@@ -1890,9 +1890,11 @@ namespace FusionAnimator.Editor
                 return false;
             }
 
+            EnsureGraphCollections();
             string layerId = targetState.LayerId;
             string targetScope = GetStateScopePath(targetState.Name);
             bool changed = false;
+            FusionAnimatorTransitionDefinition targetEntryTransition = null;
             for (int i = _graph.Transitions.Count - 1; i >= 0; --i)
             {
                 FusionAnimatorTransitionDefinition transition = _graph.Transitions[i];
@@ -1915,24 +1917,75 @@ namespace FusionAnimator.Editor
                 string destinationScope = GetStateScopePath(destinationState.Name);
                 if (string.Equals(destinationScope, targetScope, StringComparison.OrdinalIgnoreCase))
                 {
-                    _graph.Transitions.RemoveAt(i);
-                    changed = true;
+                    if (string.Equals(transition.ToStateId, targetState.Id, StringComparison.Ordinal))
+                    {
+                        targetEntryTransition = transition;
+                        continue;
+                    }
+
+                    bool hasConditions = transition.Conditions != null && transition.Conditions.Count > 0;
+                    if (hasConditions == false)
+                    {
+                        _graph.Transitions.RemoveAt(i);
+                        changed = true;
+                    }
                 }
             }
 
-            _graph.Transitions.Add(new FusionAnimatorTransitionDefinition
+            if (targetEntryTransition == null)
             {
-                Id = FusionAnimatorGraphAsset.NewId("transition"),
-                Name = "Entry",
-                FromStateId = FusionAnimatorGraphAsset.SpecialNodeEntryId,
-                ToStateId = targetState.Id,
-                Priority = 0,
-                HasExitTime = false,
-                FixedDuration = true,
-                BlendDurationSeconds = 0.0f,
-                Conditions = new List<FusionAnimatorConditionDefinition>(),
-            });
-            changed = true;
+                targetEntryTransition = new FusionAnimatorTransitionDefinition
+                {
+                    Id = FusionAnimatorGraphAsset.NewId("transition"),
+                    Name = "Entry",
+                    FromStateId = FusionAnimatorGraphAsset.SpecialNodeEntryId,
+                    ToStateId = targetState.Id,
+                    Priority = 0,
+                    HasExitTime = false,
+                    FixedDuration = true,
+                    BlendDurationSeconds = 0.0f,
+                    Conditions = new List<FusionAnimatorConditionDefinition>(),
+                };
+                _graph.Transitions.Add(targetEntryTransition);
+                changed = true;
+            }
+            else
+            {
+                if (string.Equals(targetEntryTransition.Name, "Entry", StringComparison.Ordinal) == false)
+                {
+                    targetEntryTransition.Name = "Entry";
+                    changed = true;
+                }
+
+                if (targetEntryTransition.HasExitTime)
+                {
+                    targetEntryTransition.HasExitTime = false;
+                    changed = true;
+                }
+
+                if (targetEntryTransition.FixedDuration == false)
+                {
+                    targetEntryTransition.FixedDuration = true;
+                    changed = true;
+                }
+
+                if (Mathf.Abs(targetEntryTransition.BlendDurationSeconds) > 0.0001f)
+                {
+                    targetEntryTransition.BlendDurationSeconds = 0.0f;
+                    changed = true;
+                }
+
+                if (targetEntryTransition.Conditions == null)
+                {
+                    targetEntryTransition.Conditions = new List<FusionAnimatorConditionDefinition>();
+                    changed = true;
+                }
+                else if (targetEntryTransition.Conditions.Count > 0)
+                {
+                    targetEntryTransition.Conditions.Clear();
+                    changed = true;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(targetScope) && string.Equals(_graph.EntryStateId, targetState.Id, StringComparison.Ordinal) == false)
             {
@@ -1961,27 +2014,8 @@ namespace FusionAnimator.Editor
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(_scopeFilter))
-            {
-                return string.Equals(_graph.EntryStateId, state.Id, StringComparison.Ordinal);
-            }
-
-            for (int i = 0; i < _graph.Transitions.Count; ++i)
-            {
-                FusionAnimatorTransitionDefinition transition = _graph.Transitions[i];
-                if (transition == null)
-                {
-                    continue;
-                }
-
-                if (string.Equals(transition.FromStateId, FusionAnimatorGraphAsset.SpecialNodeEntryId, StringComparison.Ordinal) &&
-                    string.Equals(transition.ToStateId, state.Id, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return TryGetScopeDefaultStateId(_activeLayerId, _scopeFilter, out string defaultStateId) &&
+                   string.Equals(defaultStateId, state.Id, StringComparison.Ordinal);
         }
 
         private bool IsDefaultScopeNodeForCurrentScope(string defaultStateId, string childScopePath)
@@ -3834,6 +3868,8 @@ namespace FusionAnimator.Editor
                     IntValue = condition.IntValue,
                     FloatValue = condition.FloatValue,
                     Vector2Value = condition.Vector2Value,
+                    RangeMin = condition.RangeMin,
+                    RangeMax = condition.RangeMax,
                 });
             }
 
@@ -5548,28 +5584,6 @@ namespace FusionAnimator.Editor
                         continue;
                     }
 
-                    if (fromStateId == FusionAnimatorGraphAsset.SpecialNodeEntryId)
-                    {
-                        FusionAnimatorStateDefinition defaultTargetState = FindState(toStateId);
-                        if (defaultTargetState != null)
-                        {
-                            EnsureUndo();
-                            if (SetScopeDefaultStateInternal(defaultTargetState))
-                            {
-                                dirty = true;
-                                forceRebuild = true;
-                            }
-                        }
-
-                        if (duplicateEdges == null)
-                        {
-                            duplicateEdges = new List<Edge>();
-                        }
-
-                        duplicateEdges.Add(edge);
-                        continue;
-                    }
-
                     FusionAnimatorTransitionDefinition transition = FindTransitionByEndpoints(fromStateId, toStateId);
                     if (transition == null)
                     {
@@ -5577,7 +5591,7 @@ namespace FusionAnimator.Editor
                         transition = new FusionAnimatorTransitionDefinition
                         {
                             Id = FusionAnimatorGraphAsset.NewId("transition"),
-                            Name = "Transition",
+                            Name = fromStateId == FusionAnimatorGraphAsset.SpecialNodeEntryId ? "Entry" : "Transition",
                             FromStateId = fromStateId,
                             ToStateId = toStateId,
                         };
@@ -6586,17 +6600,8 @@ namespace FusionAnimator.Editor
             }
 
             string normalizedScope = string.IsNullOrWhiteSpace(scopePath) ? string.Empty : scopePath.Trim();
-            if (string.IsNullOrWhiteSpace(normalizedScope) &&
-                string.IsNullOrWhiteSpace(_graph.EntryStateId) == false)
-            {
-                FusionAnimatorStateDefinition rootDefault = FindState(_graph.EntryStateId);
-                if (rootDefault != null && string.Equals(rootDefault.LayerId, layerId, StringComparison.Ordinal))
-                {
-                    stateId = rootDefault.Id;
-                    return true;
-                }
-            }
-
+            FusionAnimatorTransitionDefinition conditionalFallback = null;
+            string conditionalFallbackStateId = null;
             if (_graph.Transitions != null)
             {
                 for (int i = 0; i < _graph.Transitions.Count; ++i)
@@ -6616,9 +6621,36 @@ namespace FusionAnimator.Editor
                     string destinationScope = GetStateScopePath(destinationState.Name);
                     if (string.Equals(destinationScope, normalizedScope, StringComparison.OrdinalIgnoreCase))
                     {
-                        stateId = destinationState.Id;
-                        return true;
+                        bool hasConditions = transition.Conditions != null && transition.Conditions.Count > 0;
+                        if (hasConditions == false)
+                        {
+                            stateId = destinationState.Id;
+                            return true;
+                        }
+
+                        if (conditionalFallback == null || transition.Priority < conditionalFallback.Priority)
+                        {
+                            conditionalFallback = transition;
+                            conditionalFallbackStateId = destinationState.Id;
+                        }
                     }
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(conditionalFallbackStateId) == false)
+            {
+                stateId = conditionalFallbackStateId;
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(normalizedScope) &&
+                string.IsNullOrWhiteSpace(_graph.EntryStateId) == false)
+            {
+                FusionAnimatorStateDefinition rootDefault = FindState(_graph.EntryStateId);
+                if (rootDefault != null && string.Equals(rootDefault.LayerId, layerId, StringComparison.Ordinal))
+                {
+                    stateId = rootDefault.Id;
+                    return true;
                 }
             }
 
