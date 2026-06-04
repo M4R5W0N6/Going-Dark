@@ -3808,14 +3808,14 @@ MonoBehaviour:
     CanInterrupt: 1
     Conditions:
     - ParameterId: param_46d4d6948b114e198f8335dfe9f2321c
-      Operator: 8
+      Operator: 4
       UseAbsoluteValue: 1
       BoolValue: 0
       IntValue: 0
       FloatValue: 0
       Vector2Value: {x: 0, y: 0}
-      RangeMin: 0
-      RangeMax: 0.75
+      RangeMin: 0.05
+      RangeMax: 1
     PreviewResults: []
   - Id: transition_a304d2fb35aa40d6a16dca8cf5e1718d
     Name: Entry
